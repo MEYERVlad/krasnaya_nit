@@ -913,10 +913,10 @@ function newsroom(y53,interactive){
   else s+=`<path d="M342 136 L382 137 L381 152 L384 166 L380 188 L343 187 L345 170 L341 154 Z" fill="#1c2c22" stroke="#15201a"/><circle cx="345" cy="139" r="1.6" fill="#a3221b"/><circle cx="379" cy="140" r="1.6" fill="#a3221b"/>`;
   [['Холлоуэй',264],['Лэнг',313],['Рук',362]].forEach(([n,x])=>{s+=`<text x="${x}" y="206" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="11" fill="#e9dfc7">${n}</text>`;});
   // editor's door
-  s+=`<rect x="430" y="104" width="150" height="328" fill="#1d130b"/><rect x="442" y="116" width="126" height="314" fill="url(#gWood)" stroke="${OL}"/><rect x="442" y="116" width="126" height="314" fill="url(#pWood)" opacity=".5"/>`;
+  s+=`<rect x="430" y="104" width="150" height="396" fill="#1d130b"/><rect x="442" y="116" width="126" height="382" fill="url(#gWood)" stroke="${OL}"/><rect x="442" y="116" width="126" height="382" fill="url(#pWood)" opacity=".5"/>`;
   s+=`<rect x="454" y="128" width="102" height="160" fill="${y53?'#e8cf96':'#36413c'}" opacity="${y53?.85:1}"/><rect x="454" y="128" width="102" height="160" fill="url(#pMottle)" opacity=".7"/>`;
   s+=`<text x="505" y="186" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="17" letter-spacing="3" fill="#b8924a">${y53?'РЕДАКТОР':'Р Д КТОР'}</text><text x="505" y="208" text-anchor="middle" font-family="Cormorant SC, serif" font-size="12" letter-spacing="2" fill="#b8924a">${y53?'М. ХОЛЛОУЭЙ':'М. ХОЛЛ  ЭЙ'}</text>`;
-  s+=`<rect x="454" y="306" width="102" height="110" fill="none" stroke="#1f1209" stroke-width="2"/><circle cx="556" cy="300" r="5" fill="url(#gBrass)" stroke="${OL}"/>`;
+  s+=`<rect x="454" y="310" width="102" height="172" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="424" y="496" width="162" height="6" fill="#2a1a10"/><circle cx="556" cy="300" r="5" fill="url(#gBrass)" stroke="${OL}"/>`;
   // wall clock + calendar
   s+=dial(640,104,22,y53?6:3,y53?45:10);
   if(!y53) s+=`<path d="M626 92 L650 116" stroke="#fff" stroke-width=".8" opacity=".6"/>`;
@@ -924,12 +924,12 @@ function newsroom(y53,interactive){
   s+=`<text x="641" y="169" text-anchor="middle" font-family="Cormorant SC, serif" font-size="9" letter-spacing="1" fill="#f3e9d2">${y53?'НОЯБРЬ 1953':'ДЕКАБРЬ 1974'}</text><text x="641" y="212" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="36" fill="#211810">${y53?13:31}</text><text x="641" y="229" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="11" fill="#5a4a38">${y53?'пятница':'вторник'}</text>`;
   // darkroom door
   const lit=y53||F.labOpen;
-  s+=`<rect x="700" y="140" width="120" height="296" fill="#1a110a"/><rect x="712" y="152" width="96" height="282" fill="#191718" stroke="${OL}"/><rect x="712" y="152" width="96" height="282" fill="url(#pMottle)" opacity=".6"/>`;
+  s+=`<rect x="700" y="140" width="120" height="360" fill="#1a110a"/><rect x="712" y="152" width="96" height="346" fill="#191718" stroke="${OL}"/><rect x="712" y="152" width="96" height="346" fill="url(#pMottle)" opacity=".6"/>`;
   s+=`<rect x="700" y="140" width="120" height="12" fill="#3a2516"/><rect x="700" y="140" width="120" height="2" fill="#8a5f3e" opacity=".6"/>`;
   if(y53&&F.sawKey) s+=`<g transform="translate(784 135) scale(.32)">${icon('labkey')}</g>`;
   if(!y53) s+=`<rect x="702" y="136" width="116" height="4" fill="#8f8a7c" opacity=".35"/>`;
   s+=`<rect x="726" y="218" width="68" height="34" fill="#e8dfc9" stroke="#2a2018"/><text x="760" y="233" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="10" letter-spacing="1" fill="#211810" textLength="60" lengthAdjust="spacingAndGlyphs">ЛАБОРАТОРИЯ</text><text x="760" y="246" text-anchor="middle" font-family="Cormorant SC, serif" font-size="9" letter-spacing="1" fill="#a3221b">НЕ ВХОДИТЬ</text>`;
-  s+=`<rect x="790" y="300" width="12" height="22" rx="3" fill="url(#gBrass)" stroke="${OL}"/><circle cx="796" cy="308" r="2" fill="#140c08"/><rect x="795" y="309" width="2" height="7" fill="#140c08"/>`;
+  s+=`<rect x="694" y="496" width="132" height="6" fill="#2a1a10"/><rect x="790" y="300" width="12" height="22" rx="3" fill="url(#gBrass)" stroke="${OL}"/><circle cx="796" cy="308" r="2" fill="#140c08"/><rect x="795" y="309" width="2" height="7" fill="#140c08"/>`;
   s+=`<rect x="748" y="108" width="24" height="6" fill="#2a2420"/><path d="M752 114 Q750 132 760 134 Q770 132 768 114 Z" fill="${lit?'#ff3a24':'#4a1814'}" stroke="${OL}"/><path d="M752 118 h16 M751 125 h18 M760 114 v20" stroke="#1a1414" stroke-width="1.2"/>`;
   if(lit) s+=`<circle cx="760" cy="124" r="70" fill="url(#rRed)"/><rect x="712" y="152" width="96" height="140" fill="#ff2a14" opacity=".08"/>`;
   // coat rack
@@ -970,14 +970,14 @@ function newsroom(y53,interactive){
   else s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".28"/>`;
   s+=`<rect width="1000" height="640" fill="url(#rDark)"/>`;
   if(interactive){
-    s+=hs('window',48,74,144,230)+hs('crowO',112,300,80,60)+hs('staff',228,90,170,146)+hs('edDoor',442,116,126,314);
+    s+=hs('window',48,74,144,230)+hs('crowO',112,300,80,60)+hs('staff',228,90,170,146)+hs('edDoor',442,116,126,382);
     s+=hs('clockO',612,80,56,50)+hs('calO',608,156,66,82)+hs('lintel',696,124,128,30)+hs('cabinet',850,236,136,282);
     if(y53){
-      s+=hs('lab',700,152,120,282)+hs('editor',464,250,84,272)+hs('rook',614,254,86,270);
+      s+=hs('lab',700,152,120,346)+hs('editor',464,250,84,272)+hs('rook',614,254,86,270);
       s+=hs('mother',210,312,80,82)+hs('typer',196,374,108,56)+hs('ada',418,506,90,92);
       if(!F.letterTaken) s+=hs('letter',118,412,64,26);
     } else {
-      s+=hs('lab',710,156,100,280)+hs('typer',186,380,128,72)+hs('boxes',600,492,154,104)+hs('desk',88,430,322,74);
+      s+=hs('lab',710,156,100,342)+hs('typer',186,380,128,72)+hs('boxes',600,492,154,104)+hs('desk',88,430,322,74);
     }
     s+=arrow(500,612);
   }
@@ -1043,7 +1043,7 @@ function printArt(n){
     s+=`<path d="M186 180 C190 150 204 146 206 126 C214 146 222 140 226 118 C232 142 246 146 252 180 Z" fill="#f0a040"/><path d="M200 180 C204 160 214 156 216 140 C222 158 232 160 236 180 Z" fill="#ffe08a"/>`;
     s+=`<rect x="250" y="34" width="34" height="30" rx="8" fill="url(#gWood)" stroke="${OL}"/>${dial(267,48,11,...PRINTS[2])}`;
     s+=`<g transform="translate(88 132) scale(.82)">${bust(PEOPLE.doctor,{look:2})}</g>`;
-    s+=`<path d="M108 120 l20 -4" stroke="#efe6cf" stroke-width="3"/><circle cx="129" cy="115.6" r="1.6" fill="#ff8a3a"/><path d="M130 112 C126 96 140 92 134 76 C130 64 142 58 138 44" stroke="#d8d2c4" stroke-width="2.5" fill="none" opacity=".55"/>`;
+    s+=`<path d="M93 109.5 l18 3" stroke="#efe6cf" stroke-width="2.6" stroke-linecap="round"/><circle cx="112" cy="112.7" r="1.6" fill="#ff8a3a"/><path d="M113 109 C109 93 123 89 117 73 C113 61 125 55 121 41" stroke="#d8d2c4" stroke-width="2.5" fill="none" opacity=".55"/>`;
     s+=`<g transform="translate(46 196)"><path d="M-36 0 L-32 -26 Q-30 -34 -20 -36 L20 -36 Q30 -34 32 -26 L36 0 Z" fill="#4e2a18" stroke="${OL}"/><path d="M-30 -36 Q0 -54 30 -36 L22 -30 Q0 -40 -22 -30 Z" fill="#0d0705"/><path d="M-10 -40 l4 -14 l6 0 l0 14" fill="url(#gAmber)" opacity=".8"/></g>`;
   } else if(n===3){ // pantry: Higgs, one glove
     s+=`<rect width="300" height="200" fill="#3a3226"/><rect width="300" height="200" fill="url(#pMottle)"/>`;
