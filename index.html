@@ -44,6 +44,8 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 .drop{animation:drop 1.4s cubic-bezier(.3,.6,.4,1) both}
 @keyframes drop{0%{transform:translate(120px,-420px) rotate(40deg);opacity:0}30%{opacity:1}100%{transform:none}}
 .spin{animation:shimmer 1.4s linear infinite}
+.blink{animation:blink 3.2s steps(1) infinite}
+@keyframes blink{0%,100%{opacity:1}61%{opacity:.35}63%{opacity:1}66%{opacity:.5}68%{opacity:1}}
 @keyframes shimmer{0%,100%{opacity:.15}50%{opacity:.45}}
 #fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .grain{position:absolute;inset:-50%;pointer-events:none;opacity:.10;animation:grain .9s steps(5) infinite}
@@ -117,8 +119,25 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 .ending .q{font-family:var(--f-hand);font-style:normal;color:#e2b0a6;font-size:clamp(22px,3.4vw,28px)}
 .menu{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
 .menu h2{margin:0 0 6px;font-family:var(--f-display);font-weight:500;letter-spacing:.12em;font-size:30px}
+#scene.red>svg{filter:grayscale(1) sepia(1) saturate(5) hue-rotate(-32deg) brightness(.7) contrast(1.15)}
+.twin{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:center}
+.twin>.card{transform:rotate(-1.5deg)}.twin>.card+.card{transform:rotate(1.8deg)}
+.pcard{width:min(260px,100%);padding:12px 12px 6px;background:#e6dbc1}
+.pcard>svg{display:block;width:100%;height:auto}
+.back{width:min(300px,100%);min-height:300px;padding:28px 24px;box-sizing:border-box;background:#e3d7bc;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.back .hand{font-size:30px;line-height:1.2;color:#3a1a14;text-align:center}
+.stamp{align-self:center;border:3px double #5b3a86;color:#5b3a86;border-radius:10px;padding:8px 14px;transform:rotate(-9deg);font-family:var(--f-display);letter-spacing:.12em;font-size:14px;text-align:center;line-height:1.35;opacity:.85}
+.stamp b{display:block;font-size:20px;letter-spacing:.18em}
+.letter{width:min(440px,100%);padding:26px 30px 30px;background:#efe7d3;transform:rotate(-1deg);display:flex;flex-direction:column;align-items:center;gap:8px}
+.letter>svg{width:84px;height:84px}
+.letter .sm{font-family:var(--f-display);letter-spacing:.16em;font-size:13px;color:#4a3a28;border-bottom:1px solid #8a7a60;padding-bottom:8px;text-align:center}
+.letter .hand{font-size:clamp(21px,4.6vw,27px);line-height:1.4;align-self:stretch}
+.negstrip{background:#2a1a0e;padding:22px 10px;display:flex;gap:10px;width:min(760px,100%);box-sizing:border-box;position:relative;transform:rotate(-1deg);box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.negstrip::before,.negstrip::after{content:"";position:absolute;left:0;right:0;height:12px;background:repeating-linear-gradient(90deg,transparent 0 9px,#d9c9a8 9px 17px);opacity:.75}
+.negstrip::before{top:5px}.negstrip::after{bottom:5px}
+.negstrip svg{flex:1;min-width:0;height:auto;filter:grayscale(1) invert(1) sepia(.7) hue-rotate(-15deg) saturate(1.6)}
 @media (max-width:520px){.brand span{display:none}}
-@media (prefers-reduced-motion:reduce){.rain,.flame,.grain,.spin,#scene.memory>svg,.title .thread path{animation:none}.title .thread path{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.blink,.rain,.flame,.grain,.spin,#scene.memory>svg,.title .thread path{animation:none}.title .thread path{stroke-dashoffset:0}}
 </style>
 
 </head>
@@ -127,7 +146,7 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 
 <div id="app">
   <div class="bar">
-    <div class="brand"><b>КРАСНАЯ НИТЬ</b><span>Глава I. Ужин у Пикмана</span></div>
+    <div class="brand"><b>КРАСНАЯ НИТЬ</b><span id="chName">Глава I. Ужин у Пикмана</span></div>
     <div class="tools">
       <button class="ib" id="bHint" title="Спросить ворона" aria-label="Подсказка"><svg viewBox="0 0 24 24"><path d="M3 15c2-5 6-8 10-7l3-2 4 1-3 2c1 3 0 6-3 8l2 4h-2l-2-3c-3 1-6 0-9-3z" fill="currentColor"/></svg></button>
       <button class="ib" id="bSound" title="Звук" aria-label="Звук"><svg viewBox="0 0 24 24" id="sndIco"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8c2 2 2 6 0 8M19 5c4 4 4 10 0 14" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
@@ -143,10 +162,10 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
     <div id="flash"></div>
     <div id="fade"></div>
     <div class="title" id="title">
-      <span class="ch">ГЛАВА I · УЖИН У ПИКМАНА</span>
+      <span class="ch" id="tCh">ГЛАВА I · УЖИН У ПИКМАНА</span>
       <h1>Красная нить</h1>
       <svg class="thread" viewBox="0 0 560 50" preserveAspectRatio="none"><path d="M4 30 C90 6 150 44 230 24 S380 8 440 30 S530 40 556 14"/></svg>
-      <p>Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.</p>
+      <p id="tLead">Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.</p>
       <div class="row"><button class="btn red" id="bStart">Начать</button><button class="btn" id="bCont" hidden>Продолжить</button></div>
     </div>
   </div>
@@ -161,7 +180,11 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 (() => {
 'use strict';
 const OL = '#1a110d';
-const SAVE_KEY = 'krasnaya-nit-ch1-v1';
+const LAST_KEY = 'krasnaya-nit-last';
+const CHAPTERS = {
+  1:{key:'krasnaya-nit-ch1-v1',name:'Глава I. Ужин у Пикмана',tag:'ГЛАВА I · УЖИН У ПИКМАНА',lead:'Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.'},
+  2:{key:'krasnaya-nit-ch2-v1',name:'Глава II. Тёмная комната',tag:'ГЛАВА II · ТЁМНАЯ КОМНАТА',lead:'1975 год. На обороте фотографии без лица — штамп фотолаборатории «Вечернего вестника». Газету закрыли, но мамин стол всё ещё стоит в редакции.'}
+};
 const $ = s => document.querySelector(s);
 
 /* ---------- helpers ---------- */
@@ -208,6 +231,7 @@ $('#gdefs').innerHTML = `
 <radialGradient id="rHead" cx=".45" cy=".4" r=".65"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#5a2410" stop-opacity=".38"/></radialGradient>
 <radialGradient id="rLamp" cx="350" cy="350" r="420" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc977" stop-opacity=".42"/><stop offset=".45" stop-color="#ff9d4a" stop-opacity=".12"/><stop offset="1" stop-color="#ff9d4a" stop-opacity="0"/></radialGradient>
 <radialGradient id="rDark" cx=".42" cy=".5" r=".75"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity=".78"/></radialGradient>
+<radialGradient id="rRed"><stop offset="0" stop-color="#ff2a14" stop-opacity=".45"/><stop offset=".5" stop-color="#ff2a14" stop-opacity=".1"/><stop offset="1" stop-color="#ff2a14" stop-opacity="0"/></radialGradient>
 <radialGradient id="rCandle"><stop offset="0" stop-color="#ffd38a" stop-opacity=".55"/><stop offset=".4" stop-color="#ff9f45" stop-opacity=".16"/><stop offset="1" stop-color="#ff9f45" stop-opacity="0"/></radialGradient>
 <radialGradient id="rHorn" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0d0905"/><stop offset=".55" stop-color="#3d2a12"/><stop offset="1" stop-color="#b8924a"/></radialGradient>
 <radialGradient id="rDial" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#f6efdc"/><stop offset=".8" stop-color="#e3d6b6"/><stop offset="1" stop-color="#b9a47a"/></radialGradient>
@@ -250,7 +274,10 @@ const PEOPLE = {
   lady:{name:'Леди Корделия Вейн',role:'Вдова. «Близкий друг» хозяина.',skin:'#f0ddcc',hair:'#7d3420',brow:'#5a2a1a',style:'bun',female:true,dress:'#1f4a3a',pearls:true,lips:'#8e2a2a',short:'Леди Вейн'},
   butler:{name:'Хиггс',role:'Дворецкий. Разливал вино весь вечер.',skin:'#e2d4c4',hair:'#141111',style:'slick',coat:'#131113',shirt:'#f0ebe2',tie:'#131113',long:true,he:true},
   mother:{name:'Мама',skin:'#f1ddcb',hair:'#2a1a14',brow:'#2a1a14',style:'wave',female:true,dress:'#2a3854',lips:'#9a2c2c'},
-  stranger:{name:'???',skin:'#ddd2c2',hair:'#1f1c1a',style:'slick',coat:'#2b2826',shirt:'#e8e2d4',tie:'#2b2826',hat:true,scratched:true,he:true}
+  stranger:{name:'???',skin:'#ddd2c2',hair:'#1f1c1a',style:'slick',coat:'#2b2826',shirt:'#e8e2d4',tie:'#2b2826',hat:true,scratched:true,he:true},
+  editor:{name:'Мортимер Холлоуэй',role:'Главный редактор «Вечернего вестника».',skin:'#e8cdb3',hair:'#cfc8ba',brow:'#9a9286',style:'side',coat:'#5a4a3a',vest:'#3a3328',shirt:'#efe7d6',tie:'#6a2a20',visor:true,he:true,short:'Холлоуэй'},
+  rook:{name:'Сайлас Рук',role:'Фотограф «Вечернего вестника».',skin:'#2a1d18',hair:'#0d0b0b',style:'slick',coat:'#141010',shirt:'#2a1e1e',tie:'#141010',hat:true,shadow:true,he:true,short:'Рук'},
+  ada7:{name:'Ада, 7 лет',skin:'#f3dfcc',hair:'#3a2418',brow:'#3a2418',style:'bob',female:true,dress:'#8c2d2a',lips:'#c0605a'}
 };
 function bust(p,o={}){
   const W=p.wide?78:62, hrx=p.wide?28:25, hry=p.long?34:31, hy=-50, skinD=shade(p.skin,-.13);
@@ -287,12 +314,15 @@ function bust(p,o={}){
     case 'slick': s+=`<path d="M-26 -48 C-29 -80 -9 -87 4 -86 C22 -85 31 -72 26 -48 C25 -63 15 -71 0 -72 C-12 -72 -22 -64 -26 -48 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-14 -80 Q2 -84 16 -78" stroke="#fff" stroke-opacity=".18" stroke-width="2" fill="none"/>`;break;
     case 'bald': s+=`<path d="M-29 -48 C-32 -58 -29 -66 -24 -67 C-26 -58 -25 -52 -22 -42 Z M29 -48 C32 -58 29 -66 24 -67 C26 -58 25 -52 22 -42 Z" fill="${H}"/><ellipse cx="-9" cy="-72" rx="9" ry="4" fill="#fff" opacity=".22" transform="rotate(-18 -9 -72)"/>`;break;
     case 'bun': s+=`<circle cx="7" cy="-86" r="13" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-27 -44 C-32 -78 -10 -88 4 -86 C24 -84 32 -70 27 -44 C24 -58 18 -70 6 -72 C-2 -66 -14 -64 -22 -58 C-25 -54 -26 -50 -27 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-18 -74 Q-6 -82 8 -78 M2 -92 Q8 -96 14 -90" stroke="${shade(H,.25)}" stroke-width="1.2" fill="none"/>`;break;
+    case 'bob': s+=`<path d="M-29 -40 C-35 -76 -14 -90 2 -88 C22 -88 35 -74 29 -40 C31 -30 27 -22 21 -25 L22 -58 C8 -66 -8 -66 -22 -58 L-21 -25 C-27 -22 -31 -30 -29 -40 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-23 -58 C-12 -52 10 -52 23 -58 L23 -68 C8 -78 -8 -78 -23 -68 Z" fill="${H}"/><path d="M14 -84 l12 -8 l2 12 Z M14 -84 l-2 -12 l12 4 Z" fill="#b8322a" stroke="${OL}" stroke-width=".8"/>`;break;
     case 'wave': s+=`<path d="M-28 -44 C-36 -70 -20 -90 2 -88 C26 -88 37 -68 29 -42 C35 -33 31 -22 24 -25 C27 -40 25 -55 15 -66 C3 -60 -9 -62 -19 -57 C-24 -46 -24 -36 -21 -25 C-30 -23 -35 -35 -28 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-16 -78 Q-4 -70 10 -76 Q20 -80 26 -70" stroke="${shade(H,.22)}" stroke-width="1.3" fill="none"/>`;break;
   }
   if(p.mus==='walrus') s+=`<path d="M-17 ${hy+21} C-13 ${hy+10} -4 ${hy+12} 0 ${hy+14} C4 ${hy+12} 13 ${hy+10} 17 ${hy+21} C11 ${hy+17} 5 ${hy+18} 0 ${hy+17} C-5 ${hy+18} -11 ${hy+17} -17 ${hy+21} Z" fill="${H}" stroke="${OL}" stroke-width=".8"/>`;
   if(p.mus==='thin') s+=`<path d="M-9 ${hy+17} Q-4 ${hy+14} 0 ${hy+16} Q4 ${hy+14} 9 ${hy+17} Q4 ${hy+18} 0 ${hy+17.5} Q-4 ${hy+18} -9 ${hy+17} Z" fill="${shade(H,-.2)}"/>`;
   if(p.glasses) s+=`<g fill="#d6e2ea" fill-opacity=".14" stroke="#2c2420" stroke-width="1.5"><circle cx="${-ex}" cy="${ey}" r="7.8"/><circle cx="${ex}" cy="${ey}" r="7.8"/></g><path d="M-2.5 ${ey} Q0 ${ey-2} 2.5 ${ey} M${-ex-7.8} ${ey} L-24 ${ey-2} M${ex+7.8} ${ey} L24 ${ey-2}" stroke="#2c2420" stroke-width="1.3" fill="none"/>`;
   if(p.monocle) s+=`<circle cx="${ex}" cy="${ey}" r="9" fill="#fff" fill-opacity=".1" stroke="#d2ae62" stroke-width="1.8"/><path d="M${ex+8} ${ey+4} Q34 -10 26 26" stroke="#d2ae62" stroke-width=".9" fill="none"/>`;
+  if(p.visor) s+=`<path d="M-27 -66 Q0 -76 27 -66" stroke="#1d3a26" stroke-width="3" fill="none"/><path d="M-30 -66 Q0 -78 30 -66 L38 -56 Q0 -70 -38 -56 Z" fill="#2f7a4a" fill-opacity=".72" stroke="${OL}" stroke-width="1"/>`;
+  if(p.shadow) s+=`<ellipse cx="0" cy="${hy}" rx="${hrx+1}" ry="${hry+1}" fill="#0a0606" opacity=".95"/><path d="M${hrx-5} ${hy-24} Q${hrx+3} ${hy} ${hrx-7} ${hy+26}" stroke="#d2321f" stroke-width="2.4" fill="none" opacity=".75"/>`;
   if(p.hat) s+=`<path d="M-24 -74 C-24 -100 24 -100 24 -74 Z" fill="#2a2522" stroke="${OL}" stroke-width="1.2"/><path d="M-6 -97 Q0 -90 6 -97" stroke="${OL}" fill="none"/><rect x="-24" y="-80" width="48" height="6" fill="#141110"/><ellipse cx="0" cy="-74" rx="38" ry="6.5" fill="#2a2522" stroke="${OL}" stroke-width="1.2"/>`;
   if(p.scratched) s+=`<path d="M-24 -70 L19 -64 L-22 -57 L23 -50 L-25 -42 L21 -35 L-19 -28 L17 -22 M-16 -74 L-4 -20 M8 -76 L14 -22" stroke="#f3eee2" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/><path d="M-22 -60 L20 -46 L-20 -34" stroke="#8a7f70" stroke-width="1" fill="none"/>`;
   return s;
@@ -314,7 +344,17 @@ const ITEMS = {
   vial:{name:'Пустой флакон',desc:'Аптечный флакон тёмного стекла, пустой. Этикетка: «Kalium cyanatum. Отпущено по рецепту д-ра А. Г.».'},
   note:{name:'Записка из веера',special:'note'},
   glove:{name:'Перчатка',desc:'Белая перчатка прислуги, на манжете вышита буква «Х». На пальцах — пятна вина и запах горького миндаля.'},
-  page:{name:'Страница блокнота',special:'page'}
+  page:{name:'Страница блокнота',special:'page'},
+  faceless:{name:'Фото без лица',special:'faceless'},
+  group:{name:'Снимок редакции',special:'group'},
+  letter:{name:'Письмо из приюта',special:'letter'},
+  labkey:{name:'Ключ от лаборатории',desc:'Длинный ключ с картонной биркой «Лаб.». Двадцать два года он пролежал на притолоке.'},
+  film:{name:'Банка с плёнкой',desc:'Жестяная банка, обмотанная чёрной лентой. «14.XI. Не открывать на свету. — С. Р.»'},
+  negative:{name:'Негатив',special:'negative'},
+  pr1:{name:'Отпечаток: коридор',print:1},
+  pr2:{name:'Отпечаток: камин',print:2},
+  pr3:{name:'Отпечаток: буфетная',print:3},
+  pr4:{name:'Отпечаток: бокал',print:4}
 };
 const EVIDENCE = {vial:'doctor',note:'lady',glove:'butler',page:'pickman'};
 const LINKMSG = {
@@ -336,16 +376,26 @@ function icon(id){
     case 'note':return `<path d="M12 14 L50 10 L54 50 L16 54 Z" fill="#efe6d3" stroke="#b9ab8e"/><path d="M18 22 Q28 18 36 22 T48 20 M19 30 Q30 27 40 30 M20 38 Q30 35 46 37" stroke="#23324f" stroke-width="1.6" fill="none"/><path d="M36 46 l10 -1" stroke="#23324f" stroke-width="1.6"/>`;
     case 'glove':return `<path d="M20 56 L20 36 L17 17 Q17 12 21 12 Q24 12 25 17 L26 31 L26 9 Q26 5 30 5 Q33 5 33 9 L33 31 L35 11 Q35 7 39 7 Q42 8 42 12 L40 32 L43 18 Q44 14 47 15 Q50 16 49 20 L45 40 Q43 50 41 56 Z" fill="#f3efe6" stroke="#8f887a" stroke-width="1.2"/><path d="M20 42 L12 33 Q9 29 12 27 Q15 26 18 30 L22 35" fill="#f3efe6" stroke="#8f887a" stroke-width="1.2"/><circle cx="30" cy="12" r="3" fill="#7a1a1f" opacity=".7"/><circle cx="38" cy="16" r="2" fill="#7a1a1f" opacity=".6"/><rect x="20" y="50" width="21" height="6" fill="#e6e0d2" stroke="#8f887a"/>`;
     case 'page':return `<path d="M12 8 L52 8 L52 56 L46 53 L40 57 L34 53 L28 57 L22 53 L16 57 L12 54 Z" fill="#ece4cf" stroke="#b5a988"/><path d="M14 18 h36 M14 26 h36 M14 34 h36 M14 42 h36" stroke="#7d93b8" stroke-width=".7"/><path d="M18 16 Q26 12 32 16 M18 24 Q30 20 44 24 M18 32 Q26 29 40 32" stroke="#23324f" stroke-width="1.5" fill="none"/>`;
+    case 'group':return `<g transform="rotate(5 32 32)"><rect x="8" y="12" width="48" height="40" fill="#e6dbc1"/><rect x="11" y="15" width="42" height="28" fill="#4f5446"/><rect x="11" y="35" width="42" height="8" fill="#3a2a1c"/><rect x="28" y="18" width="10" height="17" fill="#c9b48a" opacity=".6"/><circle cx="19" cy="27" r="3" fill="#1d1813"/><rect x="16" y="30" width="7" height="7" fill="#1d1813"/><circle cx="33" cy="25" r="3" fill="#1d1813"/><circle cx="46" cy="25" r="3" fill="#0a0808"/><rect x="43" y="28" width="7" height="10" fill="#0a0808"/></g>`;
+    case 'letter':return `<path d="M12 8 L52 8 L52 56 L12 56 Z" fill="#efe7d3" stroke="#a89a7c"/><circle cx="32" cy="20" r="8" fill="none" stroke="#2a2420" stroke-width="1.5"/><path d="M27 22 Q30 15 36 17 L38 19 L35 21 Q32 25 27 22 Z" fill="#1a1612"/><path d="M38 19 l4 1" stroke="#c9a256" stroke-width="1.5"/><path d="M18 34 Q26 31 34 34 T46 33 M18 41 Q28 38 40 41 M18 48 Q26 45 36 48" stroke="#23324f" stroke-width="1.4" fill="none"/>`;
+    case 'labkey':return `<circle cx="14" cy="32" r="8" fill="none" stroke="url(#gBrass)" stroke-width="4"/><rect x="21" y="30" width="34" height="4.5" fill="url(#gBrass)"/><rect x="47" y="34" width="4" height="8" fill="url(#gBrass)"/><rect x="40" y="34" width="3" height="6" fill="url(#gBrass)"/><path d="M10 26 L4 12 L18 8 L22 22" fill="#d8c79c" stroke="#7a6a4a"/><circle cx="12" cy="13" r="1.4" fill="#7a6a4a"/><path d="M8 18 l9 -3" stroke="#a3221b" stroke-width="1.6"/>`;
+    case 'film':return `<ellipse cx="32" cy="50" rx="18" ry="6" fill="#4a4a4e" stroke="${OL}"/><rect x="14" y="20" width="36" height="30" fill="url(#gSilver)" stroke="${OL}"/><ellipse cx="32" cy="20" rx="18" ry="6" fill="#c8c6c0" stroke="${OL}"/><rect x="14" y="30" width="36" height="9" fill="#111"/><rect x="22" y="31.5" width="20" height="6" fill="#e9dfc7"/><path d="M25 34.5 h14" stroke="#a3221b" stroke-width="1.2"/>`;
+    case 'negative':return `<g transform="rotate(-12 32 32)"><rect x="4" y="20" width="56" height="24" fill="#5a3416"/><path d="M6 22.5 h52 M6 41.5 h52" stroke="#e8d5ae" stroke-width="2" stroke-dasharray="2.5 2.5"/><rect x="8" y="25" width="14" height="14" fill="#d9c49a"/><rect x="25" y="25" width="14" height="14" fill="#cdb78e"/><rect x="42" y="25" width="14" height="14" fill="#d9c49a"/><circle cx="15" cy="31" r="3" fill="#3a2410"/><circle cx="32" cy="31" r="3" fill="#3a2410"/><circle cx="49" cy="31" r="3" fill="#3a2410"/></g>`;
   }
+  if(id==='faceless') return icon('ph_stranger');
+  if(/^pr\d$/.test(id)) return `<g transform="rotate(${id==='pr2'||id==='pr3'?4:-4} 32 32)"><rect x="4" y="12" width="56" height="42" fill="#e9e1cc"/><svg x="7" y="15" width="50" height="33.3" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"><g filter="url(#fSepia)">${printArt(+id[2])}</g></svg></g>`;
   if(id.startsWith('ph_')){const p=PEOPLE[id.slice(3)];return `<g transform="rotate(-4 32 32)"><rect x="9" y="5" width="46" height="55" fill="#e7dcc3"/><svg x="13" y="9" width="38" height="40" viewBox="-60 -100 120 126" preserveAspectRatio="xMidYMid slice"><rect x="-60" y="-100" width="120" height="126" fill="#6d5a44"/><g filter="url(#fSepia)">${bust(p)}</g></svg></g>`;}
   return '';
 }
 
 /* ---------- state ---------- */
 let S;
-function fresh(){return{scene:'room',inv:[],sel:null,f:{ch:3,cm:3,bag:[0,0,0],slots:[null,null,null,null],linked:{},shot:{},talk:{}}};}
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
-function load(){try{const t=localStorage.getItem(SAVE_KEY);return t?JSON.parse(t):null;}catch(e){return null;}}
+function fresh(n){
+  if((n||1)===2) return{ch:2,scene:'office',inv:['faceless','magnifier'],sel:null,f:{tl:[null,null,null,null],dev:0,took:{},talk:{}}};
+  return{ch:1,scene:'room',inv:[],sel:null,f:{ch:3,cm:3,bag:[0,0,0],slots:[null,null,null,null],linked:{},shot:{},talk:{}}};
+}
+function save(){try{localStorage.setItem(CHAPTERS[S.ch].key,JSON.stringify(S));localStorage.setItem(LAST_KEY,S.ch);}catch(e){}}
+function load(n){try{const t=localStorage.getItem(CHAPTERS[n].key),d=t?JSON.parse(t):null;if(d&&d.f){d.ch=n;return d;}}catch(e){}return null;}
 const has = id=>S.inv.includes(id);
 function addItem(id){if(!has(id)){S.inv.push(id);sfx.pick();renderInv(id);}}
 function removeItem(id){S.inv=S.inv.filter(i=>i!==id);if(S.sel===id)S.sel=null;renderInv();}
@@ -800,13 +850,333 @@ function watchView(){
   return s;
 }
 
+/* ==================== CHAPTER II ==================== */
+const RAIN_OFF = (()=>{rnd=mulberry(21);return rainLines(48,192,74,362,60)+rainLines(48,192,74,362,38,'b');})();
+function clockHM(cx,cy,r,h,m,col='#1b1410'){
+  const am=m*6, ah=(h%12)*30+m*.5, pt=(a,l)=>[cx+Math.sin(a*Math.PI/180)*l,cy-Math.cos(a*Math.PI/180)*l];
+  const [hx,hy]=pt(ah,r*.5),[mx,my]=pt(am,r*.8);
+  return `<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="${col}" stroke-width="${r*.1}" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="${col}" stroke-width="${r*.055}" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="${r*.08}" fill="${col}"/>`;
+}
+function dial(cx,cy,r,h,m,rim='url(#gBrass)'){return `<circle cx="${cx}" cy="${cy}" r="${r*1.14}" fill="${rim}" stroke="${OL}"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#rDial)"/>${dialTicks(cx,cy,r,Math.max(1,r/12))}${clockHM(cx,cy,r,h,m)}`;}
+function standing(p,x,y,sc,floor,o={}){
+  const W=(p.wide?78:62)*sc, top=y+66*sc, hip=y+150*sc, c=p.female?p.dress:p.coat;
+  let s=`<path d="M${x-W} ${top} L${x-W*.86} ${hip} L${x+W*.86} ${hip} L${x+W} ${top} Z" fill="${c}" stroke="${OL}" stroke-width="1.2"/>`;
+  s+=`<path d="M${x-W*.8} ${hip-2} L${x-W*.66} ${floor} L${x-5*sc} ${floor} L${x-3*sc} ${hip+14*sc} L${x+3*sc} ${hip+14*sc} L${x+5*sc} ${floor} L${x+W*.66} ${floor} L${x+W*.8} ${hip-2} Z" fill="${shade(c,-.3)}" stroke="${OL}" stroke-width="1.2"/>`;
+  s+=`<ellipse cx="${x-W*.4}" cy="${floor}" rx="${17*sc}" ry="${5*sc}" fill="#0a0806"/><ellipse cx="${x+W*.4}" cy="${floor}" rx="${17*sc}" ry="${5*sc}" fill="#0a0806"/>`;
+  return s+`<g transform="translate(${x} ${y}) scale(${sc})">${bust(p,o)}</g>`;
+}
+function miniPhoto(pid,x,y,w,h,bg='#6b5842'){
+  return `<rect x="${x-w/2-3}" y="${y-h/2-3}" width="${w+6}" height="${h+6}" fill="#e6dbc1"/><svg x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" viewBox="-60 -100 120 ${120*h/w}" preserveAspectRatio="xMidYMin slice"><rect x="-60" y="-100" width="120" height="240" fill="${bg}"/><g filter="url(#fSepia)">${bust(PEOPLE[pid])}</g></svg>`;
+}
+function typewriter(x,y,covered){
+  if(covered) return `<path d="M${x-62} ${y+30} C${x-66} ${y-6} ${x-40} ${y-30} ${x} ${y-30} C${x+40} ${y-30} ${x+66} ${y-6} ${x+62} ${y+30} Q${x+40} ${y+38} ${x+20} ${y+30} Q${x} ${y+40} ${x-20} ${y+31} Q${x-40} ${y+38} ${x-62} ${y+30} Z" fill="#cfc8b8" stroke="#6f685a" stroke-width="1.2"/><path d="M${x-30} ${y-22} Q${x-10} ${y} ${x-16} ${y+30} M${x+24} ${y-24} Q${x+40} ${y} ${x+34} ${y+30}" stroke="#9a9384" stroke-width="1.4" fill="none"/>`;
+  let s=`<rect x="${x-46}" y="${y-44}" width="92" height="30" fill="#f1ead8" stroke="#a89a7c"/><path d="M${x-38} ${y-36} h70 M${x-38} ${y-29} h60 M${x-38} ${y-22} h66" stroke="#3a3028" stroke-width="1.2" opacity=".7"/>`;
+  s+=`<rect x="${x-58}" y="${y-18}" width="116" height="10" rx="5" fill="#141414" stroke="${OL}"/><circle cx="${x-62}" cy="${y-13}" r="5" fill="#222" stroke="${OL}"/><circle cx="${x+62}" cy="${y-13}" r="5" fill="#222" stroke="${OL}"/>`;
+  s+=`<path d="M${x-54} ${y-8} L${x+54} ${y-8} L${x+62} ${y+28} L${x-62} ${y+28} Z" fill="#1d1c1e" stroke="${OL}" stroke-width="1.4"/><path d="M${x-50} ${y-6} L${x+50} ${y-6}" stroke="#6a6a70" stroke-width="1" opacity=".6"/>`;
+  for(let r=0;r<3;r++) for(let i=0;i<9;i++) s+=`<circle cx="${x-44+i*11+r*3}" cy="${y+4+r*8}" r="3.2" fill="#e9e1cf" stroke="#000" stroke-width=".8"/>`;
+  return s+`<text x="${x}" y="${y-10.5}" text-anchor="middle" font-family="Cormorant SC, serif" font-size="7" fill="#c9a256" letter-spacing="2">UNDERWOOD</text>`;
+}
+function ravenCrest(x,y,r,col='#1a1612'){
+  const k=r/105;
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${col}" stroke-width="${r*.08}"/><circle cx="${x}" cy="${y}" r="${r*.84}" fill="none" stroke="${col}" stroke-width="${r*.03}"/><g transform="translate(${x-6*k} ${y+22*k}) scale(${k})">${crow(0,0,1,false).replace(/#0d0c11|#17161c|#111/g,col)}</g><path d="M${x-.5*r} ${y-.13*r} L${x-.7*r} ${y+.12*r}" stroke="#c9a256" stroke-width="${r*.07}" stroke-linecap="round"/><circle cx="${x-.74*r}" cy="${y+.2*r}" r="${r*.08}" fill="none" stroke="#c9a256" stroke-width="${r*.045}"/><path d="M${x-.62*r} ${y+.02*r} l${r*.07} ${r*.03}" stroke="#c9a256" stroke-width="${r*.05}"/>`;
+}
+
+/* ---------- NEWSROOM (1975 / 1953) ---------- */
+function newsroom(y53,interactive){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="500" fill="${y53?'#5a6450':'#3a4237'}"/><rect width="1000" height="500" fill="url(#pMottle)"/>`;
+  for(let x=0;x<1000;x+=50) s+=`<rect x="${x}" y="37" width="1" height="358" fill="#000" opacity=".07"/>`;
+  s+=`<rect width="1000" height="26" fill="#1b1e18"/><rect y="26" width="1000" height="5" fill="#7d846f" opacity=".5"/><rect y="31" width="1000" height="6" fill="#000" opacity=".25"/>`;
+  s+=`<rect y="400" width="1000" height="100" fill="#3a2516"/><rect y="400" width="1000" height="100" fill="url(#pWood)" opacity=".6"/><rect y="395" width="1000" height="8" fill="#4e3220"/><rect y="395" width="1000" height="2" fill="#8a5f3e" opacity=".7"/>`;
+  for(let x=10;x<1000;x+=110) s+=`<rect x="${x}" y="414" width="96" height="70" fill="#2e1c10" stroke="#170d06" stroke-width="2"/>`;
+  // linoleum
+  s+=`<rect y="500" width="1000" height="140" fill="#2c2a25"/>`;
+  const ys=[500,516,536,562,596,640], k=y=>(y-260)/240;
+  for(let r=0;r<5;r++) for(let i=-16;i<16;i++){ if((i+r)&1) continue;
+    const a=ys[r],b=ys[r+1],x0=i*42,x1=(i+1)*42;
+    s+=`<path d="M${500+x0*k(a)} ${a} L${500+x1*k(a)} ${a} L${500+x1*k(b)} ${b} L${500+x0*k(b)} ${b} Z" fill="${y53?'#58503f':'#4a453a'}"/>`;}
+  s+=`<rect y="500" width="1000" height="140" fill="url(#pMottle)" opacity=".8"/><rect y="494" width="1000" height="10" fill="#1c1009"/>`;
+  if(!y53) s+=`<path d="M300 560 l40 -6 l8 22 l-42 5 Z" fill="#d8d0bc" opacity=".55"/><path d="M640 610 l52 4 l-4 22 l-52 -6 Z" fill="#d8d0bc" opacity=".45"/><path d="M90 590 l36 -10 l10 18 l-36 10 Z" fill="#c9c0a8" opacity=".4"/>`;
+  // window
+  s+=`<rect x="36" y="62" width="168" height="312" fill="#15120f"/>`;
+  s+=`<clipPath id="cWinO"><rect x="48" y="74" width="144" height="288"/></clipPath><g clip-path="url(#cWinO)"><rect x="48" y="74" width="144" height="288" fill="url(#gNight)"/>
+    <path d="M48 250 L70 250 L70 210 L92 210 L92 236 L116 236 L116 190 L124 182 L132 190 L132 240 L160 240 L160 222 L192 222 L192 362 L48 362 Z" fill="#0a0e14"/>
+    <rect x="76" y="222" width="5" height="7" fill="#e8c06a" opacity="${y53?.7:.3}"/><rect x="122" y="204" width="4" height="6" fill="#e8c06a" opacity=".5"/><rect x="170" y="232" width="5" height="6" fill="#e8c06a" opacity="${y53?.6:.2}"/>
+    ${RAIN_OFF}${crow(150,350,.62,true)}<rect id="lightning" x="48" y="74" width="144" height="288" fill="#dfe8ff" opacity="0"/></g>`;
+  s+=`<path d="M96 74 V362 M144 74 V362 M48 150 H192 M48 226 H192 M48 300 H192" stroke="#15120f" stroke-width="5"/><rect x="28" y="362" width="184" height="14" fill="#3a2a1c"/><rect x="28" y="362" width="184" height="2" fill="#7a5638" opacity=".7"/>`;
+  if(!y53) s+=`<path d="M48 74 L120 74 L48 132 Z" fill="#fff" opacity=".05"/><path d="M150 300 l20 -26 l6 30" stroke="#cfe0ee" stroke-width="1" opacity=".4" fill="none"/>`;
+  // staff board
+  s+=`<rect x="236" y="98" width="170" height="146" fill="#000" opacity=".35"/><rect x="228" y="90" width="170" height="146" fill="url(#gWood)" stroke="${OL}"/><rect x="236" y="98" width="154" height="130" fill="#2e4636"/>`;
+  s+=`<text x="313" y="114" text-anchor="middle" font-family="Cormorant SC, serif" font-size="11" letter-spacing="2" fill="#d8c79c">НАШИ СОТРУДНИКИ</text>`;
+  s+=miniPhoto('editor',264,162,36,48)+miniPhoto('mother',313,162,36,48,'#5a4a38');
+  if(y53) s+=miniPhoto('rook',362,162,36,48,'#3a3026')+`<ellipse cx="364" cy="158" rx="20" ry="26" fill="#fff8e6" opacity=".85" filter="url(#fBlurS)"/>`;
+  else s+=`<path d="M342 136 L382 137 L381 152 L384 166 L380 188 L343 187 L345 170 L341 154 Z" fill="#1c2c22" stroke="#15201a"/><circle cx="345" cy="139" r="1.6" fill="#a3221b"/><circle cx="379" cy="140" r="1.6" fill="#a3221b"/>`;
+  [['Холлоуэй',264],['Лэнг',313],['Рук',362]].forEach(([n,x])=>{s+=`<text x="${x}" y="206" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="11" fill="#e9dfc7">${n}</text>`;});
+  // editor's door
+  s+=`<rect x="430" y="104" width="150" height="328" fill="#1d130b"/><rect x="442" y="116" width="126" height="314" fill="url(#gWood)" stroke="${OL}"/><rect x="442" y="116" width="126" height="314" fill="url(#pWood)" opacity=".5"/>`;
+  s+=`<rect x="454" y="128" width="102" height="160" fill="${y53?'#e8cf96':'#36413c'}" opacity="${y53?.85:1}"/><rect x="454" y="128" width="102" height="160" fill="url(#pMottle)" opacity=".7"/>`;
+  s+=`<text x="505" y="186" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="17" letter-spacing="3" fill="#b8924a">${y53?'РЕДАКТОР':'Р Д КТОР'}</text><text x="505" y="208" text-anchor="middle" font-family="Cormorant SC, serif" font-size="12" letter-spacing="2" fill="#b8924a">${y53?'М. ХОЛЛОУЭЙ':'М. ХОЛЛ  ЭЙ'}</text>`;
+  s+=`<rect x="454" y="306" width="102" height="110" fill="none" stroke="#1f1209" stroke-width="2"/><circle cx="556" cy="300" r="5" fill="url(#gBrass)" stroke="${OL}"/>`;
+  // wall clock + calendar
+  s+=dial(640,104,22,y53?6:3,y53?45:10);
+  if(!y53) s+=`<path d="M626 92 L650 116" stroke="#fff" stroke-width=".8" opacity=".6"/>`;
+  s+=`<rect x="610" y="158" width="62" height="78" fill="#000" opacity=".3" transform="translate(3 4)"/><rect x="610" y="158" width="62" height="78" fill="#ece4cf"/><rect x="610" y="158" width="62" height="14" fill="#8e1f1a"/>`;
+  s+=`<text x="641" y="169" text-anchor="middle" font-family="Cormorant SC, serif" font-size="9" letter-spacing="1" fill="#f3e9d2">${y53?'НОЯБРЬ 1953':'ДЕКАБРЬ 1974'}</text><text x="641" y="212" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="36" fill="#211810">${y53?13:31}</text><text x="641" y="229" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="11" fill="#5a4a38">${y53?'пятница':'вторник'}</text>`;
+  // darkroom door
+  const lit=y53||F.labOpen;
+  s+=`<rect x="700" y="140" width="120" height="296" fill="#1a110a"/><rect x="712" y="152" width="96" height="282" fill="#191718" stroke="${OL}"/><rect x="712" y="152" width="96" height="282" fill="url(#pMottle)" opacity=".6"/>`;
+  s+=`<rect x="700" y="140" width="120" height="12" fill="#3a2516"/><rect x="700" y="140" width="120" height="2" fill="#8a5f3e" opacity=".6"/>`;
+  if(y53&&F.sawKey) s+=`<g transform="translate(784 135) scale(.32)">${icon('labkey')}</g>`;
+  if(!y53) s+=`<rect x="702" y="136" width="116" height="4" fill="#8f8a7c" opacity=".35"/>`;
+  s+=`<rect x="726" y="218" width="68" height="34" fill="#e8dfc9" stroke="#2a2018"/><text x="760" y="233" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="10" letter-spacing="1" fill="#211810" textLength="60" lengthAdjust="spacingAndGlyphs">ЛАБОРАТОРИЯ</text><text x="760" y="246" text-anchor="middle" font-family="Cormorant SC, serif" font-size="9" letter-spacing="1" fill="#a3221b">НЕ ВХОДИТЬ</text>`;
+  s+=`<rect x="790" y="300" width="12" height="22" rx="3" fill="url(#gBrass)" stroke="${OL}"/><circle cx="796" cy="308" r="2" fill="#140c08"/><rect x="795" y="309" width="2" height="7" fill="#140c08"/>`;
+  s+=`<rect x="748" y="108" width="24" height="6" fill="#2a2420"/><path d="M752 114 Q750 132 760 134 Q770 132 768 114 Z" fill="${lit?'#ff3a24':'#4a1814'}" stroke="${OL}"/><path d="M752 118 h16 M751 125 h18 M760 114 v20" stroke="#1a1414" stroke-width="1.2"/>`;
+  if(lit) s+=`<circle cx="760" cy="124" r="70" fill="url(#rRed)"/><rect x="712" y="152" width="96" height="140" fill="#ff2a14" opacity=".08"/>`;
+  // coat rack
+  s+=`<rect x="584" y="270" width="5" height="226" fill="#2a1a10"/><path d="M586 276 l-14 10 M586 276 l14 10 M586 290 l-12 6 M586 290 l12 6" stroke="#2a1a10" stroke-width="3" stroke-linecap="round"/><path d="M574 494 l12 -14 l12 14" stroke="#2a1a10" stroke-width="4" fill="none"/>`;
+  if(y53) s+=`<path d="M572 286 C560 320 562 400 568 440 L604 440 C610 400 612 320 600 286 Z" fill="#6b5a44" stroke="${OL}"/><path d="M586 290 L586 436" stroke="#4a3e30" stroke-width="1.4"/><path d="M576 300 Q586 312 596 300" stroke="#7b8f7a" stroke-width="5" fill="none"/>`;
+  // archive cabinet
+  s+=`<rect x="858" y="244" width="136" height="282" fill="#000" opacity=".35"/><rect x="850" y="236" width="136" height="282" fill="url(#gWood)" stroke="${OL}" stroke-width="1.5"/><rect x="850" y="236" width="136" height="282" fill="url(#pWood)" opacity=".6"/>`;
+  s+=`<rect x="876" y="243" width="84" height="16" fill="#2a1a10"/><text x="918" y="255" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="2" fill="#d8c79c">АРХИВ</text>`;
+  for(let r=0;r<4;r++) for(let c=0;c<3;c++){const x=858+c*42,y=266+r*60;s+=`<rect x="${x}" y="${y}" width="38" height="54" fill="#4a2e1a" stroke="#1f1209" stroke-width="1.5"/><rect x="${x+11}" y="${y+12}" width="16" height="9" fill="#e6dbc1" stroke="#8a6a3a"/><rect x="${x+12}" y="${y+33}" width="14" height="5" rx="2" fill="url(#gBrass)"/>`;}
+  // newspaper bundles / boxes
+  if(y53) s+=`<g><rect x="630" y="532" width="92" height="40" fill="#d8ceb4" stroke="#6f6550"/><path d="M630 544 h92 M630 556 h92" stroke="#9a8e74" stroke-width=".8"/><path d="M676 532 v40 M630 552 h92" stroke="#7a5a3a" stroke-width="2.5"/><rect x="640" y="500" width="78" height="32" fill="#e2d8bf" stroke="#6f6550"/><path d="M679 500 v32 M640 516 h78" stroke="#7a5a3a" stroke-width="2.5"/></g>`;
+  else s+=`<g><rect x="604" y="508" width="132" height="86" fill="#7a5a36" stroke="#3a2412" stroke-width="1.5"/><path d="M604 508 L620 494 L752 494 L736 508 Z" fill="#8f6c44" stroke="#3a2412"/><path d="M736 508 L752 494 L752 580 L736 594 Z" fill="#5e4428" stroke="#3a2412"/><rect x="636" y="532" width="68" height="24" fill="#e6dbc1"/><text x="670" y="549" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="11" letter-spacing="1" fill="#211810">НА ВЫВОЗ</text><path d="M604 520 h132" stroke="#c9b48a" stroke-width="5" opacity=".55"/></g>`;
+  // hanging lamps
+  [[330,y53||1],[690,y53?1:0]].forEach(([x,on])=>{s+=`<line x1="${x}" y1="0" x2="${x}" y2="52" stroke="#111" stroke-width="2"/><path d="M${x-28} 74 Q${x} 44 ${x+28} 74 Z" fill="#2c4a3a" stroke="${OL}"/><path d="M${x-28} 74 Q${x} 80 ${x+28} 74" fill="${on?'#ffe6a8':'#3a3a30'}" stroke="${OL}"/>`;if(on) s+=`<circle cx="${x}" cy="90" r="${y53?220:150}" fill="url(#rCandle)" opacity="${y53?.55:.35}"/>`;});
+  // people (1953)
+  if(y53){
+    s+=standing(PEOPLE.editor,505,312,.7,520,{look:2,closed:false});
+    s+=`<path d="M522 268 q14 -4 16 12 q2 14 -10 18" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M532 296 C548 330 520 350 540 380 C556 404 532 420 548 440" stroke="#111" stroke-width="1.6" fill="none" stroke-dasharray="3 2"/>`;
+    s+=standing(PEOPLE.rook,656,316,.72,522);
+    s+=`<rect x="640" y="356" width="34" height="24" fill="#2a1c14" stroke="#c2271b" stroke-width="1"/><circle cx="657" cy="368" r="7" fill="url(#gBrass)"/><circle cx="657" cy="368" r="3.5" fill="#111"/><path d="M630 330 L642 358 M684 330 L672 358" stroke="#2a1c14" stroke-width="2"/>`;
+  }
+  // mother's desk
+  s+=`<ellipse cx="250" cy="602" rx="170" ry="9" fill="#000" opacity=".4"/><path d="M96 446 L114 446 L110 596 L100 596 Z M384 446 L402 446 L398 596 L388 596 Z" fill="#2c1a0e" stroke="${OL}"/>`;
+  if(y53) s+=`<g transform="translate(250 392) scale(.86)">${bust(PEOPLE.mother,{look:-1})}</g>`;
+  else s+=`<path d="M200 336 Q250 318 300 336 L302 420 L198 420 Z" fill="#2a1a10" stroke="${OL}"/><path d="M212 346 Q250 334 288 346 L288 404 L212 404 Z" fill="#4a2e1a" opacity=".7"/>`;
+  s+=`<rect x="88" y="430" width="322" height="20" fill="#5a3a22" stroke="${OL}" stroke-width="1.5"/><rect x="88" y="430" width="322" height="20" fill="url(#pWood)" opacity=".7"/><rect x="88" y="430" width="322" height="2" fill="#a07650" opacity=".7"/>`;
+  s+=`<rect x="98" y="450" width="302" height="54" fill="url(#gWood)" stroke="${OL}"/><rect x="110" y="458" width="120" height="38" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="160" y="474" width="20" height="6" rx="3" fill="url(#gBrass)"/>`;
+  s+=typewriter(250,418,!y53);
+  if(y53) s+=sleeve(214,410,222,420,PEOPLE.mother.dress)+sleeve(286,410,278,420,PEOPLE.mother.dress)+handsAt(222,420,278,420,PEOPLE.mother.skin,PEOPLE.mother.dress);
+  // desk lamp & papers
+  s+=`<ellipse cx="370" cy="429" rx="18" ry="4" fill="url(#gBrass)" stroke="${OL}"/><rect x="368" y="398" width="4" height="30" fill="url(#gBrassH)"/><path d="M344 400 Q370 380 396 400 Z" fill="url(#gShade)" stroke="${OL}"/>`;
+  if(y53) s+=`<path d="M346 400 Q370 406 394 400" fill="#ffe6a8"/><path d="M346 400 L394 400 L420 430 L320 430 Z" fill="#ffd590" opacity=".18"/>`;
+  s+=`<path d="M300 428 L340 424 L344 430 L302 432 Z" fill="#e6dcc4"/><path d="M304 424 L338 420 L342 427 L306 429 Z" fill="#d8ccb0"/>`;
+  if(y53&&!F.letterTaken) s+=`<g transform="translate(150 424) rotate(-6)"><rect x="-26" y="-9" width="52" height="16" fill="#efe7d3" stroke="#8a7a60"/><circle cx="-16" cy="-1" r="4.5" fill="none" stroke="#1a1612" stroke-width="1.2"/><path d="M-6 -3 h26 M-6 2 h20" stroke="#23324f" stroke-width="1"/></g>`;
+  if(y53) s+=`<g transform="translate(462 548) scale(.46)">${bust(PEOPLE.ada7,{look:-3})}</g><path d="M424 574 L480 566 L488 586 L430 594 Z" fill="#f1ead8" stroke="#a89a7c"/><path d="M436 582 l10 -6 l6 8 M458 579 l8 -5 l5 7" stroke="#2c4f9a" stroke-width="1.4" fill="none"/><path d="M450 577 l10 -3" stroke="#c0392b" stroke-width="1.4"/><path d="M482 572 l14 6" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>`;
+  // lighting
+  if(y53) s+=`<rect width="1000" height="640" fill="#ffb060" opacity=".06"/>`;
+  else s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".28"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)"/>`;
+  if(interactive){
+    s+=hs('window',48,74,144,230)+hs('crowO',112,300,80,60)+hs('staff',228,90,170,146)+hs('edDoor',442,116,126,314);
+    s+=hs('clockO',612,80,56,50)+hs('calO',608,156,66,82)+hs('lintel',696,124,128,30)+hs('cabinet',850,236,136,282);
+    if(y53){
+      s+=hs('lab',700,152,120,282)+hs('editor',464,250,84,272)+hs('rook',614,254,86,270);
+      s+=hs('mother',210,312,80,82)+hs('typer',196,374,108,56)+hs('ada',418,506,90,92);
+      if(!F.letterTaken) s+=hs('letter',118,412,64,26);
+    } else {
+      s+=hs('lab',710,156,100,280)+hs('typer',186,380,128,72)+hs('boxes',600,492,154,104)+hs('desk',88,430,322,74);
+    }
+    s+=arrow(500,612);
+  }
+  return s;
+}
+const officeView=()=>newsroom(false,true), office53View=()=>newsroom(true,true);
+
+/* ---------- ARCHIVE CABINET ---------- */
+const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+const DRAWERS=[
+  'Январь. «Туман над доками». Все плёнки сданы, на каждом конверте — «С. Р.»',
+  'Февраль. Наводнение в Эссексе. Мамины статьи, его снимки.',
+  'Март. Похороны королевы Марии. Сотни кадров, все одинаково серые.',
+  'Апрель. «Приют святой Агнессы открыт после ремонта». Мистер Пикман перерезает ленточку.',
+  'Май. Вырезки про Эверест. Своих снимков не было — только телеграммы.',
+  'Июнь. Коронация. Самый толстый конверт в архиве.',
+  'Июль. Благотворительный бал в Пикман-холле. Леди Вейн на каждом втором кадре.',
+  'Август. Регата. Паруса, паруса, паруса.',
+  'Сентябрь. Доктор Грей открывает аптеку на Хай-стрит. Улыбается в объектив.',
+  'Октябрь. Конверт «Пропавшие сироты?» — пустой. Надпись зачёркнута.',
+  '',
+  'Декабрь. Пусто. В декабре пятьдесят третьего у газеты уже не было фотографа.'
+];
+function cabinetView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#3a4237"/><rect width="1000" height="640" fill="url(#pMottle)"/><rect y="560" width="1000" height="80" fill="#2c2a25"/>`;
+  s+=`<rect x="270" y="30" width="480" height="620" fill="#000" opacity=".4"/><rect x="258" y="20" width="484" height="630" rx="4" fill="url(#gWood)" stroke="${OL}" stroke-width="3"/><rect x="258" y="20" width="484" height="630" fill="url(#pWood)" opacity=".8"/>`;
+  s+=`<rect x="380" y="36" width="240" height="44" fill="#22150c" stroke="#8a5f3e"/><text x="500" y="56" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="20" letter-spacing="5" fill="#d8c79c">АРХИВ НЕГАТИВОВ</text><text x="500" y="73" text-anchor="middle" font-family="Cormorant SC, serif" font-size="13" letter-spacing="4" fill="#b8924a">1953</text>`;
+  for(let i=0;i<12;i++){
+    const c=i%3, r=Math.floor(i/3), x=278+c*152, y=96+r*134, open=F.drawer===i;
+    if(open){
+      s+=`<rect x="${x}" y="${y}" width="140" height="124" fill="#0c0705"/>`;
+      for(let k=0;k<6;k++) s+=`<rect x="${x+14+k*19}" y="${y+8+(k%2)*4}" width="16" height="40" fill="${i===10&&k===3?'#c9b48a':'#d8ccb0'}" stroke="#6f6550" transform="rotate(${k%2?3:-2} ${x+20+k*19} ${y+40})"/>`;
+      if(i===10) s+=`<path d="M${x+70} ${y+10} l0 30" stroke="#a3221b" stroke-width="2"/>`;
+      s+=`<path d="M${x-6} ${y+46} L${x+146} ${y+46} L${x+156} ${y+150} L${x-16} ${y+150} Z" fill="#5a3820" stroke="${OL}" stroke-width="2"/><rect x="${x-16}" y="${y+150}" width="172" height="10" fill="#2a1a10"/>`;
+      s+=`<rect x="${x+50}" y="${y+96}" width="56" height="24" fill="#efe6cf" stroke="#8a6a3a" stroke-width="2"/><text x="${x+78}" y="${y+115}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="20" fill="#211810">${ROMAN[i]}</text>`;
+    } else {
+      s+=`<rect x="${x}" y="${y}" width="140" height="124" fill="#4a2e1a" stroke="#1f1209" stroke-width="3"/><rect x="${x+6}" y="${y+6}" width="128" height="112" fill="none" stroke="#8a5f3e" stroke-width="1" opacity=".5"/>`;
+      s+=`<rect x="${x+38}" y="${y+22}" width="64" height="36" rx="3" fill="url(#gBrass)" stroke="${OL}"/><rect x="${x+44}" y="${y+27}" width="52" height="26" fill="#efe6cf"/><text x="${x+70}" y="${y+48}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="22" fill="#211810">${ROMAN[i]}</text>`;
+      s+=`<rect x="${x+46}" y="${y+80}" width="48" height="14" rx="6" fill="url(#gBrass)" stroke="${OL}"/>`;
+    }
+  }
+  s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".22"/><rect width="1000" height="640" fill="url(#rDark)" opacity=".7"/>`;
+  for(let i=0;i<12;i++){const c=i%3,r=Math.floor(i/3);s+=hs('d'+i,278+c*152,96+r*134,140,124);}
+  s+=arrow(860,612);
+  return s;
+}
+
+/* ---------- PRINTS (Rook's film, 14.XI.1953) ---------- */
+const PRINTS={1:[9,20],2:[9,25],3:[9,30],4:[9,35]};
+function printArt(n){
+  let s='';
+  if(n===1){ // hallway: Pickman & Lady
+    s+=`<rect width="300" height="200" fill="url(#pStripe)"/><rect y="150" width="300" height="50" fill="#2a160d"/><rect y="146" width="300" height="6" fill="#a8843f" opacity=".5"/>`;
+    s+=`<rect x="226" y="18" width="46" height="176" fill="url(#gWoodD)" stroke="${OL}"/><path d="M220 22 Q249 0 278 22 Z" fill="#2a160c"/>${dial(249,52,17,...PRINTS[1])}<rect x="236" y="80" width="26" height="90" fill="#0d0705"/><line x1="249" y1="80" x2="249" y2="150" stroke="#b8924a" stroke-width="2"/><circle cx="249" cy="154" r="7" fill="url(#gGold)"/>`;
+    s+=`<rect x="40" y="30" width="56" height="74" fill="url(#gGold)"/><rect x="45" y="35" width="46" height="64" fill="#2f2418"/>`;
+    s+=`<g transform="translate(150 130) scale(.8)">${bust(PEOPLE.pickman,{look:-3})}</g>`;
+    s+=`<g transform="translate(108 140) rotate(14) scale(.72)">${bust(PEOPLE.lady,{closed:true})}</g>`;
+    s+=sleeve(176,150,128,164,PEOPLE.pickman.coat)+`<ellipse cx="124" cy="165" rx="7" ry="5" fill="${PEOPLE.pickman.skin}" stroke="${OL}"/>`;
+  } else if(n===2){ // fireplace: doctor
+    s+=`<rect width="300" height="200" fill="#2b4440"/><rect width="300" height="200" fill="url(#pDamask)"/><rect y="168" width="300" height="32" fill="#2a160d"/>`;
+    s+=`<rect x="150" y="70" width="140" height="110" fill="#8a8072" stroke="${OL}"/><rect x="142" y="62" width="156" height="12" fill="#a39a8a" stroke="${OL}"/><path d="M174 180 L174 108 Q220 84 266 108 L266 180 Z" fill="#120a06"/>`;
+    s+=`<path d="M186 180 C190 150 204 146 206 126 C214 146 222 140 226 118 C232 142 246 146 252 180 Z" fill="#f0a040"/><path d="M200 180 C204 160 214 156 216 140 C222 158 232 160 236 180 Z" fill="#ffe08a"/>`;
+    s+=`<rect x="250" y="34" width="34" height="30" rx="8" fill="url(#gWood)" stroke="${OL}"/>${dial(267,48,11,...PRINTS[2])}`;
+    s+=`<g transform="translate(88 132) scale(.82)">${bust(PEOPLE.doctor,{look:2})}</g>`;
+    s+=`<path d="M108 120 l20 -4" stroke="#efe6cf" stroke-width="3"/><circle cx="129" cy="115.6" r="1.6" fill="#ff8a3a"/><path d="M130 112 C126 96 140 92 134 76 C130 64 142 58 138 44" stroke="#d8d2c4" stroke-width="2.5" fill="none" opacity=".55"/>`;
+    s+=`<g transform="translate(46 196)"><path d="M-36 0 L-32 -26 Q-30 -34 -20 -36 L20 -36 Q30 -34 32 -26 L36 0 Z" fill="#4e2a18" stroke="${OL}"/><path d="M-30 -36 Q0 -54 30 -36 L22 -30 Q0 -40 -22 -30 Z" fill="#0d0705"/><path d="M-10 -40 l4 -14 l6 0 l0 14" fill="url(#gAmber)" opacity=".8"/></g>`;
+  } else if(n===3){ // pantry: Higgs, one glove
+    s+=`<rect width="300" height="200" fill="#3a3226"/><rect width="300" height="200" fill="url(#pMottle)"/>`;
+    [40,80].forEach(y=>{s+=`<rect x="120" y="${y}" width="180" height="6" fill="#4a2e1a" stroke="${OL}"/>`;for(let i=0;i<9;i++) s+=`<rect x="${128+i*19}" y="${y-26}" width="9" height="26" rx="3" fill="${i%3?'#1d2a1d':'#4a1414'}" stroke="${OL}"/>`;});
+    s+=dial(48,40,18,...PRINTS[3]);
+    s+=`<rect y="156" width="300" height="44" fill="#4a2e1a" stroke="${OL}"/><rect y="156" width="300" height="4" fill="#8a5f3e" opacity=".6"/>`;
+    s+=`<g transform="translate(150 130) scale(.86)">${bust(PEOPLE.butler,{look:-2})}</g>`;
+    s+=`<rect x="206" y="118" width="17" height="46" rx="5" fill="#1d2a1d" stroke="${OL}"/><rect x="210" y="100" width="9" height="20" fill="#1d2a1d" stroke="${OL}"/><rect x="208" y="132" width="13" height="14" fill="#e8dcc0"/>`;
+    s+=sleeve(176,170,206,150,PEOPLE.butler.coat)+`<ellipse cx="210" cy="148" rx="10" ry="7.5" fill="#f4f0e8" stroke="#8f887a"/>`;
+    s+=sleeve(112,170,200,104,PEOPLE.butler.coat)+`<ellipse cx="206" cy="100" rx="8" ry="6.5" fill="${PEOPLE.butler.skin}" stroke="${OL}"/><path d="M214 96 l8 -8 M216 100 l10 -2" stroke="#b9b4aa" stroke-width="2"/>`;
+  } else { // glass + gloved hand with ring
+    s+=`<rect width="300" height="200" fill="url(#pStripe)"/><g filter="url(#fBlurS)"><rect x="236" y="70" width="40" height="60" fill="url(#gWoodD)"/><circle cx="250" cy="96" r="34" fill="url(#rCandle)"/></g><g opacity=".85"><rect x="30" y="0" width="60" height="130" fill="url(#gWoodD)"/>${dial(60,46,22,...PRINTS[4])}</g>`;
+    s+=`<rect y="128" width="300" height="72" fill="url(#gCloth)"/><path d="M0 128 h300" stroke="#a89a7c"/>`;
+    s+=`<ellipse cx="130" cy="180" rx="26" ry="5" fill="#e8eef0" opacity=".8"/><line x1="130" y1="180" x2="130" y2="148" stroke="#e8eef0" stroke-width="3"/><path d="M104 92 Q102 144 130 148 Q158 144 156 92 Z" fill="#dfeaf0" fill-opacity=".3" stroke="#f3f6f6" stroke-width="1.6"/><path d="M106 116 Q106 144 130 146 Q154 144 154 116 Z" fill="#6a0f14"/>`;
+    s+=`<path d="M300 20 C250 24 210 36 186 52 L160 56 Q150 58 152 64 Q156 68 166 66 L176 66 L150 72 Q142 76 146 82 Q150 86 160 82 L188 76 C210 74 240 70 300 64 Z" fill="#f4f0e8" stroke="#8f887a" stroke-width="1.4"/><path d="M194 52 Q190 64 196 74" stroke="#cfc8ba" stroke-width="1.2" fill="none"/>`;
+    s+=`<ellipse cx="172" cy="62" rx="5" ry="8" fill="url(#gGold)" stroke="${OL}" stroke-width=".8"/><ellipse cx="172" cy="62" rx="2.8" ry="4.6" fill="#141010"/>`;
+    for(let i=0;i<9;i++) s+=`<circle cx="${146+(i*37%13)-6}" cy="${86+i*3.4}" r="${.6+(i*7%5)*.2}" fill="#fbf8f0"/>`;
+  }
+  return s;
+}
+
+/* ---------- DARKROOM ---------- */
+const TRAYX=[360,520,680], CAPS=['#3f7a3f','#4a5fb0','#8a4a1e'];
+function darkroomView(){
+  const F=S.f, red=!!F.red; let s='';
+  s+=`<rect width="1000" height="640" fill="#2a2420"/><rect width="1000" height="640" fill="url(#pMottle)"/><rect width="1000" height="22" fill="#141110"/>`;
+  // curtain + Rook's wall behind
+  s+=`<rect x="40" y="36" width="200" height="440" fill="#120e0c"/>`;
+  if(F.curtain) s+=`<rect x="70" y="60" width="150" height="300" fill="#8a5a34"/><rect x="70" y="60" width="150" height="300" fill="url(#pCork)"/><path d="M90 100 Q140 150 190 110 M100 200 Q150 160 200 220" stroke="#a51d17" stroke-width="2" fill="none"/><rect x="88" y="80" width="30" height="38" fill="#e6dbc1"/><rect x="170" y="90" width="30" height="38" fill="#e6dbc1"/><rect x="120" y="180" width="34" height="26" fill="#efe7d4"/>`;
+  s+=`<rect x="32" y="30" width="216" height="8" fill="url(#gBrassH)"/>`;
+  s+= F.curtain
+    ? `<path d="M40 38 L80 38 C70 160 84 300 66 476 L40 476 Z" fill="#0d0b0b" stroke="#2a2626"/><path d="M48 38 v438 M60 38 v438" stroke="#1d1a1a" stroke-width="3"/>`
+    : `<path d="M40 38 L240 38 L240 476 L40 476 Z" fill="#0d0b0b" stroke="#2a2626"/>`+[64,96,128,160,192,222].map(x=>`<path d="M${x} 38 C${x+6} 180 ${x-6} 320 ${x+4} 476" stroke="#1f1b1b" stroke-width="7" fill="none"/>`).join('');
+  // switch
+  s+=`<rect x="266" y="226" width="40" height="64" rx="4" fill="#d8d0bc" stroke="${OL}"/><rect x="278" y="240" width="16" height="36" rx="3" fill="#2a2420"/><rect x="279" y="${red?258:241}" width="14" height="17" rx="3" fill="#efe6cf" stroke="${OL}"/>`;
+  s+=`<circle cx="286" cy="232" r="3" fill="#f2efe2" stroke="${OL}"/><circle cx="286" cy="284" r="3" fill="#c2271b" stroke="${OL}"/>`;
+  // safelight and bulb
+  s+=`<rect x="538" y="160" width="44" height="34" rx="4" fill="#1a1414" stroke="${OL}"/><rect x="544" y="166" width="32" height="22" fill="${red?'#ff3a24':'#5a1a14'}"/>`;
+  s+=`<line x1="430" y1="0" x2="430" y2="100" stroke="#111" stroke-width="2"/><rect x="424" y="98" width="12" height="10" fill="#4a4440"/><ellipse cx="430" cy="118" rx="11" ry="13" fill="${red?'#4a4440':'#fff6d8'}" stroke="${OL}"/>`;
+  if(!red) s+=`<circle cx="430" cy="118" r="260" fill="url(#rCandle)" opacity=".7"/>`;
+  // clothesline
+  s+=`<path d="M30 64 Q500 94 970 60" stroke="#c9c0a8" stroke-width="1.6" fill="none"/>`;
+  const HANG=['pr3','pr1','pr4','pr2'];
+  if(F.printed) HANG.forEach((id,i)=>{ if(F.took[id]) return; const x=330+i*100,y=80;
+    s+=`<g transform="rotate(${[-3,2,-2,3][i]} ${x} ${y})"><rect x="${x-42}" y="${y}" width="84" height="60" fill="#e9e1cc"/><svg x="${x-38}" y="${y+4}" width="76" height="50" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"><g filter="url(#fSepia)">${printArt(+id[2])}</g></svg><rect x="${x-4}" y="${y-10}" width="8" height="18" fill="#c9a26a" stroke="${OL}"/></g>`;});
+  // shelf
+  s+=`<rect x="320" y="230" width="210" height="8" fill="#4a2e1a" stroke="${OL}"/><rect x="340" y="196" width="22" height="34" fill="#c8d4d8" opacity=".35" stroke="#8a9498"/><rect x="372" y="208" width="16" height="22" fill="#c8d4d8" opacity=".3" stroke="#8a9498"/>`;
+  s+=`<rect x="440" y="186" width="56" height="44" rx="6" fill="#1d1d1f" stroke="${OL}"/><circle cx="468" cy="207" r="16" fill="#e9e1cf"/>${clockHM(468,207,14,0,8)}<text x="468" y="228" text-anchor="middle" font-family="Cormorant SC, serif" font-size="6" fill="#c9a256">ТАЙМЕР</text>`;
+  // chart
+  s+=`<rect x="626" y="150" width="170" height="130" fill="#000" opacity=".3" transform="translate(4 5)"/><rect x="626" y="150" width="170" height="130" fill="#efe7d3"/><rect x="626" y="150" width="170" height="130" fill="url(#pPaper)"/>`;
+  s+=`<text x="711" y="170" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="12" letter-spacing="2" fill="#211810">ПОРЯДОК ПРОЯВКИ</text><line x1="640" y1="176" x2="782" y2="176" stroke="#211810"/>`;
+  [['1. Проявитель','коричневая','8 мин'],['2. Стоп-ванна','зелёная','30 сек'],['3. Фиксаж','синяя','5 мин']].forEach(([a,b,c],i)=>{const y=196+i*24;s+=`<text x="640" y="${y}" font-family="Cormorant Garamond, serif" font-size="13" fill="#211810">${a}</text><text x="782" y="${y}" text-anchor="end" font-family="Cormorant Garamond, serif" font-style="italic" font-size="12" fill="#4a3a28">${c}</text><text x="652" y="${y+11}" font-family="Marck Script, cursive" font-size="11" fill="#23324f">крышка — ${b}</text>`;});
+  s+=`<text x="711" y="271" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" fill="#a3221b" textLength="150" lengthAdjust="spacingAndGlyphs">ПЛЁНКА — ТОЛЬКО ПРИ КРАСНОМ СВЕТЕ</text>`;
+  // enlarger
+  s+=`<rect x="868" y="110" width="12" height="290" fill="url(#gSilver)" stroke="${OL}"/><rect x="824" y="150" width="62" height="64" rx="6" fill="#26262a" stroke="${OL}" stroke-width="1.5"/><path d="M834 150 Q855 126 876 150" fill="#1d1d20" stroke="${OL}"/><rect x="840" y="214" width="30" height="20" fill="#3a3a3e" stroke="${OL}"/><path d="M840 234 L846 252 L864 252 L870 234 Z" fill="#141414" stroke="${OL}"/><circle cx="855" cy="252" r="5" fill="#1a1f26"/>`;
+  if(!F.filmTaken) s+=`<rect x="886" y="176" width="10" height="16" fill="#1a1414"/><circle cx="854" cy="170" r="2" fill="#fff" class="spin"/>`;
+  if(F.printing) s+=`<path d="M846 254 L864 254 L896 390 L814 390 Z" fill="#fff4d0" opacity=".35"/>`;
+  // bench
+  s+=`<path d="M250 380 L990 380 L1000 420 L240 420 Z" fill="#3e3a36" stroke="${OL}"/><rect x="240" y="420" width="760" height="220" fill="#2a1c12"/><rect x="240" y="420" width="760" height="220" fill="url(#pWood)" opacity=".5"/><rect x="240" y="420" width="760" height="6" fill="#4a3424"/>`;
+  s+=`<path d="M300 440 v200 M900 440 v200" stroke="#120c08" stroke-width="3"/>`;
+  [[318,452],[604,452]].forEach(([x,y])=>{s+=`<rect x="${x}" y="${y}" width="270" height="170" fill="none" stroke="#120c08" stroke-width="2"/><rect x="${x+6}" y="${y+6}" width="258" height="158" fill="none" stroke="#5a3a22" stroke-width="1" opacity=".5"/><rect x="${x+124}" y="${y+18}" width="22" height="6" rx="3" fill="url(#gBrass)"/>`;});
+  s+=`<rect x="250" y="560" width="44" height="60" rx="4" fill="#4a4a50" stroke="${OL}"/><path d="M250 572 h44" stroke="#2a2a2e" stroke-width="2"/><path d="M262 560 Q272 548 282 560" stroke="#2a2a2e" stroke-width="3" fill="none"/>`;
+  s+=`<g transform="translate(560 396) rotate(-3)"><rect x="-34" y="-12" width="68" height="14" fill="#1b1b4a" stroke="${OL}"/><rect x="-34" y="-12" width="68" height="4" fill="#d8c79c"/><text x="0" y="0" text-anchor="middle" font-family="Cormorant SC, serif" font-size="7" fill="#d8c79c" letter-spacing="1">ФОТОБУМАГА</text></g>`;
+  s+=`<rect x="814" y="384" width="82" height="20" fill="#e9e1cc" stroke="${OL}"/><rect x="814" y="384" width="82" height="20" fill="#e9e1cc" stroke="${OL}"/>`;
+  // bottles + trays
+  TRAYX.forEach((x,i)=>{
+    s+=`<path d="M${x-15} 378 L${x-15} 312 Q${x-15} 300 ${x-6} 296 L${x-6} 284 L${x+6} 284 L${x+6} 296 Q${x+15} 300 ${x+15} 312 L${x+15} 378 Z" fill="url(#gAmber)" stroke="${OL}"/>`;
+    s+=`<rect x="${x-9}" y="272" width="18" height="14" rx="2" fill="${red?'#5a1a14':CAPS[i]}" stroke="${OL}"/><rect x="${x-12}" y="326" width="24" height="30" fill="#d8ccb0" opacity=".55"/><path d="M${x-8} 334 h14 M${x-8} 342 h10" stroke="#8a7a60" stroke-width="1" opacity=".5"/>`;
+    s+=`<path d="M${x-66} 384 L${x+66} 384 L${x+72} 410 L${x-72} 410 Z" fill="#d8d4cc" stroke="${OL}"/><path d="M${x-58} 388 L${x+58} 388 L${x+62} 404 L${x-62} 404 Z" fill="${['#9fb4a8','#a8b0c4','#b8a890'][i]}" opacity=".55"/>`;
+  });
+  if(F.dev>0&&F.dev<3) s+=`<path d="M${TRAYX[[2,0][F.dev-1]]-30} 396 h60" stroke="#3a2416" stroke-width="5"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".75"/>`;
+  if(red) s+=`<rect width="1000" height="640" fill="#000" opacity=".25"/>`;
+  s+=hs('curtain',40,38,200,438)+hs('switch',260,220,52,76)+hs('chart',626,150,170,130)+hs('timer',436,184,64,48)+hs('bulb',414,96,32,40)+hs('safelight',534,156,52,42);
+  TRAYX.forEach((x,i)=>{s+=hs('t'+i,x-72,268,144,144);});
+  s+=hs('enlarger',818,106,84,300);
+  if(F.printed) HANG.forEach((id,i)=>{if(!F.took[id]) s+=hs('h'+id,288+i*100,72,84,72);});
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- ROOK'S WALL ---------- */
+const RB=[['pickman',150,150,-3],['lady',318,168,2],['doctor',682,168,-2],['butler',850,150,3]];
+const RBNOTE={pickman:'деньги приюта?',lady:'ревность?',doctor:'яд — у него',butler:'вино — его руки'};
+const TLX=[170,390,610,830], TLY=510;
+function rookBoard(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#1a1412"/><rect x="20" y="20" width="960" height="600" fill="#120c08"/><rect x="28" y="28" width="944" height="584" fill="#8a5a34"/><rect x="28" y="28" width="944" height="584" fill="url(#pCork)"/><rect x="28" y="28" width="944" height="584" fill="url(#rCork)"/>`;
+  s+=`<g transform="translate(500 312) rotate(-2)"><rect x="-86" y="-30" width="172" height="62" fill="#d8ccad"/><rect x="-86" y="-30" width="172" height="62" fill="url(#pPaper)"/><text x="0" y="-12" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="11" fill="#211810">МЕЦЕНАТ ГОДА</text><text x="0" y="3" text-anchor="middle" font-family="Old Standard TT, serif" font-size="9" fill="#211810">О. Пикман, попечитель</text><text x="0" y="15" text-anchor="middle" font-family="Old Standard TT, serif" font-size="9" fill="#211810">приюта св. Агнессы</text>${pin(0,-26,'#2f4d6b')}</g>`;
+  s+=photoCard('mother',500,150,124,156,{rot:-1,label:'Э.',fs:18,bg:'#5a4a38'});
+  RB.forEach(([pid,x,y,rot])=>{
+    s+=photoCard(pid,x,y,112,140,{rot,label:PEOPLE[pid].short||'Хиггс',fs:14});
+    s+=`<g transform="translate(${x} ${y+96}) rotate(${-rot})"><rect x="-54" y="-13" width="108" height="26" fill="#efe7d4"/><text x="0" y="5" text-anchor="middle" font-family="Marck Script, cursive" font-size="15" fill="#23324f">${RBNOTE[pid]}</text></g>`;
+  });
+  const cut={pickman:F.tl[0],lady:F.tl[0],doctor:F.tl[1],butler:F.tl[2]};
+  RB.forEach(([pid,x,y])=>{
+    const x1=x, y1=y-62, x2=500, y2=82;
+    if(!cut[pid]) s+=thread(x1,y1,x2,y2,26);
+    else { const mx=x1+(x2-x1)*.3, my=y1+(y2-y1)*.3+18, nx=x2+(x1-x2)*.22, ny=y2+(y1-y2)*.22+12;
+      s+=`<path d="M${x1} ${y1} Q${(x1+mx)/2} ${my+6} ${mx} ${my+26}" stroke="#a51d17" stroke-width="2.4" fill="none"/><path d="M${x2} ${y2} Q${(x2+nx)/2} ${ny} ${nx} ${ny+22}" stroke="#a51d17" stroke-width="2.4" fill="none"/>`; }
+    s+=pin(x1,y1);
+  });
+  s+=pin(500,82);
+  // timeline strip
+  s+=`<g transform="rotate(-.6 500 500)"><rect x="56" y="392" width="888" height="200" fill="#000" opacity=".25" transform="translate(4 5)"/><rect x="56" y="392" width="888" height="200" fill="#e9e1cc"/><rect x="56" y="392" width="888" height="200" fill="url(#pPaper)"/>`;
+  s+=`<text x="76" y="414" font-family="Marck Script, cursive" font-size="18" fill="#3a1a14">14.XI — мои кадры:</text><text x="924" y="582" text-anchor="end" font-family="Marck Script, cursive" font-size="20" fill="#a3221b">21:40 †</text><path d="M70 588 H860" stroke="#3a1a14" stroke-width="1.5" stroke-dasharray="6 5"/>`;
+  ['21:20','21:25','21:30','21:35'].forEach((t,i)=>{
+    const x=TLX[i], id=F.tl[i];
+    s+=`<text x="${x}" y="446" text-anchor="middle" font-family="Marck Script, cursive" font-size="22" fill="#23324f">${t}</text>`;
+    if(!id) s+=`<rect x="${x-82}" y="${TLY-52}" width="164" height="110" fill="none" stroke="#6f6550" stroke-width="2" stroke-dasharray="7 6"/><text x="${x}" y="${TLY+14}" text-anchor="middle" font-family="Marck Script, cursive" font-size="40" fill="#6f6550" opacity=".5">?</text>`;
+    else s+=`<rect x="${x-80}" y="${TLY-48}" width="168" height="112" fill="#000" opacity=".3"/><rect x="${x-84}" y="${TLY-54}" width="168" height="112" fill="#f1ead8" stroke="#a89a7c"/><svg x="${x-78}" y="${TLY-48}" width="156" height="100" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"><g filter="url(#fSepia)">${printArt(+id[2])}</g></svg>${pin(x,TLY-48,'#c9a256')}`;
+  });
+  s+=`</g>`;
+  if(F.ring){ const x=TLX[3]+18, y=TLY-6;
+    s+=`<line x1="${x+44}" y1="${y+40}" x2="${x+66}" y2="${y+66}" stroke="#3a2416" stroke-width="8" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="58" fill="#e9e1cc" stroke="url(#gBrass)" stroke-width="7"/><g filter="url(#fSepia)"><ellipse cx="${x}" cy="${y}" rx="34" ry="44" fill="url(#gGold)" stroke="${OL}"/><ellipse cx="${x}" cy="${y}" rx="24" ry="33" fill="#141010"/>${ravenCrest(x,y,20,'#d8c79c')}</g><path d="M${x-40} ${y-26} Q${x-30} ${y-46} ${x-8} ${y-50}" stroke="#fff" stroke-width="3" opacity=".6" fill="none"/>`; }
+  if(F.crest){ s+=`<g transform="translate(888 300) rotate(6)"><rect x="-54" y="-44" width="108" height="88" fill="#efe7d3" stroke="#8a7a60"/>${ravenCrest(0,-12,22)}<text x="0" y="32" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" letter-spacing="1" fill="#211810">ПРИЮТ СВ. АГНЕССЫ</text></g>`+thread(888,262,TLX[3]+18,TLY-64,20)+pin(888,262,'#c9a256'); }
+  RB.forEach(([pid,x,y])=>{s+=hs('rb_'+pid,x-58,y-72,116,190);});
+  s+=hs('rbMother',436,70,128,160)+hs('rbClip',412,280,176,66);
+  TLX.forEach((x,i)=>{s+=hs('tl'+i,x-86,TLY-56,172,118);});
+  s+=arrow(500,622);
+  return s;
+}
+
 /* ---------- scenes & rendering ---------- */
-const SCENES={room,board:()=>boardArt(true),clock:clockView,trunk:trunkView,dinner:()=>renderDinner(true),bag:bagView,watch:watchView};
-const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room'};
-const MEMORY=new Set(['dinner','bag','watch']);
+const SCENES={room,board:()=>boardArt(true),clock:clockView,trunk:trunkView,dinner:()=>renderDinner(true),bag:bagView,watch:watchView,
+  office:officeView,office53:office53View,cabinet:cabinetView,darkroom:darkroomView,rookboard:rookBoard};
+const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room',cabinet:'office',darkroom:'office',rookboard:'darkroom',office53:'office'};
+const MEMORY=new Set(['dinner','bag','watch','office53']);
+const INDOOR=new Set(['darkroom','rookboard']);
 const sceneEl=$('#scene');
 function render(){
   sceneEl.classList.toggle('memory',MEMORY.has(S.scene));
+  sceneEl.classList.toggle('red',S.scene==='darkroom'&&!!S.f.red);
   sceneEl.innerHTML=`<svg viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Сцена">${SCENES[S.scene]()}</svg>`;
   S.f.sixthAnim=false;
   save();
@@ -827,7 +1197,7 @@ function renderInv(newId){
 }
 shelf.addEventListener('click',e=>{
   const b=e.target.closest('.slot'); if(!b) return;
-  const id=b.dataset.i; sfx.click();
+  const id=b.dataset.i; sfx.click(); S.f.touched=1;
   if(S.sel===id){inspect(id);} else {S.sel=id;}
   renderInv();
 });
@@ -854,13 +1224,19 @@ function inspect(id){
   }
   if(it.special==='note'){openOv(`<div class="note card hand">Держись подальше от Огастеса, Элеонора.<br>Ты пожалеешь, если не остановишься.<div style="text-align:right;margin-top:10px">— К.</div></div>`);return;}
   if(it.special==='page'){openOv(`<div class="page card hand">П. — приют св. Агнессы.<br>40&nbsp;000 фунтов исчезли.<br>Доказательства у меня.<br>Статья — в понедельник!</div>`);return;}
+  if(it.special==='faceless'){S.f.stamp=1;openOv(`<div class="twin"><div class="pcard card"><svg viewBox="0 0 200 240">${photoCard('stranger',100,120,180,230,{rot:0,label:'«Ты смотришь не туда»',fs:15,bg:'#3a3026'})}</svg></div><div class="back card"><div class="hand">Ты смотришь не&nbsp;туда, Ада</div><div class="stamp">Фотолаборатория<br>«Вечернего вестника»<b>НЕГАТИВ XI-14</b></div></div></div>`);return;}
+  if(it.special==='group'){openOv(`<div class="photo-insp" id="pin"><svg viewBox="0 0 1000 640">${newsroom(true,false)}</svg><div class="lbl">13.XI.1953 · Редакция «Вечернего вестника»</div></div><div class="close" style="font-size:17px;color:#e9dfc7">Коснитесь снимка, чтобы вглядеться</div>`,e=>{if(e.target.closest('#pin')){closeOv();enterMemory();return true;}});return;}
+  if(it.special==='letter'){openOv(`<div class="letter card"><svg viewBox="-50 -50 100 100">${ravenCrest(0,0,44)}</svg><div class="sm">ПРИЮТ СВЯТОЙ АГНЕССЫ · БЛЭКВУД-ЛЕЙН</div><div class="hand">Миссис Лэнг!<br>Я знаю, куда ушли деньги приюта. Завтра у Пикмана я расскажу вам всё. Приходите непременно.<div style="text-align:right">— Друг</div></div></div>`);return;}
+  if(it.special==='negative'){openOv(`<div class="negstrip">${[1,2,3,4].map(n=>`<svg viewBox="0 0 300 200">${printArt(n)}</svg>`).join('')}</div><div class="close" style="font-size:17px;color:#e9dfc7">Свет и тень поменялись местами. Нужен увеличитель.</div>`);return;}
+  if(it.print){openOv(`<div class="photo-insp" style="cursor:default"><svg viewBox="0 0 300 200"><g filter="url(#fSepia)">${printArt(it.print)}</g></svg><div class="lbl">14.XI.53 · Пикман-холл</div></div>`);return;}
   if(it.person){const p=PEOPLE[it.person];openOv(`<div class="itemcard card"><svg viewBox="0 0 200 240">${photoCard(it.person,100,120,180,230,{rot:-2})}</svg><h3>${p.name}</h3><p>${p.role}</p></div>`);return;}
   openOv(`<div class="itemcard card"><svg viewBox="0 0 64 64">${icon(id)}</svg><h3>${it.name}</h3><p>${it.desc}</p></div>`);
 }
-function newsOv(){openOv(`<div class="news card"><div class="mast">Вечерний вестник</div><div class="date"><span>Воскресенье, 15 ноября 1953</span><span>№ 4127</span><span>Цена 2 пенса</span></div><h2>Трагедия в особняке Пикмана</h2><div class="sub">Сотрудница нашей редакции скончалась во время званого ужина</div><div class="cols"><p>Вчера вечером во время званого ужина в доме мистера Огастеса Пикмана скоропостижно скончалась миссис Элеонора Лэнг, 34 лет, корреспондент «Вечернего вестника».</p><p>По заключению доктора Альберта Грея, присутствовавшего за столом, смерть наступила от внезапной остановки сердца. Мистер Пикман выразил семье глубочайшие соболезнования.</p><p>Слуги утверждают, что большие часы в обеденной зале остановились в ту же минуту — <i>без двадцати десять</i> — и с тех пор их никто не заводил.</p><p>Полиция не нашла оснований для расследования. У миссис Лэнг осталась семилетняя дочь.</p></div></div>`);}
+function newsOv(){openOv(`<div class="news card"><div class="mast">Вечерний вестник</div><div class="date"><span>Воскресенье, 15 ноября 1953</span><span>№ 4127</span><span>Цена 2 пенса</span></div><h2>Трагедия в особняке Пикмана</h2><div class="sub">Сотрудница нашей редакции скончалась во время званого ужина</div><div class="cols"><p>Вчера вечером во время званого ужина в доме мистера Огастеса Пикмана скоропостижно скончалась миссис Элеонора Лэнг, 34 года, корреспондент «Вечернего вестника».</p><p>По заключению доктора Альберта Грея, присутствовавшего за столом, смерть наступила от внезапной остановки сердца. Мистер Пикман выразил семье глубочайшие соболезнования.</p><p>Слуги утверждают, что большие часы в обеденной зале остановились в ту же минуту — <i>без двадцати десять</i> — и с тех пор их никто не заводил.</p><p>Полиция не нашла оснований для расследования. У миссис Лэнг осталась семилетняя дочь.</p></div></div>`);}
 
 /* ---------- hints ---------- */
 function hint(){
+  if(S.ch===2) return hint2();
   const F=S.f, mem=MEMORY.has(S.scene);
   const allShot=['doctor','pickman','lady','butler'].every(p=>F.shot[p]);
   const allEv=F.sediment&&F.vialTaken&&F.noteTaken&&F.gloveTaken&&F.pageTaken;
@@ -891,6 +1267,33 @@ function hint(){
   return 'Кар! Ты смотришь не туда, Ада.';
 }
 
+function hint2(){
+  const F=S.f;
+  if(F.ended) return 'Кар! Теперь ты смотришь туда, Ада.';
+  if(S.scene==='office53'){
+    if(!F.letterTaken) return 'Кар! На мамином столе лежит письмо. Кто-то назначил ей встречу.';
+    if(!F.sawKey) return 'Кар! Фотограф стоит у лаборатории. Посмотри на дверь — куда он прячет ключ?';
+    return 'Кар! Ты видела, где ключ. Возвращайся в семьдесят пятый.';
+  }
+  if(!F.groupTaken) return F.stamp?'Кар! Штамп: XI-14. Архив разложен по месяцам.':'Кар! Переверни фотографию без лица. На обороте есть штамп.';
+  if(!F.visited) return 'Кар! Снимок из архива. Вглядись в него как следует.';
+  if(!F.letterTaken||!F.sawKey) return 'Кар! Вернись в тот вечер. Ты ещё не всё увидела.';
+  if(!F.keyTaken) return 'Кар! Над дверью лаборатории. Двадцать два года пыли.';
+  if(!F.labOpen) return 'Кар! Ключ подойдёт к лаборатории.';
+  if(!F.filmTaken) return 'Кар! Плёнку прячут там, где всегда темно. В увеличителе что-то гремит.';
+  if(F.dev<3){
+    if(!F.red) return 'Кар! Банку с плёнкой открывают только при красном свете.';
+    if(!F.chart) return 'Кар! На стене висит порядок проявки.';
+    return 'Кар! При красном свете все крышки одного цвета. Запомни их при белом. Или понюхай.';
+  }
+  if(!F.printed) return F.red?'Кар! Негатив — в увеличитель.':'Кар! Фотобумага боится белого света. Негатив — в увеличитель.';
+  if(['pr1','pr2','pr3','pr4'].some(p=>!F.took[p])) return 'Кар! Сними отпечатки с верёвки.';
+  if(!F.curtain) return 'Кар! За чёрной шторой кто-то вёл своё расследование.';
+  if(F.tl.some(x=>!x)) return 'Кар! Смотри на часы в каждом кадре. Разложи их по времени.';
+  if(!F.ring) return 'Кар! Последний кадр. Рука над бокалом. Возьми лупу.';
+  return 'Кар! Где ты уже видела этого ворона? Перечитай письмо.';
+}
+
 /* ---------- actions ---------- */
 const TALK={
   doctor:['«Сердце. Я же предупреждал её — сердце».','«Пульса нет. Ничего нельзя было сделать. Ничего»','«Который час? Запишите: без двадцати десять»'],
@@ -899,13 +1302,23 @@ const TALK={
   butler:['«Я лишь разливал вино, мисс. Как всегда»','«Бокал миссис Лэнг я наполнял дважды. Нет — трижды»','«Простите, мисс. Мне велено не разговаривать с гостями»']
 };
 function talk(pid){const n=S.f.talk[pid]||0;S.f.talk[pid]=n+1;msg(TALK[pid][n%TALK[pid].length]);}
+const TALK2={
+  mother:['«Ада, солнышко, ещё пять минут — и домой»','«Завтра ужин у Пикмана, а в понедельник статья уйдёт в набор. Пусть попробуют остановить»','«Сайлас говорит, что мне не стоит туда ходить. Сайлас слишком многого боится»','«Ада, не трогай мою лупу. Она для корректуры, а не для жуков»'],
+  editor:['«Да, мистер Пикман. Нет, мистер Пикман. Статья не выйдет, даю слово»','«Элеонора, зайди ко мне. Нет... лучше в понедельник»','«Рук! Где плёнки с верфи? Ты мне должен с октября!»'],
+  rook:['«Не ходи завтра к Пикману, Элеонора. Я прошу тебя»','«Я буду там с камерой. Если что-то случится, плёнка всё запомнит»','«Не смотри на меня так, малышка»']
+};
 const WRONG=['Это здесь ни к чему.','Не то.','Нет. Не сюда.','Ничего не происходит.'];
 function wrong(){sfx.wrong();msg(WRONG[Math.floor(Math.random()*WRONG.length)]);S.sel=null;renderInv();}
 
 function act(id,sel){
   const F=S.f, sc=S.scene;
-  if(id==='back'){ if(sc==='dinner'){go('room',false);setTimeout(()=>msg('Я отпускаю воспоминание. Снова 1975 год, и снова дождь.'),400);} else go(PARENT[sc]); return true;}
-  if(id==='crow'||id==='crowD'){sfx.caw();msg(hint(),6500);return true;}
+  if(id==='back'){
+    if(sc==='dinner'){go('room',false);setTimeout(()=>msg('Я отпускаю воспоминание. Снова 1975 год, и снова дождь.'),400);}
+    else if(sc==='office53'){go('office',false);setTimeout(()=>msg('Снова семьдесят пятый. Пыль, коробки, тишина.'),400);}
+    else go(PARENT[sc]);
+    return true;}
+  if(id==='crow'||id==='crowD'||id==='crowO'){sfx.caw();msg(hint(),6500);return true;}
+  if(S.ch===2) return act2(id,sel);
   switch(sc+':'+id){
   /* room */
   case 'room:board': go('board'); return true;
@@ -1044,9 +1457,135 @@ function act(id,sel){
   }
   return false;
 }
+
+const TLMSG=[
+  'Двадцать один двадцать. Пикман и леди Вейн в коридоре, вдвоём. Пока они целовались, мамин бокал был далеко. Две нити рвутся.',
+  'Двадцать один двадцать пять. Доктор курит у камина, а саквояж стоит раскрытым в холле. Флакон мог взять кто угодно. Нить рвётся.',
+  'Двадцать один тридцать. Хиггс в буфетной — в одной перчатке. Вторую кто-то у него взял. Нить рвётся.',
+  'Двадцать один тридцать пять. Рука в белой перчатке над маминым бокалом. А поверх перчатки — перстень. Слуги перстней не носят.'
+];
+function act2(id,sel){
+  const F=S.f, sc=S.scene;
+  switch(sc+':'+id){
+  /* office 1975 */
+  case 'office:window': if(sel) return false; msg('Дождь. Тот же, что и двадцать два года назад.');return true;
+  case 'office:staff': if(sel) return false; msg('«Наши сотрудники». Редактор Холлоуэй, мама... А вместо фотографа — вырезанный квадрат. Подпись: «С. Рук».');return true;
+  case 'office:edDoor': if(sel) return false; msg('Кабинет редактора. Заперт. Буквы на стекле облупились.');return true;
+  case 'office:clockO': if(sel) return false; msg('Часы встали в десять минут четвёртого. Никто не заметил, когда.');return true;
+  case 'office:calO': if(sel) return false; msg('Тридцать первое декабря семьдесят четвёртого. Последний номер «Вестника».');return true;
+  case 'office:cabinet': if(sel) return false; go('cabinet');return true;
+  case 'office:desk': if(sel) return false; msg('Мамин стол. В ящике — пустые бланки и засохшая чернильница. Всё остальное увезли.');return true;
+  case 'office:typer': if(sel) return false; msg('Её «Ундервуд» под чехлом. Я помню, как стучали клавиши.');return true;
+  case 'office:boxes': if(sel) return false; msg('«На вывоз». Подшивки, счета, чьи-то перчатки. Двадцать лет газеты — в три коробки.');return true;
+  case 'office:lintel':
+    if(sel) return false;
+    if(F.sawKey&&!F.keyTaken){F.keyTaken=1;addItem('labkey');render();msg('Пыль, паутина — и ключ. Там, где он его оставил двадцать два года назад.');}
+    else msg(F.keyTaken?'Пустая притолока.':'Пыльная притолока. Паутина — и больше ничего не видно.');
+    return true;
+  case 'office:lab':
+    if(sel==='labkey'){removeItem('labkey');F.labOpen=1;sfx.unlock();render();msg('Ключ подошёл. Красная лампа над дверью мигнула и зажглась.');setTimeout(()=>go('darkroom'),1100);return true;}
+    if(sel) return false;
+    if(F.labOpen) go('darkroom'); else {sfx.wrong();msg('Лаборатория. Заперто. «Не входить».');}
+    return true;
+  /* cabinet */
+  case 'cabinet:d10':
+    if(sel) return false;
+    sfx.drawer(); F.drawer=10;
+    if(!F.groupTaken){F.groupTaken=1;addItem('group');render();msg('Ноябрь. Конверт «XI-14 · Пикман-холл» пуст: «Плёнка не сдана. — С. Р.» А под ним — снимок редакции, сделанный днём раньше.',7000);}
+    else {render();msg('Ноябрь. Пустой конверт: «Плёнка не сдана».');}
+    return true;
+  /* memory: office 1953 */
+  case 'office53:mother':
+    if(sel==='magnifier'){msg('Она держит эту лупу в кармане жакета. Сейчас она лежит в моём.');return true;}
+    if(sel) return false;
+    if(!F.sawMother){F.sawMother=1;msg('Мама. Живая. Она не видит меня — она видит ту, семилетнюю.',4500);return true;}
+    talkTo('mother');return true;
+  case 'office53:editor': if(sel) return false; talkTo('editor');return true;
+  case 'office53:rook':
+    if(sel==='magnifier'){msg('Я наклоняюсь ближе. Свет из-за спины. Лица нет — только тень.');return true;}
+    if(sel) return false; talkTo('rook');return true;
+  case 'office53:lab':
+    if(sel) return false;
+    if(!F.sawKey){F.sawKey=1;sfx.unlock();render();msg('Рук запирает лабораторию и кладёт ключ на притолоку. Он думает, что его никто не видит.',5500);}
+    else msg('Ключ на притолоке. Двадцать два года он будет лежать там.');
+    return true;
+  case 'office53:lintel': if(sel) return false; return act2('lab',null);
+  case 'office53:letter':
+    if(sel) return false;
+    F.letterTaken=1;addItem('letter');render();msg('Письмо на бланке приюта святой Агнессы. В углу — герб: ворон с ключом в клюве.');return true;
+  case 'office53:typer': if(sel) return false; msg('«ПРИЮТ СВЯТОЙ АГНЕССЫ: КУДА ИСЧЕЗЛИ СОРОК ТЫСЯЧ?» Статья, которая так и не вышла.');return true;
+  case 'office53:ada': if(sel) return false; msg('Это я. Рисую «маму и я». Этот рисунок до сих пор лежит в её сундуке.');return true;
+  case 'office53:staff': if(sel) return false; msg('Блик лампы на его фотографии. Даже здесь я не вижу его лица.');return true;
+  case 'office53:clockO': if(sel) return false; msg('Без четверти семь. Мама обещала, что мы пойдём домой.');return true;
+  case 'office53:calO': if(sel) return false; msg('Тринадцатое ноября, пятница. До ужина у Пикмана — один день.');return true;
+  case 'office53:edDoor': if(sel) return false; msg('Дверь открыта. Холлоуэй говорит по телефону — тихо, прикрывая трубку.');return true;
+  case 'office53:cabinet': if(sel) return false; msg('Архив. Ноябрьский ящик ещё ждёт своих плёнок.');return true;
+  case 'office53:window': if(sel) return false; msg('Пятьдесят третий год. Дождь уже идёт.');return true;
+  /* darkroom */
+  case 'darkroom:switch':
+    if(sel) return false;
+    F.red=!F.red;sfx.click();render();amb();
+    msg(F.red?'Красный свет. Теперь здесь всё одного цвета.':'Белый свет. Резкий, как вспышка.');return true;
+  case 'darkroom:bulb': case 'darkroom:safelight': if(sel) return false; return act2('switch',null);
+  case 'darkroom:chart': if(sel) return false; F.chart=1; msg('Порядок проявки: проявитель — коричневая крышка, стоп-ванна — зелёная, фиксаж — синяя.',5500);return true;
+  case 'darkroom:timer': if(sel) return false; msg('Таймер остановился на восьми минутах. Ровно столько нужно проявителю.');return true;
+  case 'darkroom:curtain':
+    if(sel) return false;
+    if(!F.curtain){F.curtain=1;sfx.creak();render();msg('За шторой — стена. Фотографии, нитки, булавки. Он тоже искал.');setTimeout(()=>go('rookboard'),1400);}
+    else go('rookboard');
+    return true;
+  case 'darkroom:enlarger':
+    if(sel==='negative'){
+      if(!F.red){sfx.wrong();msg('При белом свете фотобумага почернеет. Нужен красный.');S.sel=null;renderInv();return true;}
+      removeItem('negative');F.printing=1;render();sfx.click();msg('Щелчок лампы. Бумага в проявителе... На ней медленно проступают лица.',4000);
+      setTimeout(()=>{F.printing=0;F.printed=1;sfx.pin();if(S.scene==='darkroom')render();msg('Четыре отпечатка сохнут на верёвке.');save();},3600);
+      return true;}
+    if(sel) return false;
+    if(!F.filmTaken){F.filmTaken=1;addItem('film');render();msg('В корпусе лампы гремела жестяная банка. «14.XI. Не открывать на свету. — С. Р.»',6000);}
+    else msg(F.printed?'Увеличитель остывает. Пахнет нагретой пылью.':'Фотоувеличитель. Лампа ещё работает.');
+    return true;
+  case 'darkroom:t0': case 'darkroom:t1': case 'darkroom:t2': {
+    const i=+id[1], SMELL=['Резкий запах уксуса.','Тяжёлый запах серы.','Почти без запаха. Скользкий, как мыло.'], COL=['Зелёная','Синяя','Коричневая'];
+    if(sel==='film'){
+      if(!F.red){sfx.wrong();msg('Нет! На белом свету плёнка засветится. Сначала красный свет.');S.sel=null;renderInv();return true;}
+      const need=[2,0,1][F.dev];
+      if(i!==need){sfx.wrong();F.dev=0;S.sel=null;renderInv();render();msg(SMELL[i]+' Не та кювета — и не тот черёд. Начну сначала.');return true;}
+      F.dev++;sfx.slosh();
+      if(F.dev===3){removeItem('film');addItem('negative');render();msg('Фиксаж. Теперь свет ей не страшен. Негатив — четыре кадра.');}
+      else {render();msg(F.dev===1?'Проявитель. Восемь минут... На плёнке проступают тени.':'Стоп-ванна. Проявка остановлена. Теперь — закрепить.');}
+      return true;}
+    if(sel) return false;
+    msg(F.red?SMELL[i]+' Крышку при красном свете не разглядеть.':COL[i]+' крышка. '+SMELL[i]);return true; }
+  /* Rook's wall */
+  case 'rookboard:rbMother': if(sel) return false; msg('Мама. Под фотографией его почерком: «Э. — если со мной что-то случится, плёнка в увеличителе».',6000);return true;
+  case 'rookboard:rbClip': if(sel) return false; msg('«Меценат года». Пикман, попечитель приюта святой Агнессы.');return true;
+  }
+  if(sc==='cabinet'&&/^d\d+$/.test(id)){ if(sel) return false; const i=+id.slice(1); sfx.drawer(); F.drawer=i; render(); msg(DRAWERS[i]); return true; }
+  if(sc==='darkroom'&&id.startsWith('hpr')){ const pid=id.slice(1); F.took[pid]=1; addItem(pid); render(); msg('Отпечаток ещё влажный. На стене за ним — часы.'); return true; }
+  if(sc==='rookboard'&&id.startsWith('rb_')){ if(sel) return false; const pid=id.slice(3); msg('«'+RBNOTE[pid]+'» — '+PEOPLE[pid].name+'.'); return true; }
+  if(sc==='rookboard'&&id.startsWith('tl')){
+    const i=+id[2], cur=F.tl[i];
+    if(!cur){
+      if(sel&&/^pr\d$/.test(sel)){
+        if(+sel[2]!==i+1){sfx.wrong();msg('Нет. Часы на этом снимке показывают другое время.');S.sel=null;renderInv();return true;}
+        F.tl[i]=sel;removeItem(sel);sfx.pin();if(i<3)setTimeout(()=>sfx.tear(),250);render();msg(TLMSG[i],7000);return true;}
+      if(sel) return false;
+      msg('Пустое место. Над ним его почерком: '+['21:20','21:25','21:30','21:35'][i]+'.');return true;
+    }
+    if(i===3&&sel==='magnifier'){ if(!F.ring){F.ring=1;render();msg('На печатке перстня — ворон с ключом в клюве. Где я его уже видела?',6000);} else msg('Ворон с ключом. Я его не забуду.'); return true; }
+    if(i===3&&sel==='letter'){
+      if(!F.ring){msg('Сначала надо разглядеть перстень.');return true;}
+      removeItem('letter');F.crest=1;sfx.pin();sfx.thread();render();msg('Тот же ворон с ключом. Герб приюта святой Агнессы.',6000);checkEnd2();return true; }
+    if(sel) return false;
+    msg(TLMSG[i]); return true;
+  }
+  return false;
+}
+function talkTo(pid){const n=S.f.talk[pid]||0;S.f.talk[pid]=n+1;msg(TALK2[pid][n%TALK2[pid].length]);}
 sceneEl.addEventListener('click',e=>{
   if(busy) return;
   const t=e.target.closest('[data-h]'); if(!t) return;
+  S.f.touched=1;
   const sel=S.sel, ok=act(t.dataset.h,sel);
   if(!ok&&sel){ S.sel=null; renderInv(); if(!act(t.dataset.h,null)) wrong(); }
   save();
@@ -1054,8 +1593,24 @@ sceneEl.addEventListener('click',e=>{
 function enterMemory(){
   if(MEMORY.has(S.scene)){msg('Я уже здесь.');return;}
   sfx.whoosh(); S.f.visited=1; S.sel=null; renderInv();
+  if(S.ch===2){go('office53',true);setTimeout(()=>say(['13 ноября 1953 года. Пятница, без четверти семь.','За день до ужина у Пикмана. Мама ещё здесь.']),1100);return;}
   go('dinner',true);
   setTimeout(()=>say(['14 ноября 1953 года. Без двадцати десять.','Всё застыло — в ту самую минуту.']),1100);
+}
+function checkEnd2(){
+  const F=S.f; if(F.ended||!F.crest) return;
+  F.ended=1; save();
+  setTimeout(()=>{sfx.caw();msg('Где-то за стеной каркнул ворон.',4000);},2600);
+  setTimeout(showEnding2,7000);
+}
+function showEnding2(){
+  openOv(`<div class="ending"><div class="ch">ГЛАВА II · КОНЕЦ</div><h2>Ворон с ключом</h2><p>Четыре кадра — четыре нити рвутся. Пикман и леди Вейн были в коридоре. Доктор курил у камина, бросив саквояж открытым. Хиггс стоял в буфетной в одной перчатке.</p><p>В двадцать один тридцать пять над маминым бокалом — чужая рука в перчатке Хиггса. На пальце перстень: ворон с ключом в клюве. Герб приюта святой Агнессы. Того самого, о котором мама писала свою последнюю статью.</p><p>Сайлас Рук снял это — и не проявил. Утром пятнадцатого ноября он исчез.</p><div class="q">«Теперь ты смотришь туда, Ада»</div><p style="font-size:16px;color:var(--paper-dim)">Глава III. Приют святой Агнессы — скоро.</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на стену</button><button class="btn" id="eCh1">Глава I</button><button class="btn red" id="eNew">Начать главу заново</button></div></div>`,e=>{
+    if(e.target.id==='eNew'){closeOv();restart();return true;}
+    if(e.target.id==='eCh1'){closeOv();switchChapter(1);return true;}
+    if(e.target.id==='eStay'){closeOv();if(S.scene!=='rookboard')go('rookboard');return true;}
+    return true;
+  });
+  ovIn.querySelector('.close').remove();
 }
 function checkEnd(){
   const F=S.f;
@@ -1066,8 +1621,9 @@ function checkEnd(){
   setTimeout(showEnding,8200);
 }
 function showEnding(){
-  openOv(`<div class="ending"><div class="ch">ГЛАВА I · КОНЕЦ</div><h2>Человек без лица</h2><p>Четыре лица на доске. Четыре нити тянутся к маме: флакон из саквояжа, угроза в веере, перчатка на подносе, страница из блокнота. Каждый из них мог.</p><p>Но кто-то в тот вечер стоял за фотоаппаратом. На снимке, который бросил ворон, у этого человека нет лица. На обороте выцветшими чернилами написано:</p><div class="q">«Ты смотришь не туда, Ада»</div><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на доску</button><button class="btn red" id="eNew">Начать заново</button></div></div>`,e=>{
+  openOv(`<div class="ending"><div class="ch">ГЛАВА I · КОНЕЦ</div><h2>Человек без лица</h2><p>Четыре лица на доске. Четыре нити тянутся к маме: флакон из саквояжа, угроза в веере, перчатка на подносе, страница из блокнота. Каждый из них мог.</p><p>Но кто-то в тот вечер стоял за фотоаппаратом. На снимке, который бросил ворон, у этого человека нет лица. На обороте выцветшими чернилами написано:</p><div class="q">«Ты смотришь не туда, Ада»</div><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на доску</button><button class="btn" id="eNew">Начать заново</button><button class="btn red" id="eNext">Глава II →</button></div></div>`,e=>{
     if(e.target.id==='eNew'){closeOv();restart();return true;}
+    if(e.target.id==='eNext'){closeOv();switchChapter(2);return true;}
     if(e.target.id==='eStay'){closeOv();if(S.scene!=='board')go('board');return true;}
     return true;
   });
@@ -1077,14 +1633,14 @@ function showEnding(){
 /* ---------- fx ---------- */
 function flashFx(){const f=$('#flash');f.style.transition='none';f.style.opacity=.95;requestAnimationFrame(()=>{f.style.transition='opacity 1.1s';f.style.opacity=0;});}
 function lightning(force){
-  const roomish=!MEMORY.has(S.scene);
+  const roomish=!MEMORY.has(S.scene)&&!INDOOR.has(S.scene);
   if(!roomish&&!force) return;
   const f=$('#flash'), w=document.getElementById('lightning');
   const seq=[.22,0,.12,0]; let i=0;
-  const step=()=>{f.style.transition='none';f.style.opacity=seq[i]*(S.scene==='room'?1:.6);if(w)w.setAttribute('opacity',seq[i]*3.5);i++;if(i<seq.length)setTimeout(step,70+Math.random()*90);};
+  const step=()=>{f.style.transition='none';f.style.opacity=seq[i]*(S.scene==='room'||S.scene==='office'?1:.6);if(w)w.setAttribute('opacity',seq[i]*3.5);i++;if(i<seq.length)setTimeout(step,70+Math.random()*90);};
   step(); setTimeout(()=>sfx.thunder(),600+Math.random()*900);
 }
-setInterval(()=>{if(started&&!document.hidden&&Math.random()<.045&&!MEMORY.has(S.scene))lightning();},1000);
+setInterval(()=>{if(started&&!document.hidden&&Math.random()<.045&&!MEMORY.has(S.scene)&&!INDOOR.has(S.scene))lightning();},1000);
 // dust motes
 const cv=$('#fx'),cx=cv.getContext('2d'); let motes=[];
 function sizeFx(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=r.width*d;cv.height=r.height*d;}
@@ -1093,9 +1649,9 @@ for(let i=0;i<46;i++) motes.push({x:Math.random(),y:Math.random(),r:Math.random(
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function loop(t){
   cx.clearRect(0,0,cv.width,cv.height);
-  const mem=MEMORY.has(S&&S.scene), W=cv.width,H=cv.height, k=W/1000;
+  const mem=MEMORY.has(S&&S.scene), redRoom=S&&S.scene==='darkroom'&&S.f.red, W=cv.width,H=cv.height, k=W/1000;
   for(const m of motes){m.x+=m.vx+Math.sin(t/3000+m.p)*.00005;m.y+=m.vy;if(m.y<-.02){m.y=1.02;m.x=Math.random();}if(m.x<0)m.x=1;if(m.x>1)m.x=0;
-    const a=(.25+.25*Math.sin(t/900+m.p))*(mem?1.2:.8);cx.fillStyle=mem?`rgba(255,214,150,${a})`:`rgba(255,226,180,${a*.8})`;cx.beginPath();cx.arc(m.x*W,m.y*H,m.r*k*1.3,0,7);cx.fill();}
+    const a=(.25+.25*Math.sin(t/900+m.p))*(mem?1.2:.8);cx.fillStyle=mem?`rgba(255,214,150,${a})`:redRoom?`rgba(255,80,60,${a*.7})`:`rgba(255,226,180,${a*.8})`;cx.beginPath();cx.arc(m.x*W,m.y*H,m.r*k*1.3,0,7);cx.fill();}
   if(!reduce) requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -1125,7 +1681,7 @@ function ain(){
 }
 function amb(){
   if(!A.ctx) return; const t=A.ctx.currentTime, mem=MEMORY.has(S.scene);
-  A.rainG.gain.setTargetAtTime(mem?.045:.2,t,.8);A.memG.gain.setTargetAtTime(mem?.11:0,t,1);A.crG.gain.setTargetAtTime(mem?.5:(A.playing?.45:0),t,.5);
+  A.rainG.gain.setTargetAtTime(mem?.045:INDOOR.has(S.scene)?.035:.2,t,.8);A.memG.gain.setTargetAtTime(mem?.11:0,t,1);A.crG.gain.setTargetAtTime(mem?.5:(A.playing?.45:0),t,.5);
 }
 function env(g,t,a,peak,d){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);}
 function osc(type,f,t,dur,peak,dest,a=.005){const c=A.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);o.connect(g);g.connect(dest||A.master);env(g,t,a,peak,dur);o.start(t);o.stop(t+a+dur+.05);return o;}
@@ -1143,6 +1699,9 @@ const sfx={
   caw(){if(!A.ctx)return;const c=A.ctx;[0,.38].forEach(d=>{const t=c.currentTime+d,o=c.createOscillator(),bp=c.createBiquadFilter(),g=c.createGain(),tr=c.createOscillator(),tg=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(720,t);o.frequency.exponentialRampToValueAtTime(380,t+.28);bp.type='bandpass';bp.frequency.value=1300;bp.Q.value=2.5;tr.frequency.value=48;tg.gain.value=.5;tr.connect(tg);tg.connect(g.gain);o.connect(bp);bp.connect(g);g.connect(A.master);g.connect(A.rev);env(g,t,.02,.35,.3);o.start(t);tr.start(t);o.stop(t+.4);tr.stop(t+.4);});},
   thunder(){if(!A.ctx)return;const c=A.ctx,t=c.currentTime,s=c.createBufferSource();s.buffer=A.noise;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=180;const g=c.createGain();s.connect(lp);lp.connect(g);g.connect(A.master);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.9,t+.25);g.gain.exponentialRampToValueAtTime(.3,t+1);g.gain.exponentialRampToValueAtTime(.001,t+3.6);s.start(t);s.stop(t+3.8);},
   creak(){if(!A.ctx)return;const c=A.ctx,t=c.currentTime,o=c.createOscillator(),lp=c.createBiquadFilter(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(70,t);o.frequency.linearRampToValueAtTime(150,t+.6);o.frequency.linearRampToValueAtTime(95,t+1.3);lp.type='bandpass';lp.frequency.value=700;lp.Q.value=6;o.connect(lp);lp.connect(g);g.connect(A.master);g.connect(A.rev);env(g,t,.1,.25,1.3);o.start(t);o.stop(t+1.6);},
+  tear(){if(!A.ctx)return;const t=A.ctx.currentTime;noiseB(t,.09,.55,'highpass',2600);noiseB(t+.04,.12,.35,'bandpass',700,2);osc('sine',140,t+.03,.12,.12);},
+  slosh(){if(!A.ctx)return;const t=A.ctx.currentTime;[0,.35].forEach(d=>{const f=noiseB(t+d,.5,.22,'lowpass',900,1.5);f.frequency.exponentialRampToValueAtTime(220,t+d+.5);});},
+  drawer(){if(!A.ctx)return;const t=A.ctx.currentTime;const f=noiseB(t,.32,.3,'bandpass',420,1.4);f.frequency.linearRampToValueAtTime(260,t+.3);osc('sine',62,t+.3,.18,.3);},
   whoosh(){if(!A.ctx)return;const t=A.ctx.currentTime;const f=noiseB(t,1.6,.4,'bandpass',300,2,A.rev);f.frequency.exponentialRampToValueAtTime(3000,t+.8);f.frequency.exponentialRampToValueAtTime(250,t+1.6);osc('sine',110,t,1.8,.12,A.rev,.6);}
 };
 const music={
@@ -1166,29 +1725,49 @@ $('#bHint').onclick=()=>{if(!started)return;sfx.caw();msg(hint(),6500);};
 $('#bSound').onclick=()=>{A.on=!A.on;if(A.master)A.master.gain.setTargetAtTime(A.on?.85:0,A.ctx.currentTime,.1);$('#bSound').style.opacity=A.on?1:.45;};
 $('#bMenu').onclick=()=>{
   let armed=false;
-  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button><button class="btn" id="mNews">Перечитать газету</button><button class="btn red" id="mNew">Начать заново</button></div>`,e=>{
+  const chs=ch2Unlocked()?[1,2].map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
+  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button></div>`,e=>{
     const id=e.target.id;
+    if(/^mCh\d$/.test(id)){closeOv();switchChapter(+id[3]);return true;}
     if(id==='mNew'){if(!armed){armed=true;e.target.textContent='Точно? Прогресс сотрётся';return true;}closeOv();restart();return true;}
     if(id==='mNews'){closeOv();setTimeout(newsOv,320);return true;}
     if(id==='mCont'){closeOv();return true;}
     return false;
   });
 };
-function restart(){S=fresh();save();render();renderInv();amb();setTimeout(intro,500);}
-function intro(){say(['1975 год. Двадцать два года назад, на ужине у мистера Пикмана, умерла моя мать.','Полиция сказала: сердце. Я никогда в это не верила.','Всё, что у меня есть, — газетная вырезка на доске. И эта комната.']);}
+function restart(){S=fresh(S.ch);save();render();renderInv();amb();setTimeout(intro,500);}
+function intro(){
+  if(S.ch===2){say(['Редакция «Вечернего вестника». Газету закрыли год назад, здание продают.','Здесь мама работала до того ноября. Здесь работал и человек, который снимал тот ужин.','Сторож пустил меня до утра. У меня есть мамина лупа и фотография без лица.']);return;}
+  say(['1975 год. Двадцать два года назад, на ужине у мистера Пикмана, умерла моя мать.','Полиция сказала: сердце. Я никогда в это не верила.','Всё, что у меня есть, — газетная вырезка на доске. И эта комната.']);
+}
+function ch2Unlocked(){const c1=load(1);return S.ch===2||!!(c1&&c1.f.ended)||!!load(2);}
+function chapterUI(){const c=CHAPTERS[S.ch];$('#chName').textContent=c.name;$('#tCh').textContent=c.tag;$('#tLead').textContent=c.lead;document.title='Красная нить · '+c.name;}
+function switchChapter(n){
+  if(busy) return;
+  if(n===S.ch){if(!$('#title').classList.contains('gone'))begin(false);return;}
+  save(); busy=true;
+  const fade=$('#fade'); fade.classList.remove('white'); fade.style.opacity=1;
+  setTimeout(()=>{
+    const d=load(n); S=d||fresh(n); S.ch=n; S.sel=null;
+    chapterUI(); render(); renderInv(); amb(); fade.style.opacity=0; busy=false;
+    if(!started) begin(!d); else if(!d) setTimeout(intro,600); else msg(hint().replace('Кар! ',''));
+  },700);
+}
 
 /* ---------- boot ---------- */
 let started=false;
 function start(data){
-  const saved=(data&&data.f)?data:load();
-  S=saved&&saved.f?saved:fresh();
-  S.sel=null;
+  let last=1; try{last=+localStorage.getItem(LAST_KEY)===2?2:1;}catch(e){}
+  const saved=(data&&data.f)?data:load(last);
+  S=saved&&saved.f?saved:fresh(last);
+  S.ch=S.ch||1; S.sel=null;
+  chapterUI();
   if(S.f.recordPlaced&&!S.f.portraitOpen){S.f.eyesOpen=1;S.f.portraitOpen=1;}
   if(S.f.ended&&!S.f.sixth) S.f.sixth=1;
   render(); renderInv();
-  const hasProgress=saved&&(saved.inv.length||saved.f.clockOpen||saved.f.ch!==3);
+  const hasProgress=saved&&(S.ch===2?!!saved.f.touched:(saved.f.touched||saved.inv.length||saved.f.clockOpen||saved.f.ch!==3));
   if(hasProgress){$('#bCont').hidden=false;$('#bStart').textContent='Новая игра';$('#bStart').classList.remove('red');$('#bCont').classList.add('red');}
-  $('#bStart').onclick=()=>{ain();if(hasProgress){S=fresh();render();renderInv();}begin(true);};
+  $('#bStart').onclick=()=>{ain();if(hasProgress){S=fresh(S.ch);render();renderInv();}begin(true);};
   $('#bCont').onclick=()=>{ain();begin(false);};
   window.claude?.hot?.snapshot?.(()=>JSON.parse(JSON.stringify(S)));
   if(data&&data.f){begin(false);}
