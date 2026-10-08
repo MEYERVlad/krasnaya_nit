@@ -136,6 +136,16 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 .negstrip::before,.negstrip::after{content:"";position:absolute;left:0;right:0;height:12px;background:repeating-linear-gradient(90deg,transparent 0 9px,#d9c9a8 9px 17px);opacity:.75}
 .negstrip::before{top:5px}.negstrip::after{bottom:5px}
 .negstrip svg{flex:1;min-width:0;height:auto;filter:grayscale(1) invert(1) sepia(.7) hue-rotate(-15deg) saturate(1.6)}
+.ledger{width:min(560px,100%);padding:22px 26px 20px;background:#e9e0c8;transform:rotate(-.6deg);font-size:15px}
+.ledger .sm{font-family:var(--f-display);letter-spacing:.14em;font-size:12px;text-align:center;color:#4a3a28}
+.ledger h3{margin:4px 0 10px;text-align:center;font-family:var(--f-display);font-weight:600;font-size:22px;letter-spacing:.08em}
+.ledger table{width:100%;border-collapse:collapse;line-height:1.25}
+.ledger td{border-bottom:1px solid rgba(60,40,20,.25);padding:3px 6px;vertical-align:top}
+.ledger td:first-child{width:2em;text-align:right;font-weight:600}
+.ledger td:last-child{font-style:italic;color:#5a4a38;text-align:right}
+.ledger tr.hl td{background:rgba(163,34,27,.08)}
+.ledger .hand{font-size:17px}
+.ledger .sig{text-align:right;margin-top:8px;font-style:italic}
 @media (max-width:520px){.brand span{display:none}}
 @media (prefers-reduced-motion:reduce){.blink,.rain,.flame,.grain,.spin,#scene.memory>svg,.title .thread path{animation:none}.title .thread path{stroke-dashoffset:0}}
 </style>
@@ -183,6 +193,7 @@ const OL = '#1a110d';
 const LAST_KEY = 'krasnaya-nit-last';
 const CHAPTERS = {
   1:{key:'krasnaya-nit-ch1-v1',name:'Глава I. Ужин у Пикмана',tag:'ГЛАВА I · УЖИН У ПИКМАНА',lead:'Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.'},
+  3:{key:'krasnaya-nit-ch3-v1',name:'Глава III. Приют святой Агнессы',tag:'ГЛАВА III · ПРИЮТ СВЯТОЙ АГНЕССЫ',lead:'1975 год. Ворон с ключом — герб приюта святой Агнессы. Приют закрыт уже двадцать лет. Мама писала о нём свою последнюю статью.'},
   2:{key:'krasnaya-nit-ch2-v1',name:'Глава II. Тёмная комната',tag:'ГЛАВА II · ТЁМНАЯ КОМНАТА',lead:'1975 год. На обороте фотографии без лица — штамп фотолаборатории «Вечернего вестника». Газету закрыли, но мамин стол всё ещё стоит в редакции.'}
 };
 const $ = s => document.querySelector(s);
@@ -277,6 +288,9 @@ const PEOPLE = {
   stranger:{name:'???',skin:'#ddd2c2',hair:'#1f1c1a',style:'slick',coat:'#2b2826',shirt:'#e8e2d4',tie:'#2b2826',hat:true,scratched:true,he:true},
   editor:{name:'Мортимер Холлоуэй',role:'Главный редактор «Вечернего вестника».',skin:'#e8cdb3',hair:'#cfc8ba',brow:'#9a9286',style:'side',coat:'#5a4a3a',vest:'#3a3328',shirt:'#efe7d6',tie:'#6a2a20',visor:true,he:true,short:'Холлоуэй'},
   rook:{name:'Сайлас Рук',role:'Фотограф «Вечернего вестника».',skin:'#2a1d18',hair:'#0d0b0b',style:'slick',coat:'#141010',shirt:'#2a1e1e',tie:'#141010',hat:true,shadow:true,he:true,short:'Рук'},
+  agatha:{name:'Сестра Агата',role:'Смотрительница приюта.',skin:'#e6d2bc',hair:'#141216',brow:'#4a3a30',style:'wimple',female:true,dress:'#1c1a1e',lips:'#8a5a50'},
+  nora:{name:'Нора, 12 лет',skin:'#f1ddcb',hair:'#2a1a14',brow:'#2a1a14',style:'braids',female:true,dress:'#e8e2d4',lips:'#c0605a',ribbon:'#2a3854'},
+  martha:{name:'Марта, 12 лет',skin:'#f0d8c2',hair:'#8a3a1e',brow:'#6a2a14',style:'braids',female:true,dress:'#d8d0c0',lips:'#b85a50',ribbon:'#7a1a1a'},
   ada7:{name:'Ада, 7 лет',skin:'#f3dfcc',hair:'#3a2418',brow:'#3a2418',style:'bob',female:true,dress:'#8c2d2a',lips:'#c0605a'}
 };
 function bust(p,o={}){
@@ -315,6 +329,9 @@ function bust(p,o={}){
     case 'bald': s+=`<path d="M-29 -48 C-32 -58 -29 -66 -24 -67 C-26 -58 -25 -52 -22 -42 Z M29 -48 C32 -58 29 -66 24 -67 C26 -58 25 -52 22 -42 Z" fill="${H}"/><ellipse cx="-9" cy="-72" rx="9" ry="4" fill="#fff" opacity=".22" transform="rotate(-18 -9 -72)"/>`;break;
     case 'bun': s+=`<circle cx="7" cy="-86" r="13" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-27 -44 C-32 -78 -10 -88 4 -86 C24 -84 32 -70 27 -44 C24 -58 18 -70 6 -72 C-2 -66 -14 -64 -22 -58 C-25 -54 -26 -50 -27 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-18 -74 Q-6 -82 8 -78 M2 -92 Q8 -96 14 -90" stroke="${shade(H,.25)}" stroke-width="1.2" fill="none"/>`;break;
     case 'bob': s+=`<path d="M-29 -40 C-35 -76 -14 -90 2 -88 C22 -88 35 -74 29 -40 C31 -30 27 -22 21 -25 L22 -58 C8 -66 -8 -66 -22 -58 L-21 -25 C-27 -22 -31 -30 -29 -40 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-23 -58 C-12 -52 10 -52 23 -58 L23 -68 C8 -78 -8 -78 -23 -68 Z" fill="${H}"/><path d="M14 -84 l12 -8 l2 12 Z M14 -84 l-2 -12 l12 4 Z" fill="#b8322a" stroke="${OL}" stroke-width=".8"/>`;break;
+    case 'wimple': s+=`<path fill-rule="evenodd" d="M-42 16 C-46 -40 -40 -98 0 -98 C40 -98 46 -40 42 16 Z M0 -78 C-22 -78 -26 -60 -26 -48 C-26 -30 -18 -20 0 -18 C18 -20 26 -30 26 -48 C26 -60 22 -78 0 -78 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path fill-rule="evenodd" d="M-31 -6 C-35 -40 -31 -86 0 -86 C31 -86 35 -40 31 -6 Q0 8 -31 -6 Z M0 -77 C-21 -77 -25 -60 -25 -48 C-25 -31 -17 -21 0 -20 C17 -21 25 -31 25 -48 C25 -60 21 -77 0 -77 Z" fill="#efe9dc" stroke="${OL}" stroke-width=".8"/>`;break;
+    case 'braids': s+=`<path d="M-27 -46 C-30 -78 -12 -88 0 -88 C12 -88 30 -78 27 -46 C24 -62 14 -70 1 -72 L-1 -72 C-14 -70 -24 -62 -27 -46 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M0 -88 L0 -72" stroke="${shade(H,-.3)}" stroke-width="1.2"/>`;
+      [-1,1].forEach(d=>{for(let k=0;k<5;k++) s+=`<ellipse cx="${d*(27+k*.8)}" cy="${-40+k*11}" rx="6" ry="7" fill="${H}" stroke="${OL}" stroke-width="1"/>`; s+=`<path d="M${d*30} 16 l${d*-6} 8 l${d*12} 0 Z" fill="${p.ribbon||'#a3221b'}" stroke="${OL}" stroke-width=".8"/>`;});break;
     case 'wave': s+=`<path d="M-28 -44 C-36 -70 -20 -90 2 -88 C26 -88 37 -68 29 -42 C35 -33 31 -22 24 -25 C27 -40 25 -55 15 -66 C3 -60 -9 -62 -19 -57 C-24 -46 -24 -36 -21 -25 C-30 -23 -35 -35 -28 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-16 -78 Q-4 -70 10 -76 Q20 -80 26 -70" stroke="${shade(H,.22)}" stroke-width="1.3" fill="none"/>`;break;
   }
   if(p.mus==='walrus') s+=`<path d="M-17 ${hy+21} C-13 ${hy+10} -4 ${hy+12} 0 ${hy+14} C4 ${hy+12} 13 ${hy+10} 17 ${hy+21} C11 ${hy+17} 5 ${hy+18} 0 ${hy+17} C-5 ${hy+18} -11 ${hy+17} -17 ${hy+21} Z" fill="${H}" stroke="${OL}" stroke-width=".8"/>`;
@@ -354,7 +371,14 @@ const ITEMS = {
   pr1:{name:'Отпечаток: коридор',print:1},
   pr2:{name:'Отпечаток: камин',print:2},
   pr3:{name:'Отпечаток: буфетная',print:3},
-  pr4:{name:'Отпечаток: бокал',print:4}
+  pr4:{name:'Отпечаток: бокал',print:4},
+  ringphoto:{name:'Кадр с перстнем',special:'ringphoto'},
+  poker:{name:'Кочерга',desc:'Тяжёлая чугунная кочерга. Ею можно дотянуться туда, куда не достать рукой.'},
+  crestkey:{name:'Ключ ворона',desc:'Железный ключ, который сорок лет висел в клюве деревянного ворона. Он настоящий.'},
+  windkey:{name:'Заводной ключик',desc:'Крошечный ключик-бабочка. Он был спрятан в голове фарфоровой куклы.'},
+  boxphoto:{name:'Снимок из шкатулки',special:'boxphoto'},
+  ring9:{name:'Перстень № 9',desc:'Тяжёлый перстень: ворон с ключом в клюве. Изнутри гравировка: «№ 9 · S. Agnes · 1935».'},
+  recipe:{name:'Рецепт',special:'recipe'}
 };
 const EVIDENCE = {vial:'doctor',note:'lady',glove:'butler',page:'pickman'};
 const LINKMSG = {
@@ -383,6 +407,13 @@ function icon(id){
     case 'negative':return `<g transform="rotate(-12 32 32)"><rect x="4" y="20" width="56" height="24" fill="#5a3416"/><path d="M6 22.5 h52 M6 41.5 h52" stroke="#e8d5ae" stroke-width="2" stroke-dasharray="2.5 2.5"/><rect x="8" y="25" width="14" height="14" fill="#d9c49a"/><rect x="25" y="25" width="14" height="14" fill="#cdb78e"/><rect x="42" y="25" width="14" height="14" fill="#d9c49a"/><circle cx="15" cy="31" r="3" fill="#3a2410"/><circle cx="32" cy="31" r="3" fill="#3a2410"/><circle cx="49" cy="31" r="3" fill="#3a2410"/></g>`;
   }
   if(id==='faceless') return icon('ph_stranger');
+  if(id==='ringphoto') return icon('pr4');
+  if(id==='poker') return `<path d="M14 54 L46 14" stroke="#2a2a2e" stroke-width="5" stroke-linecap="round"/><path d="M46 14 q8 -4 6 6 l-6 2" stroke="#2a2a2e" stroke-width="4" fill="none"/><path d="M14 54 l-4 4" stroke="#4a3a2a" stroke-width="7" stroke-linecap="round"/>`;
+  if(id==='crestkey') return icon('key').replace(/url\(#gBrass\)/g,'#6a6a70');
+  if(id==='windkey') return `<path d="M32 30 C20 14 8 22 14 32 C8 42 20 50 32 34 C44 50 56 42 50 32 C56 22 44 14 32 30 Z" fill="url(#gBrass)" stroke="${OL}"/><rect x="29.5" y="32" width="5" height="22" fill="url(#gBrass)" stroke="${OL}"/><rect x="26" y="50" width="12" height="5" fill="url(#gBrass)"/>`;
+  if(id==='boxphoto') return icon('group').replace('#4f5446','#3a3428');
+  if(id==='ring9') return `<ellipse cx="32" cy="38" rx="15" ry="18" fill="none" stroke="url(#gGold)" stroke-width="6"/><ellipse cx="32" cy="20" rx="11" ry="8" fill="url(#gGold)" stroke="${OL}"/><ellipse cx="32" cy="20" rx="7" ry="5" fill="#141010"/><path d="M27 22 q3 -5 8 -3 l3 1" stroke="#c9a256" stroke-width="1.2" fill="none"/>`;
+  if(id==='recipe') return `<g transform="rotate(-6 32 32)"><rect x="8" y="14" width="48" height="36" fill="#efe7d3" stroke="#8a7a60"/><path d="M14 24 h34 M14 31 h28 M14 38 h32 M14 45 h20" stroke="#3a1a14" stroke-width="1.2"/><ellipse cx="46" cy="42" rx="5" ry="3.5" fill="#c9a26a"/></g>`;
   if(/^pr\d$/.test(id)) return `<g transform="rotate(${id==='pr2'||id==='pr3'?4:-4} 32 32)"><rect x="4" y="12" width="56" height="42" fill="#e9e1cc"/><svg x="7" y="15" width="50" height="33.3" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"><g filter="url(#fSepia)">${printArt(+id[2])}</g></svg></g>`;
   if(id.startsWith('ph_')){const p=PEOPLE[id.slice(3)];return `<g transform="rotate(-4 32 32)"><rect x="9" y="5" width="46" height="55" fill="#e7dcc3"/><svg x="13" y="9" width="38" height="40" viewBox="-60 -100 120 126" preserveAspectRatio="xMidYMid slice"><rect x="-60" y="-100" width="120" height="126" fill="#6d5a44"/><g filter="url(#fSepia)">${bust(p)}</g></svg></g>`;}
   return '';
@@ -391,6 +422,7 @@ function icon(id){
 /* ---------- state ---------- */
 let S;
 function fresh(n){
+  if(n===3) return{ch:3,scene:'dorm',inv:['ringphoto','magnifier'],sel:null,f:{lk:[1,1],talk:{}}};
   if((n||1)===2) return{ch:2,scene:'office',inv:['faceless','magnifier'],sel:null,f:{tl:[null,null,null,null],dev:0,took:{},talk:{}}};
   return{ch:1,scene:'room',inv:[],sel:null,f:{ch:3,cm:3,bag:[0,0,0],slots:[null,null,null,null],linked:{},shot:{},talk:{}}};
 }
@@ -1167,11 +1199,195 @@ function rookBoard(){
   return s;
 }
 
+/* ==================== CHAPTER III ==================== */
+const RAIN_DORM = (()=>{rnd=mulberry(31);return rainLines(64,196,74,330,50)+rainLines(64,196,74,330,30,'b');})();
+const LOCKX=i=>636+(i%6)*56, LOCKY=i=>150+Math.floor(i/6)*142;
+function ironBed(x0,x1,head,o={}){ // head: 'l' or 'r'
+  const top=470, hx=head==='l'?x0:x1, fx=head==='l'?x1:x0, dir=head==='l'?1:-1;
+  let s=`<ellipse cx="${(x0+x1)/2}" cy="566" rx="${(x1-x0)/2+10}" ry="7" fill="#000" opacity=".45"/>`;
+  s+=`<path d="M${hx} 390 V566 M${hx+dir*26} 390 V566 M${fx} 432 V566 M${fx-dir*26} 432 V566" stroke="#1b1d1f" stroke-width="5"/>`;
+  s+=`<path d="M${hx} 392 Q${hx+dir*13} 376 ${hx+dir*26} 392 M${fx} 434 Q${fx-dir*13} 420 ${fx-dir*26} 434" stroke="#1b1d1f" stroke-width="5" fill="none"/>`;
+  for(let k=1;k<4;k++) s+=`<path d="M${hx+dir*k*6.5} 396 V470 M${fx-dir*k*6.5} 438 V470" stroke="#2a2c2e" stroke-width="2"/>`;
+  s+=`<rect x="${x0+4}" y="${top}" width="${x1-x0-8}" height="34" rx="6" fill="${o.bare?'#8a8272':'#cfc8b6'}" stroke="${OL}"/>`;
+  if(!o.bare) s+=`<path d="M${head==='l'?x0+80:x0+6} ${top-4} L${head==='l'?x1-6:x1-80} ${top-4} L${head==='l'?x1-6:x1-80} ${top+34} L${head==='l'?x0+80:x0+6} ${top+34} Z" fill="#7a7f86" stroke="${OL}"/><path d="M${head==='l'?x0+80:x1-80} ${top-4} v38" stroke="#5a5f66" stroke-width="3"/>`;
+  else s+=`<path d="M${x0+30} ${top+8} q20 10 40 0 M${x1-90} ${top+14} q16 8 30 0" stroke="#5a5244" stroke-width="2" fill="none" opacity=".7"/><ellipse cx="${(x0+x1)/2+20}" cy="${top+16}" rx="26" ry="9" fill="#6a5a3a" opacity=".35"/>`;
+  s+=`<ellipse cx="${hx+dir*58}" cy="${top-2}" rx="32" ry="11" fill="#e6e0d2" stroke="${OL}"/>`;
+  s+=`<path d="M${x0} ${top+34} h${x1-x0}" stroke="#1b1d1f" stroke-width="5"/>`;
+  return s;
+}
+function musicBox(x,y,open,photo){
+  let s=`<rect x="${x-34}" y="${y-22}" width="68" height="30" rx="2" fill="url(#gWood)" stroke="${OL}"/><rect x="${x-34}" y="${y-22}" width="68" height="30" fill="url(#pWood)" opacity=".6"/><path d="M${x-30} ${y-2} h60" stroke="#c9a256" stroke-width="1.4" opacity=".7"/><circle cx="${x+34}" cy="${y-6}" r="3" fill="url(#gBrass)"/>`;
+  if(open){
+    s+=`<path d="M${x-34} ${y-22} L${x-30} ${y-66} L${x+38} ${y-66} L${x+34} ${y-22} Z" fill="#5a1b22" stroke="${OL}"/><path d="M${x-28} ${y-26} L${x-25} ${y-60} L${x+33} ${y-60} L${x+30} ${y-26} Z" fill="#7a2a30"/>`;
+    if(photo) s+=`<g transform="translate(${x+2} ${y-44}) rotate(-4)"><rect x="-18" y="-13" width="36" height="26" fill="#e6dbc1"/><rect x="-15" y="-10" width="30" height="16" fill="#3a3428"/><circle cx="-6" cy="-3" r="2.4" fill="#e6dbc1" opacity=".7"/><circle cx="6" cy="-3" r="2.4" fill="#e6dbc1" opacity=".7"/></g>`;
+    s+=`<g transform="translate(${x} ${y-24})"><ellipse cx="0" cy="0" rx="12" ry="3" fill="url(#gBrass)"/><g class="${S.f.boxPlaying?'spin':''}">${crow(0,-2,.22,false)}</g></g>`;
+  } else s+=`<path d="M${x-36} ${y-22} Q${x} ${y-36} ${x+36} ${y-22} Z" fill="#4a2e1a" stroke="${OL}"/>`;
+  return s;
+}
+function dorm(y31,interactive){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="470" fill="${y31?'#6a6250':'#4a4438'}"/><rect width="1000" height="470" fill="url(#pMottle)"/>`;
+  if(!y31) s+=`<path d="M330 60 q30 -8 44 12 q-6 30 -40 20 Z M880 80 q24 -4 40 14 q-10 24 -36 14 Z M140 380 q20 -10 40 4 q-8 20 -36 10 Z" fill="#7a7060" opacity=".55"/><path d="M600 40 l10 60 l-6 40 l12 50" stroke="#2a261e" stroke-width="1.4" fill="none" opacity=".6"/>`;
+  s+=`<rect width="1000" height="24" fill="#22201a"/><rect y="24" width="1000" height="5" fill="#8a826c" opacity=".4"/>`;
+  s+=`<rect y="380" width="1000" height="90" fill="${y31?'#46564e':'#36443e'}"/><rect y="376" width="1000" height="7" fill="#2a3430"/><rect y="376" width="1000" height="2" fill="#8aa096" opacity=".4"/>`;
+  // floor
+  s+=`<rect y="470" width="1000" height="170" fill="#3a2818"/>`;
+  for(let i=-16;i<=16;i++) s+=`<line x1="${500+i*34}" y1="470" x2="${500+i*90}" y2="640" stroke="#160c06" stroke-width="1.3" opacity=".7"/>`;
+  s+=`<rect y="470" width="1000" height="170" fill="url(#pWood)" opacity=".35"/><rect y="466" width="1000" height="8" fill="#1c1209"/>`;
+  // window
+  s+=`<path d="M52 336 V140 A78 78 0 0 1 208 140 V336 Z" fill="#141210"/>`;
+  s+=`<clipPath id="cWinA"><path d="M64 326 V142 A66 66 0 0 1 196 142 V326 Z"/></clipPath><g clip-path="url(#cWinA)"><rect x="60" y="70" width="140" height="260" fill="url(#gNight)"/><circle cx="160" cy="120" r="22" fill="#cfd8dc" opacity=".18" filter="url(#fBlur)"/>
+    <path d="M60 280 L84 280 L84 252 L100 236 L116 252 L116 272 L150 272 L150 244 L160 230 L170 244 L170 268 L200 268 L200 330 L60 330 Z" fill="#0a0d12"/>${RAIN_DORM}${crow(160,324,.6,true)}<rect id="lightning" x="60" y="70" width="140" height="260" fill="#dfe8ff" opacity="0"/>
+    ${y31?'':'<path d="M130 230 L196 230 L196 326 L130 326 Z" fill="#05070a" opacity=".55"/><path d="M130 230 l20 34 l-14 22 l30 40" stroke="#cfe0ee" stroke-width="1" fill="none" opacity=".5"/>'}</g>`;
+  s+=`<path d="M130 70 V330 M64 230 H196" stroke="#141210" stroke-width="5"/><rect x="44" y="330" width="172" height="12" fill="#3a2a1c"/>`;
+  // stove + pipe
+  s+=`<path d="M276 330 V60 Q276 44 292 44 H360" stroke="#1d1d20" stroke-width="16" fill="none"/><path d="M272 330 V60" stroke="#3a3a40" stroke-width="2" opacity=".6"/>`;
+  s+=`<rect x="234" y="330" width="84" height="134" rx="6" fill="#26262a" stroke="${OL}" stroke-width="1.5"/><rect x="246" y="372" width="60" height="40" rx="3" fill="${y31?'#a24418':'#141414'}" stroke="${OL}"/><path d="M252 382 h48 M252 392 h48 M252 402 h48" stroke="${OL}" stroke-width="2"/><rect x="228" y="326" width="96" height="8" fill="#3a3a40"/><path d="M240 464 v10 M312 464 v10" stroke="#1d1d20" stroke-width="5"/>`;
+  if(y31) s+=`<circle cx="276" cy="392" r="70" fill="url(#rCandle)"/>`;
+  if(!F.pokerTaken||y31) s+=`<path d="M330 366 L344 474" stroke="#2a2a2e" stroke-width="5" stroke-linecap="round"/><path d="M326 360 q4 -10 10 -2" stroke="#2a2a2e" stroke-width="4" fill="none"/><path d="M344 474 l8 -2" stroke="#2a2a2e" stroke-width="4"/>`;
+  // rules board
+  s+=`<rect x="338" y="150" width="70" height="104" fill="#000" opacity=".3" transform="translate(3 4)"/><rect x="338" y="150" width="70" height="104" fill="#e8dfc6"/><rect x="338" y="150" width="70" height="104" fill="url(#pPaper)"/><text x="373" y="166" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="9" letter-spacing="1" fill="#211810">РАСПОРЯДОК</text>`;
+  ['6:00 подъём','7:00 молитва','8:00 работы','13:00 обед','21:00 отбой'].forEach((t,i)=>{s+=`<text x="346" y="${184+i*15}" font-family="Cormorant Garamond, serif" font-size="10" fill="#2a1d14">${t}</text>`;});
+  // door + crest
+  s+=`<rect x="414" y="160" width="172" height="312" fill="#1a110a"/><rect x="426" y="172" width="148" height="300" fill="url(#gWood)" stroke="${OL}"/><rect x="426" y="172" width="148" height="300" fill="url(#pWood)" opacity=".55"/><line x1="500" y1="172" x2="500" y2="472" stroke="${OL}" stroke-width="2"/>`;
+  [440,506].forEach(x=>{s+=`<rect x="${x}" y="190" width="54" height="120" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="${x}" y="326" width="54" height="128" fill="none" stroke="#1f1209" stroke-width="2"/>`;});
+  s+=`<circle cx="490" cy="330" r="4" fill="url(#gBrass)"/><circle cx="510" cy="330" r="4" fill="url(#gBrass)"/><rect x="494" y="342" width="12" height="18" rx="3" fill="url(#gBrass)" stroke="${OL}"/><rect x="499" y="348" width="2" height="8" fill="#140c08"/>`;
+  s+=`<rect x="408" y="468" width="184" height="6" fill="#2a1a10"/>`;
+  s+=`<circle cx="500" cy="100" r="52" fill="#3a2516" stroke="${OL}" stroke-width="2"/><circle cx="500" cy="100" r="52" fill="url(#pWood)" opacity=".5"/>${ravenCrest(500,100,44,'#120c08')}`;
+  s+=`<path d="M436 150 L564 150 L556 160 L564 170 L436 170 L444 160 Z" fill="#5a1b22" stroke="${OL}"/><text x="500" y="164" text-anchor="middle" font-family="Cormorant SC, serif" font-size="10" fill="#d8c79c" textLength="104" lengthAdjust="spacingAndGlyphs">CLAVIS MUNDI</text>`;
+  if(!F.keyFell&&!y31) s+=`<path d="M478 92 L470 112" stroke="#6a6a70" stroke-width="2"/><g transform="translate(468 132) rotate(100) scale(.42)"><g transform="translate(-30 -32)">${icon('key').replace(/url\(#gBrass\)/g,'#5a5a60')}</g></g>`;
+  // lockers
+  for(let i=0;i<12;i++){const x=LOCKX(i), y=LOCKY(i);
+    s+=`<rect x="${x}" y="${y}" width="52" height="138" fill="${y31?'#62746a':'#4e5a54'}" stroke="${OL}" stroke-width="1.5"/><path d="M${x+10} ${y+16} h32 M${x+10} ${y+22} h32 M${x+10} ${y+28} h32" stroke="#2a322e" stroke-width="2"/>`;
+    s+=`<rect x="${x+16}" y="${y+40}" width="20" height="14" fill="#e6dbc1" stroke="#3a3a30"/><text x="${x+26}" y="${y+51}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="11" fill="#211810">${i+1}</text><rect x="${x+40}" y="${y+70}" width="5" height="18" rx="2" fill="#2a2a2a"/>`;
+    if(i===8&&!F.lockerOpen) s+=`<path d="M${x+38} ${y+84} q5 -10 10 0" stroke="#8a8a90" stroke-width="2" fill="none"/><rect x="${x+35}" y="${y+84}" width="16" height="16" rx="3" fill="url(#gBrass)" stroke="${OL}"/>`;
+    if(i===8&&F.lockerOpen&&!y31) s+=`<path d="M${x} ${y} L${x-20} ${y+8} L${x-20} ${y+130} L${x} ${y+138} Z" fill="#3a4440" stroke="${OL}"/><rect x="${x+2}" y="${y+2}" width="48" height="134" fill="#141614"/>`;
+  }
+  // beds
+  s+=ironBed(30,330,'l',{bare:!y31});
+  s+=ironBed(640,960,'r',{bare:!y31});
+  // bedside table + music box
+  s+=`<rect x="356" y="472" width="72" height="90" fill="url(#gWood)" stroke="${OL}"/><rect x="350" y="466" width="84" height="8" fill="#4a2e1a" stroke="${OL}"/><rect x="368" y="490" width="48" height="26" fill="none" stroke="#1f1209" stroke-width="2"/><circle cx="392" cy="503" r="2.6" fill="url(#gBrass)"/>`;
+  s+=musicBox(392,462,y31||F.boxOpen,!y31&&F.boxOpen&&!F.photoTaken);
+  if(y31) s+=`<rect x="416" y="430" width="6" height="30" fill="#efe6cf"/><path class="flame" d="M419 429 C416 424 417 419 419 414 C421 419 422 424 419 429 Z" fill="#ffcf6a"/><circle cx="419" cy="424" r="60" fill="url(#rCandle)"/>`;
+  // doll (1975)
+  if(!y31){
+    s+=`<g transform="translate(206 462) rotate(-12)"><path d="M-30 0 Q-28 -16 -10 -16 L26 -14 Q34 -6 26 4 L-10 6 Q-28 6 -30 0 Z" fill="#8a3a3a" stroke="${OL}"/><path d="M26 -12 l18 -6 M26 2 l18 6" stroke="#e8d6c4" stroke-width="5" stroke-linecap="round"/><circle cx="-40" cy="-6" r="13" fill="#efe4d6" stroke="${OL}"/><path d="M-52 -12 q10 -14 24 -4" stroke="#6a3a1a" stroke-width="5" fill="none"/><circle cx="-44" cy="-8" r="1.8" fill="#223"/><circle cx="-36" cy="-9" r="1.8" fill="#223"/>${F.windTaken?'<path d="M-30 -16 l-4 8 l6 4 l-4 8" stroke="#1a1410" stroke-width="1.4" fill="#2a2420"/>':'<path d="M-32 -16 l-3 6 l5 3" stroke="#6a5a4a" stroke-width="1" fill="none"/>'}</g>`;
+  }
+  // people (1931)
+  if(y31){
+    s+=standing(PEOPLE.agatha,500,300,.72,476);
+    s+=`<path d="M532 360 L548 396" stroke="#2a2420" stroke-width="2"/><rect x="540" y="396" width="18" height="24" rx="3" fill="#2a2420" stroke="${OL}"/><rect x="543" y="400" width="12" height="16" fill="#ffd27a"/><circle cx="549" cy="408" r="44" fill="url(#rCandle)"/><path d="M522 352 l-6 26" stroke="#8a8a90" stroke-width="2"/><circle cx="515" cy="382" r="5" fill="none" stroke="#8a8a90" stroke-width="2"/>`;
+    s+=`<g transform="translate(176 446) scale(.56)">${bust(PEOPLE.nora,{look:3})}</g>`;
+    s+=standing(PEOPLE.martha,LOCKX(8)+26,384,.5,474,{look:-3});
+    [[740,470],[820,468]].forEach(([x,y])=>{s+=`<circle cx="${x+70}" cy="${y-6}" r="11" fill="#e8d6c4" stroke="${OL}"/><path d="M${x+60} ${y-12} q10 -10 22 0" stroke="#4a2e1a" stroke-width="5" fill="none"/>`;});
+    s+=`<path d="M650 466 Q700 446 760 464 Q820 446 880 464 L880 476 L650 476 Z" fill="#7a7f86" stroke="${OL}"/>`;
+  }
+  // light
+  if(y31) s+=`<rect width="1000" height="640" fill="#1a1020" opacity=".25"/>`; else s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".3"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)"/>`;
+  if(interactive){
+    s+=hs('window',64,74,132,250)+hs('crowA',120,290,80,56)+hs('stove',230,326,92,140)+hs('rules',336,148,74,108);
+    s+=hs('door',426,172,148,300)+hs('crest',448,48,104,104);
+    for(let i=0;i<12;i++) s+=hs('lk'+i,LOCKX(i),LOCKY(i),52,138);
+    s+=hs('box',352,400,80,72);
+    s+=hs('bedL',30,440,320,120)+hs('bedR',640,440,320,120);
+    if(y31){ s+=hs('agatha',456,210,90,266)+hs('nora',140,386,74,90)+hs('martha',LOCKX(8)-6,330,64,144); }
+    else { if(!F.pokerTaken) s+=hs('poker',318,350,40,128); s+=hs('doll',150,436,110,46); }
+    s+=arrow(500,612);
+  }
+  return s;
+}
+const dormView=()=>dorm(false,true), dorm31View=()=>dorm(true,true);
+
+/* ---------- LOCKER 9 ---------- */
+function lockerView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#36443e"/><rect width="1000" height="640" fill="url(#pMottle)"/>`;
+  s+=`<rect x="300" y="20" width="400" height="620" fill="#141614"/>`;
+  if(F.lockerOpen){
+    s+=`<rect x="312" y="34" width="376" height="606" fill="#1d211f"/><rect x="312" y="200" width="376" height="10" fill="#3a443e"/>`;
+    s+=`<path d="M340 196 q40 -30 90 -6 q-20 10 -60 8 Z" fill="#7a2a30"/><path d="M372 196 l-10 -40 M376 194 l8 -44" stroke="#7a2a30" stroke-width="4"/><ellipse cx="600" cy="192" rx="22" ry="10" fill="#8a8478" stroke="${OL}"/>`;
+    s+=`<text x="500" y="120" text-anchor="middle" font-family="Marck Script, cursive" font-size="26" fill="#d8ccb0" opacity=".55">М. + Н. навсегда</text>`;
+    if(!F.bottomOpen) s+=`<rect x="320" y="560" width="360" height="70" fill="#2a302c" stroke="#0a0c0a" stroke-width="2"/><path d="M330 572 h340" stroke="#4a544e" stroke-width="1"/>`;
+    else { s+=`<rect x="320" y="560" width="360" height="70" fill="#060706"/><path d="M320 560 L680 560 L700 520 L340 520 Z" fill="#2a302c" stroke="#0a0c0a" stroke-width="2"/>`;
+      if(!F.ringTaken) s+=`<g transform="translate(470 596)"><ellipse rx="18" ry="22" fill="none" stroke="url(#gGold)" stroke-width="7"/><ellipse cx="0" cy="-22" rx="12" ry="8" fill="url(#gGold)" stroke="${OL}"/><ellipse cx="0" cy="-22" rx="8" ry="5" fill="#141010"/></g><circle cx="488" cy="580" r="2.4" fill="#fff" class="spin"/>`;
+      if(!F.recipeTaken) s+=`<g transform="translate(590 594) rotate(-8)"><rect x="-40" y="-22" width="80" height="44" fill="#efe7d3" stroke="#8a7a60"/><path d="M-32 -10 h60 M-32 0 h48 M-32 10 h56" stroke="#23324f" stroke-width="1.2"/></g>`; }
+    s+=`<path d="M300 20 L210 60 L210 620 L300 640 Z" fill="#56645c" stroke="${OL}" stroke-width="2"/><path d="M228 100 l56 -20 M228 112 l56 -20 M228 124 l56 -20" stroke="#2a322e" stroke-width="3"/>`;
+  } else {
+    s+=`<rect x="304" y="24" width="392" height="612" fill="#56645c" stroke="${OL}" stroke-width="3"/><rect x="304" y="24" width="392" height="612" fill="url(#pMottle)" opacity=".6"/>`;
+    for(let k=0;k<5;k++) s+=`<path d="M380 ${70+k*16} h240" stroke="#2a322e" stroke-width="5"/>`;
+    s+=`<rect x="450" y="170" width="100" height="62" fill="#e6dbc1" stroke="#3a3a30" stroke-width="2"/><text x="500" y="220" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="50" fill="#211810">9</text>`;
+    s+=`<rect x="640" y="300" width="18" height="90" rx="5" fill="#2a2a2a"/>`;
+    s+=`<path d="M560 330 Q560 270 610 270 Q660 270 660 330" stroke="#9a9aa0" stroke-width="14" fill="none"/><rect x="530" y="326" width="160" height="150" rx="16" fill="url(#gBrass)" stroke="${OL}" stroke-width="2"/>`;
+    s+=`<text x="610" y="356" text-anchor="middle" font-family="Cormorant SC, serif" font-size="13" letter-spacing="2" fill="#4a3412">М. Х.</text>`;
+    F.lk=F.lk||[1,1];
+    [575,645].forEach((x,i)=>{const d=F.lk[i];s+=`<rect x="${x-26}" y="372" width="52" height="88" rx="4" fill="#1a120a" stroke="${OL}"/><rect x="${x-21}" y="376" width="42" height="80" fill="url(#gCyl)"/><text x="${x}" y="392" text-anchor="middle" font-family="Cormorant SC, serif" font-size="14" fill="#3a2a18" opacity=".45">${(d+10)%12+1}</text><text x="${x}" y="426" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="30" fill="#1a120a">${d}</text><text x="${x}" y="450" text-anchor="middle" font-family="Cormorant SC, serif" font-size="14" fill="#3a2a18" opacity=".45">${d%12+1}</text>`;});
+  }
+  s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".25"/><rect width="1000" height="640" fill="url(#rDark)" opacity=".7"/>`;
+  if(!F.lockerOpen){ s+=hs('l0',545,368,60,96)+hs('l1',615,368,60,96)+hs('lockdoor',304,24,220,600); }
+  else { s+=hs('shelf',312,120,376,90)+hs('words',360,90,280,40); if(!F.bottomOpen) s+=hs('bottom',320,556,360,78); else { if(!F.ringTaken) s+=hs('ring',440,560,64,64); if(!F.recipeTaken) s+=hs('recipe',548,568,90,56); } }
+  s+=arrow(860,612);
+  return s;
+}
+
+/* ---------- WARDEN'S OFFICE ---------- */
+function office3View(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#2a1a12"/><rect width="1000" height="440" fill="url(#pWoodV)" opacity=".5"/>`;
+  for(let x=0;x<1000;x+=100) s+=`<rect x="${x+8}" y="40" width="84" height="380" fill="none" stroke="#140a06" stroke-width="3"/><rect x="${x+12}" y="44" width="76" height="372" fill="none" stroke="#6a4630" stroke-width="1" opacity=".4"/>`;
+  s+=`<rect width="1000" height="26" fill="#140a06"/><rect y="420" width="1000" height="220" fill="#3e0c10"/><rect y="420" width="1000" height="220" fill="url(#pMottle)"/><rect y="416" width="1000" height="8" fill="#140a06"/>`;
+  // window
+  s+=`<rect x="790" y="70" width="150" height="250" fill="#140a06"/><clipPath id="cWinW"><rect x="802" y="82" width="126" height="226"/></clipPath><g clip-path="url(#cWinW)"><rect x="802" y="82" width="126" height="226" fill="url(#gNight)"/>${RAIN_DORM.replace(/<g class="rain/g,'<g transform="translate(740 6)" ><g class="rain').replace(/<\/g>/g,'</g></g>')}<rect id="lightning" x="802" y="82" width="126" height="226" fill="#dfe8ff" opacity="0"/></g><path d="M865 82 V308 M802 196 H928" stroke="#140a06" stroke-width="5"/>`;
+  // portrait of patron
+  s+=`<rect x="96" y="66" width="150" height="190" fill="#000" opacity=".35" transform="translate(5 6)"/><rect x="96" y="66" width="150" height="190" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><rect x="108" y="78" width="126" height="166" fill="#1a2018"/><clipPath id="cPat"><rect x="108" y="78" width="126" height="166"/></clipPath><g clip-path="url(#cPat)"><rect x="108" y="78" width="126" height="166" fill="url(#rPortraitBg)" opacity=".6"/><g transform="translate(171 220) scale(.9)">${bust(PEOPLE.pickman,{look:1})}</g></g><rect x="128" y="236" width="86" height="14" fill="url(#gBrassH)"/><text x="171" y="247" text-anchor="middle" font-family="Cormorant SC, serif" font-size="8" letter-spacing="1" fill="#2a1a08">ПОПЕЧИТЕЛЬ</text>`;
+  // crest plaque + clock
+  s+=`<circle cx="500" cy="128" r="56" fill="#3a2516" stroke="${OL}" stroke-width="2"/>${ravenCrest(500,128,46,'#d8c79c')}`;
+  s+=dial(660,110,26,9,40);
+  // desk
+  s+=`<path d="M220 400 L780 400 L820 452 L180 452 Z" fill="#4a2a17" stroke="${OL}" stroke-width="1.5"/><path d="M220 400 L780 400 L820 452 L180 452 Z" fill="url(#pWood)" opacity=".5"/><rect x="180" y="452" width="640" height="120" fill="url(#gWoodD)" stroke="${OL}"/><rect x="200" y="466" width="180" height="90" fill="none" stroke="#140a06" stroke-width="2"/><rect x="620" y="466" width="180" height="90" fill="none" stroke="#140a06" stroke-width="2"/><rect x="278" y="500" width="24" height="7" rx="3" fill="url(#gBrass)"/><rect x="698" y="500" width="24" height="7" rx="3" fill="url(#gBrass)"/>`;
+  // register book
+  s+=`<path d="M290 430 L380 424 L470 430 L462 398 L380 394 L298 398 Z" fill="#efe6cf" stroke="#8a7a60"/><path d="M380 394 L380 424" stroke="#8a7a60"/><path d="M286 432 L380 428 L474 432 L470 436 L380 432 L290 436 Z" fill="#5a1b22"/>`;
+  for(let k=0;k<5;k++) s+=`<path d="M${306} ${404+k*5} h${62} M${392} ${404+k*5} h${62}" stroke="#3a3028" stroke-width=".8" opacity=".6"/>`;
+  // ring tray
+  s+=`<path d="M540 432 L700 432 L690 400 L550 400 Z" fill="#2a1416" stroke="${OL}"/><path d="M550 400 L690 400 L686 392 L554 392 Z" fill="#4a2a17" stroke="${OL}"/>`;
+  for(let i=0;i<12;i++){const x=562+(i%6)*22,y=410+Math.floor(i/6)*12; s+= (i===6||i===8)&&!(i===8&&F.ringPlaced) ? `<ellipse cx="${x}" cy="${y}" rx="5" ry="3" fill="#0a0506"/>` : `<ellipse cx="${x}" cy="${y}" rx="5" ry="3" fill="none" stroke="url(#gGold)" stroke-width="2"/>`;}
+  // lamp, inkwell
+  s+=`<ellipse cx="760" cy="404" rx="16" ry="4" fill="url(#gBrass)"/><rect x="757" y="360" width="5" height="44" fill="url(#gBrassH)"/><path d="M736 362 Q760 340 784 362 Z" fill="url(#gShade)" stroke="${OL}"/><rect x="230" y="386" width="22" height="14" fill="#1a1a2a" stroke="${OL}"/><path d="M246 386 l20 -30" stroke="#e6dcc4" stroke-width="2"/>`;
+  // shelf with files
+  s+=`<rect x="290" y="210" width="130" height="8" fill="#4a2e1a" stroke="${OL}"/>`;
+  for(let i=0;i<7;i++) s+=`<rect x="${296+i*17}" y="${160+(i%3)*4}" width="14" height="${50-(i%3)*4}" fill="${['#4a1414','#23382d','#5a4426','#2a2a40'][i%4]}" stroke="${OL}"/>`;
+  s+=`<rect width="1000" height="640" fill="#0a1424" opacity=".2"/><rect width="1000" height="640" fill="url(#rDark)" opacity=".8"/>`;
+  s+=hs('portrait',96,66,150,190)+hs('plaque',444,72,112,112)+hs('clock3',630,80,60,60)+hs('window',802,82,126,226)+hs('shelf3',290,150,130,66);
+  s+=hs('register',286,390,190,50)+hs('tray',540,388,164,48)+hs('drawer3',200,466,180,90)+hs('drawer4',620,466,180,90);
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- RING TRAY ---------- */
+function trayView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#2a1a12"/><rect width="1000" height="640" fill="url(#pWood)" opacity=".5"/>`;
+  s+=`<rect x="130" y="70" width="740" height="500" rx="14" fill="#000" opacity=".4" transform="translate(8 10)"/><rect x="130" y="70" width="740" height="500" rx="14" fill="url(#gWood)" stroke="${OL}" stroke-width="3"/><rect x="156" y="96" width="688" height="448" rx="8" fill="#4a161c"/><rect x="156" y="96" width="688" height="448" rx="8" fill="url(#pMottle)"/>`;
+  s+=`<text x="500" y="136" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="22" letter-spacing="5" fill="#d8c79c">ВЫПУСК 1935</text>`;
+  for(let i=0;i<12;i++){const x=226+(i%6)*110, y=230+Math.floor(i/6)*170, empty=(i===6)||(i===8&&!F.ringPlaced);
+    s+=`<ellipse cx="${x}" cy="${y}" rx="38" ry="44" fill="#2a0a0e" stroke="#1a0608" stroke-width="2"/><text x="${x}" y="${y+76}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="20" fill="#c9a256">${i+1}</text>`;
+    if(i===8&&F.noteOut) s+=`<rect x="${x-30}" y="${y-40}" width="60" height="80" fill="#0a0506"/>`;
+    if(!empty) s+=`<g transform="translate(${x} ${y})"><ellipse rx="22" ry="27" fill="none" stroke="url(#gGold)" stroke-width="8"/><ellipse cy="-27" rx="15" ry="10" fill="url(#gGold)" stroke="${OL}"/><ellipse cy="-27" rx="10" ry="6.5" fill="#141010"/><g transform="translate(0 -27)">${ravenCrest(0,0,6,'#c9a256').replace(/stroke-width="[^"]*"/g,'stroke-width=".6"')}</g></g>`;
+    if(i===8&&F.noteOut&&!F.noteTaken) s+=`<g transform="translate(${x} ${y-6}) rotate(-6)"><rect x="-28" y="-20" width="56" height="40" fill="#efe7d3" stroke="#8a7a60"/><path d="M-20 -8 h40 M-20 0 h32 M-20 8 h36" stroke="#3a1a14" stroke-width="1.2"/></g>`;
+  }
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".7"/>`;
+  for(let i=0;i<12;i++) s+=hs('r'+i,226+(i%6)*110-46,230+Math.floor(i/6)*170-52,92,110);
+  s+=arrow(500,612);
+  return s;
+}
+
 /* ---------- scenes & rendering ---------- */
 const SCENES={room,board:()=>boardArt(true),clock:clockView,trunk:trunkView,dinner:()=>renderDinner(true),bag:bagView,watch:watchView,
-  office:officeView,office53:office53View,cabinet:cabinetView,darkroom:darkroomView,rookboard:rookBoard};
-const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room',cabinet:'office',darkroom:'office',rookboard:'darkroom',office53:'office'};
-const MEMORY=new Set(['dinner','bag','watch','office53']);
+  office:officeView,office53:office53View,cabinet:cabinetView,darkroom:darkroomView,rookboard:rookBoard,
+  dorm:dormView,dorm31:dorm31View,office3:office3View,tray:trayView,locker:lockerView};
+const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room',cabinet:'office',darkroom:'office',rookboard:'darkroom',office53:'office',dorm31:'dorm',office3:'dorm',tray:'office3',locker:'dorm'};
+const MEMORY=new Set(['dinner','bag','watch','office53','dorm31']);
 const INDOOR=new Set(['darkroom','rookboard']);
 const sceneEl=$('#scene');
 function render(){
@@ -1224,6 +1440,9 @@ function inspect(id){
   }
   if(it.special==='note'){openOv(`<div class="note card hand">Держись подальше от Огастеса, Элеонора.<br>Ты пожалеешь, если не остановишься.<div style="text-align:right;margin-top:10px">— К.</div></div>`);return;}
   if(it.special==='page'){openOv(`<div class="page card hand">П. — приют св. Агнессы.<br>40&nbsp;000 фунтов исчезли.<br>Доказательства у меня.<br>Статья — в понедельник!</div>`);return;}
+  if(it.special==='ringphoto'){openOv(`<div class="photo-insp" style="cursor:default"><svg viewBox="0 0 300 200"><g filter="url(#fSepia)">${printArt(4)}</g><circle cx="172" cy="62" r="34" fill="none" stroke="#a3221b" stroke-width="2.5" stroke-dasharray="5 4"/></svg><div class="lbl">21:35 · ворон с ключом</div></div>`);return;}
+  if(it.special==='boxphoto'){openOv(`<div class="photo-insp" id="pin"><svg viewBox="0 0 1000 640">${dorm(true,false)}</svg><div class="lbl">Март 1931 · Н. и М.</div></div><div class="close" style="font-size:17px;color:#e9dfc7">Коснитесь снимка, чтобы вглядеться</div>`,e=>{if(e.target.closest('#pin')){closeOv();enterMemory();return true;}});return;}
+  if(it.special==='recipe'){openOv(`<div class="note card hand" style="font-size:clamp(20px,4.4vw,26px)">Миндальный пирог для мистера П.<br>Сливочное масло, мука, сахар.<br>Миндаль — горький, побольше.<br>Хозяин любит, когда горчит.<div style="text-align:right;margin-top:10px">— М.</div></div>`);return;}
   if(it.special==='faceless'){S.f.stamp=1;openOv(`<div class="twin"><div class="pcard card"><svg viewBox="0 0 200 240">${photoCard('stranger',100,120,180,230,{rot:0,label:'«Ты смотришь не туда»',fs:15,bg:'#3a3026'})}</svg></div><div class="back card"><div class="hand">Ты смотришь не&nbsp;туда, Ада</div><div class="stamp">Фотолаборатория<br>«Вечернего вестника»<b>НЕГАТИВ XI-14</b></div></div></div>`);return;}
   if(it.special==='group'){openOv(`<div class="photo-insp" id="pin"><svg viewBox="0 0 1000 640">${newsroom(true,false)}</svg><div class="lbl">13.XI.1953 · Редакция «Вечернего вестника»</div></div><div class="close" style="font-size:17px;color:#e9dfc7">Коснитесь снимка, чтобы вглядеться</div>`,e=>{if(e.target.closest('#pin')){closeOv();enterMemory();return true;}});return;}
   if(it.special==='letter'){openOv(`<div class="letter card"><svg viewBox="-50 -50 100 100">${ravenCrest(0,0,44)}</svg><div class="sm">ПРИЮТ СВЯТОЙ АГНЕССЫ · БЛЭКВУД-ЛЕЙН</div><div class="hand">Миссис Лэнг!<br>Я знаю, куда ушли деньги приюта. Завтра у Пикмана я расскажу вам всё. Приходите непременно.<div style="text-align:right">— Друг</div></div></div>`);return;}
@@ -1237,6 +1456,7 @@ function newsOv(){openOv(`<div class="news card"><div class="mast">Вечерн�
 /* ---------- hints ---------- */
 function hint(){
   if(S.ch===2) return hint2();
+  if(S.ch===3) return hint3();
   const F=S.f, mem=MEMORY.has(S.scene);
   const allShot=['doctor','pickman','lady','butler'].every(p=>F.shot[p]);
   const allEv=F.sediment&&F.vialTaken&&F.noteTaken&&F.gloveTaken&&F.pageTaken;
@@ -1315,10 +1535,12 @@ function act(id,sel){
   if(id==='back'){
     if(sc==='dinner'){go('room',false);setTimeout(()=>msg('Я отпускаю воспоминание. Снова 1975 год, и снова дождь.'),400);}
     else if(sc==='office53'){go('office',false);setTimeout(()=>msg('Снова семьдесят пятый. Пыль, коробки, тишина.'),400);}
+    else if(sc==='dorm31'){go('dorm',false);setTimeout(()=>msg('Снова семьдесят пятый. Пустые кровати, холодная печь.'),400);}
     else go(PARENT[sc]);
     return true;}
-  if(id==='crow'||id==='crowD'||id==='crowO'){sfx.caw();msg(hint(),6500);return true;}
+  if(id==='crow'||id==='crowD'||id==='crowO'||id==='crowA'){sfx.caw();msg(hint(),6500);return true;}
   if(S.ch===2) return act2(id,sel);
+  if(S.ch===3) return act3(id,sel);
   switch(sc+':'+id){
   /* room */
   case 'room:board': go('board'); return true;
@@ -1581,6 +1803,152 @@ function act2(id,sel){
   }
   return false;
 }
+
+function hint3(){
+  const F=S.f, mt=F.talk.martha||0;
+  if(F.ended) return 'Кар! Пикман-холл ждёт тебя, Ада.';
+  if(S.scene==='dorm31'){
+    if(!F.sawLocker) return 'Кар! Марта стоит у своего шкафчика. Посмотри, что она прячет.';
+    if(mt<2) return 'Кар! Послушай Марту. Она говорит про шифр.';
+    return 'Кар! Ты всё видела. Возвращайся в семьдесят пятый.';
+  }
+  if(!F.keyFell) return F.pokerTaken?'Кар! Ворон над дверью держит настоящий ключ. Достань его кочергой.':'Кар! Ключ над дверью висит слишком высоко. У печки стоит кочерга.';
+  if(!F.doorOpen) return 'Кар! Ключ ворона подойдёт к двери кабинета.';
+  if(!F.reg) return 'Кар! На столе в кабинете — книга воспитанников. Прочти её.';
+  if(!F.windTaken) return 'Кар! Кукла на кровати. У неё что-то в голове.';
+  if(!F.boxOpen) return 'Кар! Шкатулке нужен её ключик.';
+  if(!F.photoTaken) return 'Кар! В крышке шкатулки — снимок.';
+  if(!F.visited) return 'Кар! Вглядись в снимок из шкатулки.';
+  if(!F.sawLocker||mt<2) return 'Кар! Вернись в тот март. Послушай девочек.';
+  if(!F.lockerOpen) return 'Кар! Шифр — их номера из книги. Сначала её, потом мамин.';
+  if(!F.bottomOpen) return 'Кар! У шкафчика двойное дно.';
+  if(!F.ringTaken) return 'Кар! Возьми перстень.';
+  if(!F.ringPlaced) return 'Кар! Перстню пора вернуться в своё гнездо. Шкатулка выпуска — в кабинете.';
+  return 'Кар! Под бархатом что-то есть.';
+}
+const TALK3={
+  nora:['«Марта, когда нас выпустят, у нас будут кольца. Ворон с ключом — ключ от всего мира»','«Я буду писать в газету. Про всех, кто врёт»','«Заведи шкатулку ещё раз. Пусть это будет мой вальс»'],
+  martha:['«А я буду печь пироги для богатых. С миндалём. Богатые такое любят»','«Шифр от моего замка — наши номера, Нора. Сначала мой, потом твой»','«Никому не говори про второе дно. Там мои секреты»'],
+  agatha:['«Отбой! Кто шепчется — лишается кольца»','«Мистер Пикман будет доволен. Весной переведём ещё двоих»','«Брук! Хиггс! Спать!»']
+};
+const LOCKMSG=['Шкафчик № 1. Пусто.','Шкафчик № 2. Пусто, только детский носок.','Шкафчик № 3. Пусто.','Шкафчик № 4. Внутри нацарапано: «Где мы будем жить?»','Шкафчик № 5. Пусто.','Шкафчик № 6. Пустой. Дверца не закрывается.','Шкафчик № 7. Изнутри нацарапано: «Нора». Мамин.','Шкафчик № 8. Пусто.','','Шкафчик № 10. Пусто.','Шкафчик № 11. Засохший букетик ландышей.','Шкафчик № 12. Пусто.'];
+function registerOv(){
+  S.f.reg=1; save();
+  const R=[['1','Джон Эббот','переведён, 1933'],['2','Мэри Олдридж','переведена, 1932'],['3','Питер Кэмпбелл','переведён, 1933'],['4','Уильям Дойл','переведён, 1934'],['5','Сара Финч','переведена, 1932'],['6','Томас Грин','переведён, 1934'],['7','Элеонора Брук','выпущена, 1935. Кольцо № 7','<span class="hand">впоследствии Лэнг, «Вечерний вестник»</span>'],['8','Анна Кларк','переведена, 1933'],['9','Марта Хиггс','выпущена, 1935. Кольцо № 9','<span class="hand">сестра А. Хиггса. Кухня, Пикман-холл</span>'],['10','Джеймс Рид','переведён, 1934'],['11','Эмили Слоун','переведена, 1932'],['12','Роберт Вейл','переведён, 1933']];
+  openOv(`<div class="ledger card"><div class="sm">ПРИЮТ СВЯТОЙ АГНЕССЫ · КНИГА ВОСПИТАННИКОВ</div><h3>Выпуск 1935 года</h3><table>${R.map(r=>`<tr${r[3]?' class="hl"':''}><td>${r[0]}</td><td>${r[1]}${r[3]?'<br>'+r[3]:''}</td><td>${r[2]}</td></tr>`).join('')}</table><div class="sig">Попечитель: <span class="hand">О. Пикман</span></div></div>`);
+  setTimeout(()=>msg('Двенадцать детей. Десять «переведены» — куда, не сказано. Выпустились только двое: мама и Марта Хиггс.',7000),400);
+}
+function act3(id,sel){
+  const F=S.f, sc=S.scene, mem=sc==='dorm31';
+  if(sc==='dorm'||sc==='dorm31'){
+    if(/^lk\d+$/.test(id)){
+      if(sel) return false; const i=+id.slice(2);
+      if(mem){ if(i===8){F.sawLocker=1;msg('Марта приподнимает дно шкафчика и прячет что-то под него. Второе дно.',5500);} else msg('Шкафчик № '+(i+1)+'. Чей-то. Пока ещё чей-то.'); return true; }
+      if(i===8){go('locker');return true;}
+      msg(LOCKMSG[i]);return true;
+    }
+  }
+  switch(sc+':'+id){
+  /* dorm 1975 */
+  case 'dorm:window': if(sel) return false; msg('Разбитое стекло. Дождь заливает подоконник.');return true;
+  case 'dorm:stove': if(sel) return false; msg('Печка давно остыла. В золе — обгоревший листок: «...переведён по распоряжению попечителя...»');return true;
+  case 'dorm:poker': if(sel) return false; F.pokerTaken=1;addItem('poker');render();msg('Чугунная кочерга. Тяжёлая.');return true;
+  case 'dorm:rules': case 'dorm31:rules': if(sel) return false; msg('Распорядок дня. Внизу приписка от руки: «Кто шепчется после отбоя — лишается кольца».');return true;
+  case 'dorm:crest':
+    if(sel==='poker'&&!F.keyFell){removeItem('poker');F.keyFell=1;sfx.unlock();addItem('crestkey');render();msg('Кочерга дотянулась. Ключ выпал из клюва ворона и звякнул об пол.');return true;}
+    if(sel) return false;
+    msg(F.keyFell?'«Clavis mundi» — «ключ от мира». Девиз приюта.':'Деревянный ворон над дверью. В клюве — настоящий железный ключ. Высоко, рукой не достать.');return true;
+  case 'dorm:door':
+    if(sel==='crestkey'){removeItem('crestkey');F.doorOpen=1;sfx.unlock();msg('Ключ ворона подошёл.');setTimeout(()=>go('office3'),800);return true;}
+    if(sel) return false;
+    if(F.doorOpen) go('office3'); else {sfx.wrong();msg('Кабинет попечителя. Заперто.');}
+    return true;
+  case 'dorm:doll':
+    if(sel) return false;
+    if(!F.windTaken){F.windTaken=1;addItem('windkey');render();msg('У куклы отколот затылок. Внутри что-то блестит — крошечный заводной ключик.');}
+    else msg('Фарфоровая кукла. Её кто-то очень любил — и очень давно.');
+    return true;
+  case 'dorm:box':
+    if(sel==='windkey'){removeItem('windkey');F.boxOpen=1;playBox();render();msg('Ключик подошёл. Крышка открылась, и заиграл... мамин вальс. «Вальс для Элеоноры» — здесь?',6000);setTimeout(()=>{if(!S.f.photoTaken)msg('В крышке шкатулки — фотография.');},7000);return true;}
+    if(sel) return false;
+    if(F.boxOpen&&!F.photoTaken){F.photoTaken=1;addItem('boxphoto');render();msg('Снимок этой спальни. На обороте: «Март 1931. Н. и М.»');return true;}
+    if(F.boxOpen){playBox();msg('Её вальс. Значит, он родился здесь.');} else msg('Музыкальная шкатулка. Завод кончился, а ключика нет.');
+    return true;
+  case 'dorm:bedL': if(sel) return false; msg('Железная кровать. Голый матрас, пятно от протёкшей крыши.');return true;
+  case 'dorm:bedR': if(sel) return false; msg('Сорок кроватей. Ни одной подушки.');return true;
+  /* memory 1931 */
+  case 'dorm31:nora':
+    if(sel) return false;
+    if(!F.sawNora){F.sawNora=1;msg('Мама. Ей двенадцать. Косички, ночная рубашка. Она меня не видит.',4500);return true;}
+    talk3('nora');return true;
+  case 'dorm31:martha': if(sel) return false; talk3('martha'); if((F.talk.martha%3)===0&&!F.sawLocker){F.sawLocker=1;setTimeout(()=>msg('Марта приподнимает дно своего шкафчика и что-то прячет под него.',5000),3200);} return true;
+  case 'dorm31:agatha': if(sel) return false; talk3('agatha');return true;
+  case 'dorm31:box': if(sel) return false; playBox();msg('Шкатулка играет мамин вальс. Потом она запишет его на пластинку.');return true;
+  case 'dorm31:crest': if(sel) return false; msg('Ворон над дверью только что покрашен. Ключ в клюве блестит.');return true;
+  case 'dorm31:door': if(sel) return false; msg('Кабинет попечителя. Оттуда пахнет сигарами.');return true;
+  case 'dorm31:stove': if(sel) return false; msg('Печка горит. Единственное тёплое место в спальне.');return true;
+  case 'dorm31:window': if(sel) return false; msg('Март тридцать первого. Тот же дождь.');return true;
+  case 'dorm31:bedL': case 'dorm31:bedR': if(sel) return false; msg('Под одеялами спят дети. Многих из них «переведут».');return true;
+  /* warden's office */
+  case 'office3:register': if(sel) return false; registerOv();return true;
+  case 'office3:tray': if(sel) return false; go('tray');return true;
+  case 'office3:portrait': if(sel) return false; msg('Мистер Огастес Пикман, попечитель. Здесь он моложе — и улыбается.');return true;
+  case 'office3:plaque': if(sel) return false; msg('Ворон с ключом. Такой же, как на перстне.');return true;
+  case 'office3:clock3': if(sel) return false; msg('Часы остановились без двадцати десять. Совпадение?');return true;
+  case 'office3:window': if(sel) return false; msg('Внизу — заросший двор. Качели без сиденья.');return true;
+  case 'office3:shelf3': if(sel) return false; msg('Папки «Переводы, 1932–1934». Все пустые.');return true;
+  case 'office3:drawer3': if(sel) return false; msg('Квитанции о пожертвованиях. Сорок тысяч фунтов. Подпись: О. Пикман.');return true;
+  case 'office3:drawer4': if(sel) return false; msg('Письма родственников: «Куда перевели мою племянницу?» Ни одного ответа.');return true;
+  /* locker 9 */
+  case 'locker:l0': case 'locker:l1': {
+    if(sel) return false; const i=+id[1]; F.lk[i]=F.lk[i]%12+1; sfx.tick();
+    if(F.lk[0]===9&&F.lk[1]===7){F.lockerOpen=1;sfx.unlock();msg('Девять — семь. Щёлк. «Сначала мой, потом твой».');}
+    render(); return true; }
+  case 'locker:lockdoor': if(sel) return false; msg('Шкафчик № 9. На замке выцарапано «М. Х.». Два колёсика, на каждом числа от 1 до 12.');return true;
+  case 'locker:shelf': if(sel) return false; msg('Красная лента и гладкий камешек. Детские сокровища.');return true;
+  case 'locker:words': if(sel) return false; msg('«М. + Н. навсегда». Марта и Нора.');return true;
+  case 'locker:bottom':
+    if(sel) return false;
+    if(!F.sawLocker){msg('Дно шкафчика. Пыль. Хотя... звук какой-то гулкий.');return true;}
+    F.bottomOpen=1;sfx.creak();render();msg('Второе дно. Марта не соврала.');return true;
+  case 'locker:ring': if(sel) return false; F.ringTaken=1;addItem('ring9');render();msg('Перстень. Ворон с ключом. Внутри гравировка: «№ 9». Она спрятала его здесь — в своём детском тайнике.',6000);return true;
+  case 'locker:recipe': if(sel) return false; F.recipeTaken=1;addItem('recipe');render();msg('Рецепт, написанный той же рукой.');return true;
+  }
+  if(sc==='tray'&&/^r\d+$/.test(id)){
+    const i=+id.slice(1);
+    if(i===8){
+      if(sel==='ring9'&&!F.ringPlaced){removeItem('ring9');F.ringPlaced=1;sfx.pin();render();msg('Перстень лёг в девятое гнездо. Бархат под ним приподнялся.');setTimeout(()=>{F.noteOut=1;sfx.creak();if(S.scene==='tray')render();save();},1600);return true;}
+      if(sel) return false;
+      if(F.noteOut&&!F.noteTaken){F.noteTaken=1;render();rookNote();return true;}
+      msg(F.ringPlaced?'Перстень № 9 на своём месте.':'Девятое гнездо пусто.');return true;
+    }
+    if(sel==='ring9'){sfx.wrong();msg('Не то гнездо. На перстне выгравировано «№ 9».');S.sel=null;renderInv();return true;}
+    if(sel) return false;
+    if(i===6){msg(F.reg?'Седьмое гнездо пусто. Седьмой перстень — мамин.':'Седьмое гнездо пусто.');return true;}
+    msg('Перстень № '+(i+1)+'. Его так и не вручили.');return true;
+  }
+  return false;
+}
+function talk3(pid){const n=S.f.talk[pid]||0;S.f.talk[pid]=n+1;msg(TALK3[pid][n%TALK3[pid].length]);}
+function playBox(){music.waltz();S.f.boxPlaying=1;if(S.scene==='dorm'||S.scene==='dorm31')render();setTimeout(()=>{S.f.boxPlaying=0;if(S.scene==='dorm'||S.scene==='dorm31')render();},22000);}
+function rookNote(){
+  openOv(`<div class="page card hand" style="font-size:clamp(19px,4.2vw,25px)">Кольцо № 9 — Марта Хиггс.<br>Её рука над бокалом, перчатка — братнина.<br>Плёнку я спрятал. Иду к П. — пусть знает, что я знаю.<br>Если не вернусь — Ада, ты смотришь не туда. Смотри на кухню.<div style="text-align:right">— С. Р., 15.XI.53</div></div>`,()=>{setTimeout(checkEnd3,300);});
+  setTimeout(()=>msg('Тот же почерк, что на обороте фотографии без лица.',5000),500);
+}
+function checkEnd3(){
+  const F=S.f; if(F.ended) return; F.ended=1; save();
+  setTimeout(()=>{lightning(true);sfx.caw();msg('Ворон влетел в разбитое окно и бросил к моим ногам конверт с красной печатью «П».',5500);},1200);
+  setTimeout(showEnding3,7200);
+}
+function showEnding3(){
+  openOv(`<div class="ending"><div class="ch">ГЛАВА III · КОНЕЦ</div><h2>Марта</h2><p>Перстень № 9 — Марта Хиггс. Мамина подруга по приюту: «М. + Н. навсегда». Сестра дворецкого, кухарка Пикман-холла. Это её рука была над бокалом — в перчатке брата с вышитой «Х».</p><p>Сайлас Рук понял это раньше меня. Он оставил записку в её гнезде и пошёл к Пикману. Больше его никто не видел. Из десяти «переведённых» детей тоже не вернулся никто.</p><p>А Марта Хиггс жива. Ей пятьдесят шесть, и она до сих пор печёт для мистера Пикмана миндальный пирог.</p><div class="q">«Мистер Огастес Пикман имеет честь пригласить мисс Аду Лэнг на ужин. 14 ноября 1975 года»</div><p style="font-size:16px;color:var(--paper-dim)">Глава IV. Ужин у Пикмана. Снова — скоро.</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Остаться в приюте</button><button class="btn" id="eMenu">Главы</button><button class="btn red" id="eNew">Начать главу заново</button></div></div>`,e=>{
+    if(e.target.id==='eNew'){closeOv();restart();return true;}
+    if(e.target.id==='eMenu'){closeOv();setTimeout(()=>$('#bMenu').click(),350);return true;}
+    if(e.target.id==='eStay'){closeOv();return true;}
+    return true;
+  });
+  ovIn.querySelector('.close').remove();
+}
 function talkTo(pid){const n=S.f.talk[pid]||0;S.f.talk[pid]=n+1;msg(TALK2[pid][n%TALK2[pid].length]);}
 sceneEl.addEventListener('click',e=>{
   if(busy) return;
@@ -1593,6 +1961,7 @@ sceneEl.addEventListener('click',e=>{
 function enterMemory(){
   if(MEMORY.has(S.scene)){msg('Я уже здесь.');return;}
   sfx.whoosh(); S.f.visited=1; S.sel=null; renderInv();
+  if(S.ch===3){go('dorm31',true);setTimeout(()=>say(['Март 1931 года. Ночь после отбоя.','Маме двенадцать. Здесь её зовут Нора.']),1100);return;}
   if(S.ch===2){go('office53',true);setTimeout(()=>say(['13 ноября 1953 года. Пятница, без четверти семь.','За день до ужина у Пикмана. Мама ещё здесь.']),1100);return;}
   go('dinner',true);
   setTimeout(()=>say(['14 ноября 1953 года. Без двадцати десять.','Всё застыло — в ту самую минуту.']),1100);
@@ -1604,7 +1973,8 @@ function checkEnd2(){
   setTimeout(showEnding2,7000);
 }
 function showEnding2(){
-  openOv(`<div class="ending"><div class="ch">ГЛАВА II · КОНЕЦ</div><h2>Ворон с ключом</h2><p>Четыре кадра — четыре нити рвутся. Пикман и леди Вейн были в коридоре. Доктор курил у камина, бросив саквояж открытым. Хиггс стоял в буфетной в одной перчатке.</p><p>В двадцать один тридцать пять над маминым бокалом — чужая рука в перчатке Хиггса. На пальце перстень: ворон с ключом в клюве. Герб приюта святой Агнессы. Того самого, о котором мама писала свою последнюю статью.</p><p>Сайлас Рук снял это — и не проявил. Утром пятнадцатого ноября он исчез.</p><div class="q">«Теперь ты смотришь туда, Ада»</div><p style="font-size:16px;color:var(--paper-dim)">Глава III. Приют святой Агнессы — скоро.</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на стену</button><button class="btn" id="eCh1">Глава I</button><button class="btn red" id="eNew">Начать главу заново</button></div></div>`,e=>{
+  openOv(`<div class="ending"><div class="ch">ГЛАВА II · КОНЕЦ</div><h2>Ворон с ключом</h2><p>Четыре кадра — четыре нити рвутся. Пикман и леди Вейн были в коридоре. Доктор курил у камина, бросив саквояж открытым. Хиггс стоял в буфетной в одной перчатке.</p><p>В двадцать один тридцать пять над маминым бокалом — чужая рука в перчатке Хиггса. На пальце перстень: ворон с ключом в клюве. Герб приюта святой Агнессы. Того самого, о котором мама писала свою последнюю статью.</p><p>Сайлас Рук снял это — и не проявил. Утром пятнадцатого ноября он исчез.</p><div class="q">«Теперь ты смотришь туда, Ада»</div><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на стену</button><button class="btn" id="eNew">Начать главу заново</button><button class="btn red" id="eNext">Глава III →</button></div></div>`,e=>{
+    if(e.target.id==='eNext'){closeOv();switchChapter(3);return true;}
     if(e.target.id==='eNew'){closeOv();restart();return true;}
     if(e.target.id==='eCh1'){closeOv();switchChapter(1);return true;}
     if(e.target.id==='eStay'){closeOv();if(S.scene!=='rookboard')go('rookboard');return true;}
@@ -1725,7 +2095,8 @@ $('#bHint').onclick=()=>{if(!started)return;sfx.caw();msg(hint(),6500);};
 $('#bSound').onclick=()=>{A.on=!A.on;if(A.master)A.master.gain.setTargetAtTime(A.on?.85:0,A.ctx.currentTime,.1);$('#bSound').style.opacity=A.on?1:.45;};
 $('#bMenu').onclick=()=>{
   let armed=false;
-  const chs=ch2Unlocked()?[1,2].map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
+  const open=[1,2,3].filter(unlocked);
+  const chs=open.length>1?open.map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
   openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button></div>`,e=>{
     const id=e.target.id;
     if(/^mCh\d$/.test(id)){closeOv();switchChapter(+id[3]);return true;}
@@ -1737,10 +2108,11 @@ $('#bMenu').onclick=()=>{
 };
 function restart(){S=fresh(S.ch);save();render();renderInv();amb();setTimeout(intro,500);}
 function intro(){
+  if(S.ch===3){say(['Приют святой Агнессы. Закрыт в пятьдесят четвёртом, через год после маминой смерти.','Над каждой дверью здесь — ворон с ключом в клюве. Как на том перстне.','Мама писала об этом приюте свою последнюю статью. Теперь я знаю почему.']);return;}
   if(S.ch===2){say(['Редакция «Вечернего вестника». Газету закрыли год назад, здание продают.','Здесь мама работала до того ноября. Здесь работал и человек, который снимал тот ужин.','Сторож пустил меня до утра. У меня есть мамина лупа и фотография без лица.']);return;}
   say(['1975 год. Двадцать два года назад, на ужине у мистера Пикмана, умерла моя мать.','Полиция сказала: сердце. Я никогда в это не верила.','Всё, что у меня есть, — газетная вырезка на доске. И эта комната.']);
 }
-function ch2Unlocked(){const c1=load(1);return S.ch===2||!!(c1&&c1.f.ended)||!!load(2);}
+function unlocked(n){if(n===1||S.ch>=n||load(n))return true;const prev=load(n-1);return !!(prev&&prev.f.ended);}
 function chapterUI(){const c=CHAPTERS[S.ch];$('#chName').textContent=c.name;$('#tCh').textContent=c.tag;$('#tLead').textContent=c.lead;document.title='Красная нить · '+c.name;}
 function switchChapter(n){
   if(busy) return;
@@ -1757,7 +2129,7 @@ function switchChapter(n){
 /* ---------- boot ---------- */
 let started=false;
 function start(data){
-  let last=1; try{last=+localStorage.getItem(LAST_KEY)===2?2:1;}catch(e){}
+  let last=1; try{last=+localStorage.getItem(LAST_KEY);if(!CHAPTERS[last])last=1;}catch(e){}
   const saved=(data&&data.f)?data:load(last);
   S=saved&&saved.f?saved:fresh(last);
   S.ch=S.ch||1; S.sel=null;
@@ -1765,7 +2137,8 @@ function start(data){
   if(S.f.recordPlaced&&!S.f.portraitOpen){S.f.eyesOpen=1;S.f.portraitOpen=1;}
   if(S.f.ended&&!S.f.sixth) S.f.sixth=1;
   render(); renderInv();
-  const hasProgress=saved&&(S.ch===2?!!saved.f.touched:(saved.f.touched||saved.inv.length||saved.f.clockOpen||saved.f.ch!==3));
+  S.f.boxPlaying=0;
+  const hasProgress=saved&&(S.ch>=2?!!saved.f.touched:(saved.f.touched||saved.inv.length||saved.f.clockOpen||saved.f.ch!==3));
   if(hasProgress){$('#bCont').hidden=false;$('#bStart').textContent='Новая игра';$('#bStart').classList.remove('red');$('#bCont').classList.add('red');}
   $('#bStart').onclick=()=>{ain();if(hasProgress){S=fresh(S.ch);render();renderInv();}begin(true);};
   $('#bCont').onclick=()=>{ain();begin(false);};
