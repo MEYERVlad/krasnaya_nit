@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Красная нить — тизер</title>
+<link rel="stylesheet" href="../steam/fonts/fonts.css">
+<style>
+html,body{margin:0;background:#000;overflow:hidden}
+#v{position:relative;width:1920px;height:1080px;overflow:hidden;background:#000}
+.shot{position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0;display:none}
+.shot img{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.shot .bloom{filter:blur(16px) brightness(1.5) contrast(1.25);mix-blend-mode:screen;opacity:.32}
+.shot .dof{filter:blur(7px);-webkit-mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 55%,#000 100%);mask-image:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 55%,#000 100%)}
+.g-mem{filter:contrast(1.1) saturate(1.08) brightness(.96)}
+.g-night{filter:saturate(.88) contrast(1.14) brightness(.93)}
+.g-warm{filter:saturate(1.12) contrast(1.08)}
+.g-red{filter:contrast(1.18) saturate(1.25)}
+canvas{position:absolute;left:0;top:0}
+#warm{position:absolute;inset:0;background:radial-gradient(ellipse 55% 50% at 50% 55%,rgba(255,170,80,.22),rgba(255,140,60,0) 70%);mix-blend-mode:screen;opacity:0}
+#cool{position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,70,120,.25),rgba(10,20,40,0) 60%);mix-blend-mode:screen;opacity:0}
+#vig{position:absolute;inset:0;box-shadow:inset 0 0 260px 60px rgba(0,0,0,.85)}
+#flash{position:absolute;inset:0;background:#fff8ec;opacity:0}
+#bolt{position:absolute;inset:0;background:#cfdcff;opacity:0;mix-blend-mode:screen}
+.bar{position:absolute;left:0;width:1920px;height:132px;background:#000;z-index:5}
+#barT{top:0}#barB{bottom:0}
+#txt{position:absolute;left:0;right:0;bottom:132px;padding-bottom:40px!important;padding-top:60px!important;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.6));text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:50px;color:#f3e9d2;text-shadow:0 2px 6px #000,0 0 28px #000;z-index:6;padding:0 200px;line-height:1.25}
+#card{position:absolute;left:0;right:0;top:0;bottom:0;background:radial-gradient(ellipse 48% 30% at 50% 50%,rgba(0,0,0,.72),rgba(0,0,0,0));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:6;text-align:center}
+#card .l{font-family:'Cormorant SC',serif;font-weight:600;font-size:36px;letter-spacing:.5em;color:#c9a256;text-shadow:0 0 20px #000}
+#card .t{font-family:'Cormorant SC',serif;font-weight:500;font-size:92px;letter-spacing:.08em;color:#f3e9d2;text-shadow:0 0 40px #000,0 4px 10px #000}
+#card .ln{width:520px;height:2px;background:#a3221b;transform-origin:50% 50%}
+#big{position:absolute;inset:0;background:radial-gradient(ellipse 50% 24% at 50% 50%,rgba(0,0,0,.7),rgba(0,0,0,0));display:flex;align-items:center;justify-content:center;z-index:6;font-family:'Cormorant SC',serif;font-weight:600;font-size:96px;letter-spacing:.06em;color:#f3e9d2;text-shadow:0 0 50px #000,0 0 20px #000}
+#hand{position:absolute;left:0;right:0;top:640px;text-align:center;z-index:7;font-family:'Marck Script',cursive;font-size:64px;color:#e05a4a;text-shadow:0 0 24px #000}
+#logo{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:6;opacity:0}
+#logo h1{margin:0;font-family:'Cormorant SC',serif;font-weight:500;font-size:190px;letter-spacing:.1em;color:#efe4ca;text-shadow:0 0 60px rgba(0,0,0,.9);line-height:1}
+#logo svg{width:1100px;height:90px;overflow:visible;margin-top:-6px}
+#logo .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:40px;color:#c9bca2;margin-top:10px}
+#logo .soon{font-family:'Cormorant SC',serif;font-size:34px;letter-spacing:.4em;color:#c9a256;margin-top:120px}
+#crow{position:absolute;left:0;top:0;z-index:6;width:420px;height:300px;opacity:0}
+</style>
+</head>
+<body>
+<div id="v">
+  <div id="shots"></div>
+  <div id="warm"></div><div id="cool"></div>
+  <canvas id="rain" width="1920" height="1080"></canvas>
+  <canvas id="dust" width="1920" height="1080"></canvas>
+  <svg id="crow" viewBox="-70 -70 140 100"><g id="crowG"></g></svg>
+  <div id="bolt"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="960" height="540" style="width:1920px;height:1080px;opacity:.13;mix-blend-mode:overlay"></canvas>
+  <div id="logo"><h1>Красная нить</h1><svg viewBox="0 0 560 50" preserveAspectRatio="none"><path id="thread" d="M4 30 C90 6 150 44 230 24 S380 8 440 30 S530 40 556 14" stroke="#c42a22" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg><div class="sub">Детективная point-and-click головоломка</div><div class="soon">Скоро</div></div>
+  <div id="txt"></div>
+  <div id="card"><div class="l"></div><div class="t"></div><div class="ln"></div></div>
+  <div id="big"></div>
+  <div id="hand"></div>
+  <div class="bar" id="barT"></div><div class="bar" id="barB"></div>
+  <div id="flash"></div>
+</div>
+<script src="timeline.js"></script>
+<script>
+const T = TIMELINE, W = 1920, H = 1080, PW = 2888, PH = 1848;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const ease = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const lin = (a, b, p) => a + (b - a) * p;
+function rnd(seed) { let s = seed | 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+// wave(t) — гладкий шум для мерцания свечей
+const wave = (t, k) => .5 + .25 * Math.sin(t * 13.1 + k) + .15 * Math.sin(t * 23.7 + k * 2) + .1 * Math.sin(t * 41.3 + k * 3);
+
+// слои кадров
+const box = document.getElementById('shots');
+T.shots.forEach((s, i) => {
+  const d = document.createElement('div'); d.className = 'shot g-' + s.grade;
+  const src = 'plates/' + s.img + '.jpg';
+  d.innerHTML = `<img class="base" src="${src}"><img class="dof" src="${src}"><img class="bloom" src="${src}">`;
+  box.appendChild(d); s.el = d; s.imgs = [...d.querySelectorAll('img')];
+});
+// ворон (силуэт из игры)
+document.getElementById('crowG').innerHTML = `<path d="M-30 -38 C-28 -49 -18 -55 -8 -53 C0 -51 4 -45 6 -37 C14 -35 24 -29 30 -19 C38 -9 46 -1 60 5 L55 10 C45 7 36 3 28 -1 C20 1 10 3 0 1 C-10 -1 -16 -9 -18 -19 C-20 -25 -23 -30 -27 -33 Z" fill="#0b0a0e"/><path d="M-29 -41 L-47 -36 L-29 -32 Z" fill="#141318"/><path id="wing" d="M-6 -30 C10 -60 30 -70 50 -62 C34 -50 18 -38 6 -26 Z" fill="#0b0a0e"/><circle cx="-20" cy="-43" r="2.6" fill="#d9cfa8"/>`;
+
+const rainC = document.getElementById('rain').getContext('2d');
+const dustC = document.getElementById('dust').getContext('2d');
+const grainC = document.getElementById('grain').getContext('2d');
+const grainImg = grainC.createImageData(960, 540);
+const thread = document.getElementById('thread'), TL = thread.getTotalLength();
+thread.style.strokeDasharray = TL;
+const R0 = rnd(7); const DROPS = Array.from({ length: 260 }, () => [R0() * W, R0() * H, 18 + R0() * 26, .15 + R0() * .35, .9 + R0() * .6]);
+const R1 = rnd(11); const MOTES = Array.from({ length: 70 }, () => [R1(), R1(), .8 + R1() * 2.2, R1() * 6.28, .00004 + R1() * .00008]);
+
+function shotAlpha(s, t) {
+  const f = s.fade;
+  if (t < s.a - f / 2 || t > s.b + f / 2) return 0;
+  const i = clamp((t - (s.a - f / 2)) / f, 0, 1), o = clamp(((s.b + f / 2) - t) / f, 0, 1);
+  return Math.min(i, o);
+}
+function place(s, t) {
+  const p = ease(clamp((t - s.a) / (s.b - s.a), 0, 1));
+  let [cx, cy, z] = [0, 1, 2].map(k => lin(s.from[k], s.to[k], p));
+  const sc = W / PW * z, dw = PW * sc, dh = PH * sc;
+  cx = clamp(cx, (W / 2) / dw, 1 - (W / 2) / dw); cy = clamp(cy, (H / 2) / dh, 1 - (H / 2) / dh);
+  const tx = W / 2 - cx * dw, ty = H / 2 - cy * dh;
+  const tr = `translate(${tx}px,${ty}px) scale(${sc})`;
+  s.imgs.forEach(im => im.style.transform = tr);
+}
+function typed(s, t, cps = 22) { const n = Math.floor((t - s.a) * cps); return s.text.slice(0, Math.max(0, n)); }
+function fadeIO(t, a, b, fi = .5, fo = .5) { return clamp(Math.min((t - a) / fi, (b - t) / fo), 0, 1); }
+
+window.renderAt = function (t) {
+  let fx = new Set(), warmK = 0;
+  for (const s of T.shots) {
+    const al = shotAlpha(s, t);
+    if (al <= 0) { s.el.style.display = 'none'; continue; }
+    s.el.style.display = 'block'; s.el.style.opacity = al; place(s, t);
+    s.fx.forEach(f => fx.add(f));
+  }
+  // свечи / лампа
+  const w = document.getElementById('warm');
+  w.style.opacity = fx.has('candle') ? (.55 + .45 * wave(t, 1)) : fx.has('lamp') ? .35 : 0;
+  document.getElementById('cool').style.opacity = fx.has('rain') ? .8 : 0;
+  // дождь
+  rainC.clearRect(0, 0, W, H);
+  if (fx.has('rain')) {
+    rainC.strokeStyle = '#b8cde0'; rainC.lineWidth = 1.4;
+    for (const [x, y, l, a, sp] of DROPS) {
+      const yy = (y + t * 1400 * sp) % (H + 60) - 30, xx = (x - t * 160 * sp) % W;
+      rainC.globalAlpha = a; rainC.beginPath(); rainC.moveTo(xx < 0 ? xx + W : xx, yy); rainC.lineTo((xx < 0 ? xx + W : xx) - 5, yy + l); rainC.stroke();
+    }
+    rainC.globalAlpha = 1;
+  }
+  // пыль в свете
+  dustC.clearRect(0, 0, W, H);
+  if (fx.has('dust') || fx.has('candle')) {
+    for (const [x, y, r, ph, v] of MOTES) {
+      const xx = ((x + Math.sin(t * .4 + ph) * .02) % 1) * W, yy = (((y - t * v * 600) % 1 + 1) % 1) * H;
+      const a = .25 + .25 * Math.sin(t * 1.3 + ph);
+      dustC.fillStyle = `rgba(255,226,180,${a})`; dustC.beginPath(); dustC.arc(xx, yy, r, 0, 7); dustC.fill();
+    }
+  }
+  // зерно
+  const g = rnd(Math.floor(t * 24) + 3), d = grainImg.data;
+  for (let i = 0; i < d.length; i += 4) { const v = g() * 255; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+  grainC.putImageData(grainImg, 0, 0);
+  // вспышки и молнии
+  let fl = 0; for (const f of T.flashes) { const dt = t - f; if (dt >= -.04 && dt < .5) fl = Math.max(fl, dt < 0 ? 1 - (-dt / .04) : Math.exp(-dt * 9)); }
+  document.getElementById('flash').style.opacity = fl * .9;
+  let bo = 0; for (const f of T.lightning) { const dt = t - f; if (dt >= 0 && dt < .7) bo = Math.max(bo, (dt < .08 || (dt > .18 && dt < .26)) ? .55 : 0); }
+  document.getElementById('bolt').style.opacity = bo;
+  // тексты
+  const tx = document.getElementById('txt'), cd = document.getElementById('card'), bg = document.getElementById('big'), hd = document.getElementById('hand');
+  tx.textContent = ''; tx.style.opacity = 0; cd.style.opacity = 0; bg.style.opacity = 0; hd.style.opacity = 0;
+  for (const s of T.texts) {
+    if (t < s.a || t > s.b) continue;
+    const o = fadeIO(t, s.a, s.b, .3, .5);
+    if (s.style === 'line') { tx.textContent = typed(s, t); tx.style.opacity = o; }
+    if (s.style === 'card') { cd.style.opacity = o; cd.querySelector('.l').textContent = s.label; cd.querySelector('.t').textContent = s.text; cd.querySelector('.ln').style.transform = `scaleX(${ease(clamp((t - s.a) / 1.2, 0, 1))})`; cd.querySelector('.t').style.transform = `scale(${1.04 - .04 * ease(clamp((t - s.a) / 3, 0, 1))})`; }
+    if (s.style === 'big') { bg.textContent = s.text; bg.style.opacity = o; bg.style.transform = `scale(${1.12 - .12 * ease(clamp((t - s.a) / .6, 0, 1))})`; bg.style.letterSpacing = `${.06 + .04 * clamp((t - s.a) / 3, 0, 1)}em`; }
+    if (s.style === 'hand') { hd.textContent = typed(s, t, 14); hd.style.opacity = o; }
+  }
+  // ворон
+  const c = T.crow, cr = document.getElementById('crow');
+  if (t >= c.a && t <= c.b) {
+    const p = (t - c.a) / (c.b - c.a), x = lin(-420, W + 60, p), y = 420 - Math.sin(p * Math.PI) * 220;
+    cr.style.opacity = 1; cr.style.transform = `translate(${x}px,${y}px) scale(-1.6,1.6) rotate(${-8 + 10 * p}deg)`;
+    document.getElementById('wing').setAttribute('transform', `rotate(${Math.sin(t * 22) * 28} 0 -30)`);
+  } else cr.style.opacity = 0;
+  // заставка
+  const L = T.logo, lg = document.getElementById('logo');
+  if (t >= L.a) {
+    lg.style.opacity = fadeIO(t, L.a, L.b + 5, 1.2, 1);
+    thread.style.strokeDashoffset = TL * (1 - ease(clamp((t - L.a - .6) / 2.4, 0, 1)));
+    lg.querySelector('h1').style.letterSpacing = `${.16 - .06 * ease(clamp((t - L.a) / 4, 0, 1))}em`;
+    lg.querySelector('.sub').style.opacity = clamp((t - L.a - 2.2) / 1, 0, 1);
+    lg.querySelector('.soon').style.opacity = clamp((t - L.a - 7.2) / 1, 0, 1);
+  } else lg.style.opacity = 0;
+  // общее затемнение в конце
+  document.getElementById('v').style.filter = t > T.duration - 1 ? `brightness(${clamp(T.duration - t, 0, 1)})` : 'none';
+};
+window.ready = Promise.all([document.fonts.ready, ...T.shots.flatMap(s => s.imgs.map(im => im.complete && im.naturalWidth ? 0 : new Promise((ok, no) => { im.onload = ok; im.onerror = () => no(new Error('нет файла ' + im.src)); })))]);
+</script>
+</body>
+</html>
