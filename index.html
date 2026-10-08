@@ -193,6 +193,7 @@ const OL = '#1a110d';
 const LAST_KEY = 'krasnaya-nit-last';
 const CHAPTERS = {
   1:{key:'krasnaya-nit-ch1-v1',name:'Глава I. Ужин у Пикмана',tag:'ГЛАВА I · УЖИН У ПИКМАНА',lead:'Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.'},
+  4:{key:'krasnaya-nit-ch4-v1',name:'Глава IV. Ужин у Пикмана. Снова',tag:'ГЛАВА IV · УЖИН У ПИКМАНА. СНОВА',lead:'14 ноября 1975 года. Мистер Пикман снова зовёт к ужину. Те же гости, тот же стол — и мамино место накрыто для меня.'},
   3:{key:'krasnaya-nit-ch3-v1',name:'Глава III. Приют святой Агнессы',tag:'ГЛАВА III · ПРИЮТ СВЯТОЙ АГНЕССЫ',lead:'1975 год. Ворон с ключом — герб приюта святой Агнессы. Приют закрыт уже двадцать лет. Мама писала о нём свою последнюю статью.'},
   2:{key:'krasnaya-nit-ch2-v1',name:'Глава II. Тёмная комната',tag:'ГЛАВА II · ТЁМНАЯ КОМНАТА',lead:'1975 год. На обороте фотографии без лица — штамп фотолаборатории «Вечернего вестника». Газету закрыли, но мамин стол всё ещё стоит в редакции.'}
 };
@@ -291,7 +292,16 @@ const PEOPLE = {
   agatha:{name:'Сестра Агата',role:'Смотрительница приюта.',skin:'#e6d2bc',hair:'#141216',brow:'#4a3a30',style:'wimple',female:true,dress:'#1c1a1e',lips:'#8a5a50'},
   nora:{name:'Нора, 12 лет',skin:'#f1ddcb',hair:'#2a1a14',brow:'#2a1a14',style:'braids',female:true,dress:'#e8e2d4',lips:'#c0605a',ribbon:'#2a3854'},
   martha:{name:'Марта, 12 лет',skin:'#f0d8c2',hair:'#8a3a1e',brow:'#6a2a14',style:'braids',female:true,dress:'#d8d0c0',lips:'#b85a50',ribbon:'#7a1a1a'},
+  ada:{name:'Ада Лэнг',skin:'#f1ddcb',hair:'#2a1a14',brow:'#2a1a14',style:'bob',nobow:true,female:true,dress:'#1f3a3a',lips:'#8a2a2a'},
+  martha75:{name:'Марта Хиггс',skin:'#ecd2bc',hair:'#b8aca0',brow:'#8a7a70',style:'bun',female:true,dress:'#4a4038',lips:'#9a6a60',old:true},
+  martha53:{name:'Марта Хиггс',skin:'#f0d8c2',hair:'#8a3a1e',brow:'#6a2a14',style:'bun',female:true,dress:'#4a4038',lips:'#b85a50'},
   ada7:{name:'Ада, 7 лет',skin:'#f3dfcc',hair:'#3a2418',brow:'#3a2418',style:'bob',female:true,dress:'#8c2d2a',lips:'#c0605a'}
+};
+const OLD={
+  doctor:{...PEOPLE.doctor,hair:'#e6e2da',brow:'#c8c4bc',old:true},
+  pickman:{...PEOPLE.pickman,hair:'#dcd8d0',skin:'#e6c8b0',old:true},
+  lady:{...PEOPLE.lady,hair:'#a8a098',brow:'#7a706a',old:true},
+  butler:{...PEOPLE.butler,hair:'#9a9690',old:true}
 };
 function bust(p,o={}){
   const W=p.wide?78:62, hrx=p.wide?28:25, hry=p.long?34:31, hy=-50, skinD=shade(p.skin,-.13);
@@ -320,6 +330,7 @@ function bust(p,o={}){
   else{const pr=o.stare?3.5:2.7,lx=o.look||0;s+=`<circle cx="${-ex+lx}" cy="${ey}" r="${pr}" fill="#110a08"/><circle cx="${ex+lx}" cy="${ey}" r="${pr}" fill="#110a08"/>`;}
   s+=`<path d="M${-ex-6} ${ey-8} Q${-ex} ${ey-11.5} ${-ex+6} ${ey-8.5} M${ex-6} ${ey-8.5} Q${ex} ${ey-11.5} ${ex+6} ${ey-8}" stroke="${p.brow||shade(p.hair,-.15)}" stroke-width="${p.female?1.6:2.3}" fill="none" stroke-linecap="round"/>`;
   s+=`<path d="M-1 ${hy+1} Q3.5 ${hy+11} -2 ${hy+13}" stroke="${skinD}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  if(p.old) s+=`<path d="M-11 ${hy-21} q11 -3 22 0 M-8 ${hy-16} q8 -2 16 0 M${-ex-6} ${ey+6} q6 3 11 0 M${ex-5} ${ey+6} q6 3 11 0 M-14 ${hy+15} q-3 6 -1 10 M14 ${hy+15} q3 6 1 10" stroke="${skinD}" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".85"/>`;
   if(p.female){s+=`<circle cx="-13" cy="${hy+10}" r="5" fill="#d77a6a" opacity=".2"/><circle cx="13" cy="${hy+10}" r="5" fill="#d77a6a" opacity=".2"/><path d="M-6 ${hy+21} Q-3 ${hy+18.4} 0 ${hy+20} Q3 ${hy+18.4} 6 ${hy+21} Q0 ${hy+25.5} -6 ${hy+21} Z" fill="${p.lips}"/>`;}
   else s+=`<path d="M-7 ${hy+21} Q0 ${hy+22.6} 7 ${hy+21}" stroke="#5e3128" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
   const H=p.hair;
@@ -328,7 +339,7 @@ function bust(p,o={}){
     case 'slick': s+=`<path d="M-26 -48 C-29 -80 -9 -87 4 -86 C22 -85 31 -72 26 -48 C25 -63 15 -71 0 -72 C-12 -72 -22 -64 -26 -48 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-14 -80 Q2 -84 16 -78" stroke="#fff" stroke-opacity=".18" stroke-width="2" fill="none"/>`;break;
     case 'bald': s+=`<path d="M-29 -48 C-32 -58 -29 -66 -24 -67 C-26 -58 -25 -52 -22 -42 Z M29 -48 C32 -58 29 -66 24 -67 C26 -58 25 -52 22 -42 Z" fill="${H}"/><ellipse cx="-9" cy="-72" rx="9" ry="4" fill="#fff" opacity=".22" transform="rotate(-18 -9 -72)"/>`;break;
     case 'bun': s+=`<circle cx="7" cy="-86" r="13" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-27 -44 C-32 -78 -10 -88 4 -86 C24 -84 32 -70 27 -44 C24 -58 18 -70 6 -72 C-2 -66 -14 -64 -22 -58 C-25 -54 -26 -50 -27 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-18 -74 Q-6 -82 8 -78 M2 -92 Q8 -96 14 -90" stroke="${shade(H,.25)}" stroke-width="1.2" fill="none"/>`;break;
-    case 'bob': s+=`<path d="M-29 -40 C-35 -76 -14 -90 2 -88 C22 -88 35 -74 29 -40 C31 -30 27 -22 21 -25 L22 -58 C8 -66 -8 -66 -22 -58 L-21 -25 C-27 -22 -31 -30 -29 -40 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-23 -58 C-12 -52 10 -52 23 -58 L23 -68 C8 -78 -8 -78 -23 -68 Z" fill="${H}"/><path d="M14 -84 l12 -8 l2 12 Z M14 -84 l-2 -12 l12 4 Z" fill="#b8322a" stroke="${OL}" stroke-width=".8"/>`;break;
+    case 'bob': s+=`<path d="M-29 -40 C-35 -76 -14 -90 2 -88 C22 -88 35 -74 29 -40 C31 -30 27 -22 21 -25 L22 -58 C8 -66 -8 -66 -22 -58 L-21 -25 C-27 -22 -31 -30 -29 -40 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-23 -58 C-12 -52 10 -52 23 -58 L23 -68 C8 -78 -8 -78 -23 -68 Z" fill="${H}"/>${p.nobow?'':`<path d="M14 -84 l12 -8 l2 12 Z M14 -84 l-2 -12 l12 4 Z" fill="#b8322a" stroke="${OL}" stroke-width=".8"/>`}`;break;
     case 'wimple': s+=`<path fill-rule="evenodd" d="M-42 16 C-46 -40 -40 -98 0 -98 C40 -98 46 -40 42 16 Z M0 -78 C-22 -78 -26 -60 -26 -48 C-26 -30 -18 -20 0 -18 C18 -20 26 -30 26 -48 C26 -60 22 -78 0 -78 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path fill-rule="evenodd" d="M-31 -6 C-35 -40 -31 -86 0 -86 C31 -86 35 -40 31 -6 Q0 8 -31 -6 Z M0 -77 C-21 -77 -25 -60 -25 -48 C-25 -31 -17 -21 0 -20 C17 -21 25 -31 25 -48 C25 -60 21 -77 0 -77 Z" fill="#efe9dc" stroke="${OL}" stroke-width=".8"/>`;break;
     case 'braids': s+=`<path d="M-27 -46 C-30 -78 -12 -88 0 -88 C12 -88 30 -78 27 -46 C24 -62 14 -70 1 -72 L-1 -72 C-14 -70 -24 -62 -27 -46 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M0 -88 L0 -72" stroke="${shade(H,-.3)}" stroke-width="1.2"/>`;
       [-1,1].forEach(d=>{for(let k=0;k<5;k++) s+=`<ellipse cx="${d*(27+k*.8)}" cy="${-40+k*11}" rx="6" ry="7" fill="${H}" stroke="${OL}" stroke-width="1"/>`; s+=`<path d="M${d*30} 16 l${d*-6} 8 l${d*12} 0 Z" fill="${p.ribbon||'#a3221b'}" stroke="${OL}" stroke-width=".8"/>`;});break;
@@ -378,7 +389,13 @@ const ITEMS = {
   windkey:{name:'Заводной ключик',desc:'Крошечный ключик-бабочка. Он был спрятан в голове фарфоровой куклы.'},
   boxphoto:{name:'Снимок из шкатулки',special:'boxphoto'},
   ring9:{name:'Перстень № 9',desc:'Тяжёлый перстень: ворон с ключом в клюве. Изнутри гравировка: «№ 9 · S. Agnes · 1935».'},
-  recipe:{name:'Рецепт',special:'recipe'}
+  recipe:{name:'Рецепт',special:'recipe'},
+  invite75:{name:'Приглашение',special:'invite75'},
+  cellarkey:{name:'Ключ от погреба',desc:'Тяжёлый железный ключ, тёплый от Мартиной ладони.'},
+  lantern:{name:'Фонарь',desc:'Кухонный фонарь со свечой. Марта ходила с ним в погреб двадцать два года.'},
+  ledger:{name:'Книга отправок',special:'ledger'},
+  rookcam:{name:'Камера Рука',special:'rookcam'},
+  sediment75:{name:'Осадок из моего бокала',desc:'Белёсый осадок со дна моего бокала. Горький миндаль. Как тогда.'}
 };
 const EVIDENCE = {vial:'doctor',note:'lady',glove:'butler',page:'pickman'};
 const LINKMSG = {
@@ -408,6 +425,12 @@ function icon(id){
   }
   if(id==='faceless') return icon('ph_stranger');
   if(id==='ringphoto') return icon('pr4');
+  if(id==='invite75') return icon('invite');
+  if(id==='cellarkey') return icon('key').replace(/url\(#gBrass\)/g,'#4a4a50');
+  if(id==='lantern') return `<g transform="translate(0 4)">${lantern(32,36,true).replace(/<circle[^>]*rCandle[^>]*\/>/,'')}</g>`;
+  if(id==='ledger') return `<rect x="12" y="10" width="40" height="46" rx="2" fill="#3a1a14" stroke="${OL}"/><rect x="16" y="10" width="4" height="46" fill="#2a120e"/><rect x="24" y="20" width="22" height="10" fill="#d8ccb0"/><path d="M26 25 h18" stroke="#3a1a14" stroke-width="1.2"/>`;
+  if(id==='rookcam') return icon('camera');
+  if(id==='sediment75') return icon('sediment');
   if(id==='poker') return `<path d="M14 54 L46 14" stroke="#2a2a2e" stroke-width="5" stroke-linecap="round"/><path d="M46 14 q8 -4 6 6 l-6 2" stroke="#2a2a2e" stroke-width="4" fill="none"/><path d="M14 54 l-4 4" stroke="#4a3a2a" stroke-width="7" stroke-linecap="round"/>`;
   if(id==='crestkey') return icon('key').replace(/url\(#gBrass\)/g,'#6a6a70');
   if(id==='windkey') return `<path d="M32 30 C20 14 8 22 14 32 C8 42 20 50 32 34 C44 50 56 42 50 32 C56 22 44 14 32 30 Z" fill="url(#gBrass)" stroke="${OL}"/><rect x="29.5" y="32" width="5" height="22" fill="url(#gBrass)" stroke="${OL}"/><rect x="26" y="50" width="12" height="5" fill="url(#gBrass)"/>`;
@@ -422,6 +445,7 @@ function icon(id){
 /* ---------- state ---------- */
 let S;
 function fresh(n){
+  if(n===4) return{ch:4,scene:'dinner75',inv:['invite75','ring9','magnifier'],sel:null,f:{talk:{},acc:{}}};
   if(n===3) return{ch:3,scene:'dorm',inv:['ringphoto','magnifier'],sel:null,f:{lk:[1,1],talk:{}}};
   if((n||1)===2) return{ch:2,scene:'office',inv:['faceless','magnifier'],sel:null,f:{tl:[null,null,null,null],dev:0,took:{},talk:{}}};
   return{ch:1,scene:'room',inv:[],sel:null,f:{ch:3,cm:3,bag:[0,0,0],slots:[null,null,null,null],linked:{},shot:{},talk:{}}};
@@ -732,8 +756,8 @@ function candelabra(x){
 }
 function wineGlass(x,y,full=true){return `<path d="M${x-7} ${y-18} Q${x-8} ${y-5} ${x} ${y-3} Q${x+8} ${y-5} ${x+7} ${y-18} Z" fill="#dfeaf0" fill-opacity=".25" stroke="#f3f6f6" stroke-opacity=".6"/>${full?`<path d="M${x-6.5} ${y-11} Q${x-7} ${y-5} ${x} ${y-4} Q${x+7} ${y-5} ${x+6.5} ${y-11} Z" fill="#6a0f14"/>`:''}<line x1="${x}" y1="${y-3}" x2="${x}" y2="${y+8}" stroke="#e8eef0" stroke-width="1.5"/><ellipse cx="${x}" cy="${y+8}" rx="6" ry="1.6" fill="#e8eef0" opacity=".7"/>`;}
 function plate(x,y=383){return `<ellipse cx="${x}" cy="${y}" rx="30" ry="6.5" fill="#f6f1e6" stroke="#b5a88f"/><ellipse cx="${x}" cy="${y}" rx="20" ry="4" fill="none" stroke="#c9a256" stroke-width=".8"/>`;}
-function renderDinner(interactive){
-  const F=S.f; let s='';
+function renderDinner(interactive,y75){
+  const F=S.f, P=y75?OLD:PEOPLE; let s='';
   s+=`<rect width="1000" height="480" fill="url(#pStripe)"/><rect width="1000" height="480" fill="url(#pMottle)"/>`;
   s+=`<rect width="1000" height="30" fill="#2a0c0c"/><rect y="30" width="1000" height="6" fill="#a8843f" opacity=".6"/><rect y="36" width="1000" height="6" fill="#000" opacity=".3"/>`;
   s+=`<rect y="400" width="1000" height="84" fill="#2a1009"/><rect y="400" width="1000" height="84" fill="url(#pWood)" opacity=".6"/><rect y="396" width="1000" height="7" fill="#a8843f" opacity=".5"/>`;
@@ -748,7 +772,7 @@ function renderDinner(interactive){
   // painting
   s+=`<rect x="432" y="58" width="150" height="168" fill="#000" opacity=".35"/><rect x="424" y="48" width="152" height="170" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><rect x="436" y="60" width="128" height="146" fill="#2a1a10"/><clipPath id="cPaint"><rect x="436" y="60" width="128" height="146"/></clipPath><g clip-path="url(#cPaint)"><rect x="436" y="60" width="128" height="146" fill="url(#rPortraitBg)" opacity=".5"/><g transform="translate(500 186) scale(.82)">${bust(PEOPLE.pickman,{look:0})}</g></g><rect x="436" y="60" width="128" height="146" fill="none" stroke="#6e5223" stroke-width="2"/>`;
   // grandfather clock
-  s+=`<rect x="736" y="118" width="66" height="290" fill="url(#gWoodD)" stroke="${OL}" stroke-width="1.5"/><path d="M730 120 Q769 84 808 120 Z" fill="#2a160c" stroke="${OL}"/><circle cx="769" cy="168" r="25" fill="url(#gBrass)" stroke="${OL}"/><circle cx="769" cy="168" r="21" fill="url(#rDial)"/>${dialTicks(769,168,21,1)}${clockHands(769,168,21,9,8)}<rect x="752" y="206" width="34" height="150" fill="#0d0705" stroke="#5a3a22"/><line x1="769" y1="206" x2="769" y2="320" stroke="#b8924a" stroke-width="2"/><circle cx="769" cy="326" r="10" fill="url(#gGold)"/>`;
+  s+=`<rect x="736" y="118" width="66" height="290" fill="url(#gWoodD)" stroke="${OL}" stroke-width="1.5"/><path d="M730 120 Q769 84 808 120 Z" fill="#2a160c" stroke="${OL}"/><circle cx="769" cy="168" r="25" fill="url(#gBrass)" stroke="${OL}"/><circle cx="769" cy="168" r="21" fill="url(#rDial)"/>${dialTicks(769,168,21,1)}${clockHands(769,168,21,9,y75&&F.ended?9:8)}<rect x="752" y="206" width="34" height="150" fill="#0d0705" stroke="#5a3a22"/><line x1="769" y1="206" x2="769" y2="320" stroke="#b8924a" stroke-width="2"/><circle cx="769" cy="326" r="10" fill="url(#gGold)"/>`;
   // chandelier
   s+=`<line x1="500" y1="0" x2="500" y2="26" stroke="#5a411a" stroke-width="3"/><ellipse cx="500" cy="36" rx="18" ry="11" fill="url(#gBrass)" stroke="${OL}"/>`;
   [[410,46],[450,52],[550,52],[590,46]].forEach(([x,y])=>{s+=`<path d="M500 38 Q${(500+x)/2} ${y+18} ${x} ${y}" stroke="#b8924a" stroke-width="3.5" fill="none"/><rect x="${x-3}" y="${y-18}" width="6" height="18" fill="#efe6cf"/><path class="flame" style="animation-duration:${R(.12,.2)}s" d="M${x} ${y-19} C${x-3} ${y-23} ${x-2} ${y-27} ${x} ${y-31} C${x+2} ${y-27} ${x+3} ${y-23} ${x} ${y-19} Z" fill="#ffd87a"/><circle cx="${x}" cy="${y-24}" r="22" fill="url(#rCandle)"/><path d="M${x} ${y+2} l-3 8 l3 6 l3 -6 Z" fill="#e8f0f4" opacity=".7"/>`;});
@@ -758,12 +782,14 @@ function renderDinner(interactive){
   s+=chairBack(200,248,84)+chairBack(350,248,84)+chairBack(500,206,112,'#2e1a10','#6e1a1f')+chairBack(650,248,84);
   s+=`<path d="M500 194 l-8 12 l8 -4 l8 4 Z" fill="url(#gBrass)"/>`;
   // shawl on mother's chair
-  s+=`<path d="M312 290 C330 276 370 276 388 290 L394 372 C380 360 372 340 368 318 C356 330 344 330 332 318 C328 340 320 360 306 372 Z" fill="#7b8f7a" stroke="${OL}"/><path d="M306 372 l-2 10 M314 366 l-1 10 M386 368 l2 10 M394 372 l2 10" stroke="#7b8f7a" stroke-width="1.5"/>`;
+  if(!y75) s+=`<path d="M312 290 C330 276 370 276 388 290 L394 372 C380 360 372 340 368 318 C356 330 344 330 332 318 C328 340 320 360 306 372 Z" fill="#7b8f7a" stroke="${OL}"/><path d="M306 372 l-2 10 M314 366 l-1 10 M386 368 l2 10 M394 372 l2 10" stroke="#7b8f7a" stroke-width="1.5"/>`;
   // people
-  const st=pid=>({stare:!!F.shot[pid]});
-  s+=`<g transform="translate(200 334)">${bust(PEOPLE.doctor,st('doctor'))}</g>`;
-  s+=`<g transform="translate(500 334) scale(1.12)">${bust(PEOPLE.pickman,st('pickman'))}</g>`;
-  s+=`<g transform="translate(650 334)">${bust(PEOPLE.lady,{...st('lady'),look:-1.5})}</g>`;
+  const st=pid=>({stare:!!(F.shot&&F.shot[pid])});
+  s+=`<g transform="translate(200 334)">${bust(P.doctor,st('doctor'))}</g>`;
+  s+=`<g transform="translate(500 334) scale(1.12)">${bust(P.pickman,st('pickman'))}</g>`;
+  s+=`<g transform="translate(650 334)">${bust(P.lady,{...st('lady'),look:-1.5})}</g>`;
+  if(y75) s+=`<rect x="900" y="110" width="52" height="16" rx="2" fill="url(#gBrass)" stroke="${OL}"/><text x="926" y="122" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="10" letter-spacing="2" fill="#2a1a08">КУХНЯ</text>`;
+  if(y75) s+=`<g transform="translate(350 334)">${bust(PEOPLE.ada,{look:1})}</g>`;
   // table
   s+=`<ellipse cx="500" cy="528" rx="420" ry="16" fill="#000" opacity=".55"/>`;
   s+=`<path d="M150 371 L850 371 L872 392 L128 392 Z" fill="#f2ead8" stroke="#a89a7c"/>`;
@@ -772,24 +798,25 @@ function renderDinner(interactive){
   for(let x=170;x<860;x+=62) s+=`<path d="M${x} 396 Q${x+6} 450 ${x-2} 512" stroke="#8d7c5a" stroke-width="7" opacity=".16" fill="none"/>`;
   s+=`<path d="${cl.replace('M128 392 L872 392 L874 514','M874 514')}" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 3" opacity=".6"/>`;
   // child's eyes under lifted cloth
-  s+=`<path d="M582 517 Q596 494 626 500 L632 516 Q612 520 582 517 Z" fill="#0a0404"/><ellipse cx="603" cy="510" rx="2.6" ry="1.6" fill="#e9e1cf"/><ellipse cx="615" cy="509" rx="2.6" ry="1.6" fill="#e9e1cf"/><circle cx="603.4" cy="510" r="1" fill="#000"/><circle cx="615.4" cy="509" r="1" fill="#000"/>`;
+  if(!y75) s+=`<path d="M582 517 Q596 494 626 500 L632 516 Q612 520 582 517 Z" fill="#0a0404"/><ellipse cx="603" cy="510" rx="2.6" ry="1.6" fill="#e9e1cf"/><ellipse cx="615" cy="509" rx="2.6" ry="1.6" fill="#e9e1cf"/><circle cx="603.4" cy="510" r="1" fill="#000"/><circle cx="615.4" cy="509" r="1" fill="#000"/>`;
   // on the table
   s+=plate(200)+plate(350)+plate(650);
   s+=`<ellipse cx="500" cy="384" rx="46" ry="9" fill="url(#gSilver)" stroke="#6e6a62"/><path d="M468 380 C468 364 490 356 506 358 C524 360 536 368 532 380 Z" fill="#8a4a22" stroke="#3a1a0a"/><path d="M478 368 C490 362 508 362 520 366" stroke="#c07a3a" stroke-width="2" fill="none"/><path d="M530 374 q10 -6 8 -16" stroke="#3a1a0a" stroke-width="2.5" fill="none"/>`;
   s+=candelabra(275)+candelabra(575);
   s+=wineGlass(236,384)+wineGlass(686,384)+wineGlass(538,384)+wineGlass(162,384,false);
   // mother's knocked glass + spill
-  s+=`<ellipse cx="392" cy="386" rx="26" ry="4.5" fill="#6a0f14" opacity=".9"/><path d="M402 391 Q404 410 401 430 Q399 438 403 442 Q406 436 405 428 Q408 406 410 392 Z" fill="#6a0f14"/><circle cx="404" cy="452" r="2.5" fill="#6a0f14"/>`;
-  s+=`<g transform="translate(386 382) rotate(-78)"><path d="M-7 -18 Q-8 -5 0 -3 Q8 -5 7 -18 Z" fill="#dfeaf0" fill-opacity=".3" stroke="#f3f6f6" stroke-opacity=".7"/><line x1="0" y1="-3" x2="0" y2="8" stroke="#e8eef0" stroke-width="1.5"/><ellipse cx="0" cy="8" rx="6" ry="1.6" fill="#e8eef0" opacity=".8"/></g>`;
+  if(y75) s+=wineGlass(392,384,!!F.poured)+sleeve(350-48,360,338,372,PEOPLE.ada.dress)+sleeve(350+48,360,362,372,PEOPLE.ada.dress)+handsAt(340,372,360,372,PEOPLE.ada.skin,PEOPLE.ada.dress);
+  else s+=`<ellipse cx="392" cy="386" rx="26" ry="4.5" fill="#6a0f14" opacity=".9"/><path d="M402 391 Q404 410 401 430 Q399 438 403 442 Q406 436 405 428 Q408 406 410 392 Z" fill="#6a0f14"/><circle cx="404" cy="452" r="2.5" fill="#6a0f14"/>`;
+  if(!y75) s+=`<g transform="translate(386 382) rotate(-78)"><path d="M-7 -18 Q-8 -5 0 -3 Q8 -5 7 -18 Z" fill="#dfeaf0" fill-opacity=".3" stroke="#f3f6f6" stroke-opacity=".7"/><line x1="0" y1="-3" x2="0" y2="8" stroke="#e8eef0" stroke-width="1.5"/><ellipse cx="0" cy="8" rx="6" ry="1.6" fill="#e8eef0" opacity=".8"/></g>`;
   // handbag
   s+=`<path d="M302 389 Q302 372 320 372 Q338 372 338 389 Z" fill="#c9b08a" stroke="#4a3520"/><path d="M308 374 Q320 360 332 374" stroke="#c9a256" stroke-width="1.5" fill="none"/><rect x="316" y="370" width="8" height="4" fill="url(#gBrass)"/>`;
   // fan
   s+=`<path d="M690 388 L728 378 L730 383 L692 391 Z" fill="#141114" stroke="#3a3540"/><path d="M694 388 L726 380" stroke="#4a4552" stroke-width=".8" stroke-dasharray="2 2"/><circle cx="691" cy="389" r="2" fill="url(#gBrass)"/>`;
-  if(!F.noteTaken) s+=`<path d="M712 380 L722 372 L728 378 Z" fill="#efe6d3" stroke="#9d9077" stroke-width=".6"/>`;
+  if(!F.noteTaken&&!y75) s+=`<path d="M712 380 L722 372 L728 378 Z" fill="#efe6d3" stroke="#9d9077" stroke-width=".6"/>`;
   // hands
-  s+=sleeve(-48+200,360,186,368,PEOPLE.doctor.coat)+sleeve(48+200,360,214,368,PEOPLE.doctor.coat)+handsAt(188,368,212,368,PEOPLE.doctor.skin);
+  s+=sleeve(-48+200,360,186,368,P.doctor.coat)+sleeve(48+200,360,214,368,P.doctor.coat)+handsAt(188,368,212,368,P.doctor.skin);
   s+=`<circle cx="200" cy="360" r="9" fill="url(#gGold)" stroke="${OL}"/><circle cx="200" cy="360" r="6.5" fill="#f3ead2"/><path d="M200 351 Q214 344 226 352" stroke="#d2ae62" stroke-width="1" fill="none"/>`;
-  s+=sleeve(500-78,362,470,378,PEOPLE.pickman.coat)+sleeve(500+78,362,530,378,PEOPLE.pickman.coat)+handsAt(468,378,532,378,PEOPLE.pickman.skin);
+  s+=sleeve(500-78,362,470,378,P.pickman.coat)+sleeve(500+78,362,530,378,P.pickman.coat)+handsAt(468,378,532,378,P.pickman.skin);
   s+=`<line x1="466" y1="374" x2="462" y2="350" stroke="#d8d6d0" stroke-width="2.4"/><line x1="534" y1="374" x2="540" y2="352" stroke="#d8d6d0" stroke-width="2.4"/><path d="M538 352 l2 -6 M541 352 l1 -6 M544 353 l0 -6" stroke="#d8d6d0" stroke-width="1"/>`;
   s+=`<ellipse cx="636" cy="376" rx="8" ry="5.5" fill="#151215" stroke="${OL}"/><ellipse cx="664" cy="376" rx="8" ry="5.5" fill="#151215" stroke="${OL}"/><path d="M620 370 Q600 380 612 330 M680 370 Q700 380 688 330" stroke="#151215" stroke-width="9" fill="none" stroke-linecap="round"/>`;
   // butler
@@ -797,22 +824,27 @@ function renderDinner(interactive){
     <path d="M-34 220 L-30 330 L-12 330 L-8 214 Z M8 214 L12 330 L30 330 L34 220 Z" fill="#0f0e10" stroke="${OL}"/><ellipse cx="-22" cy="332" rx="14" ry="5" fill="#050505"/><ellipse cx="22" cy="332" rx="14" ry="5" fill="#050505"/>
     <path d="M-60 74 L-50 230 L-30 250 L-20 214 L20 214 L30 250 L50 230 L60 74 Z" fill="#131113" stroke="${OL}"/>
     <path d="M58 30 C68 70 66 140 60 186" stroke="${OL}" stroke-width="21" fill="none" stroke-linecap="round"/><path d="M58 30 C68 70 66 140 60 186" stroke="#131113" stroke-width="18" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="194" rx="7" ry="9" fill="${PEOPLE.butler.skin}" stroke="${OL}"/>
-    ${bust(PEOPLE.butler,st('butler'))}
+    ${bust(P.butler,st('butler'))}
     <path d="M-14 74 L0 214 L14 74" fill="${PEOPLE.butler.shirt}" opacity=".0"/>
     <path d="M-56 30 C-64 54 -64 72 -60 84 L-104 82" stroke="${OL}" stroke-width="21" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M-56 30 C-64 54 -64 72 -60 84 L-104 82" stroke="#131113" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     <ellipse cx="-110" cy="80" rx="8" ry="6" fill="#f4f0e8" stroke="#8f887a"/>
     <ellipse cx="-130" cy="76" rx="44" ry="9" fill="url(#gSilver)" stroke="#5a5650"/><ellipse cx="-130" cy="74" rx="38" ry="6" fill="none" stroke="#fff" stroke-opacity=".5"/>
-    <rect x="-156" y="30" width="16" height="44" rx="5" fill="#1d2a1d" stroke="${OL}"/><rect x="-152" y="14" width="8" height="18" fill="#1d2a1d" stroke="${OL}"/><rect x="-154" y="44" width="12" height="14" fill="#e8dcc0"/><path d="M-150 34 v34" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
-    ${F.gloveTaken?'':`<path d="M-124 72 C-124 64 -116 62 -110 64 L-96 62 Q-92 66 -96 70 L-104 72 Z" fill="#f4f0e8" stroke="#8f887a"/>`}
+    <rect x="-156" y="30" width="16" height="44" rx="5" fill="#1d2a1d" stroke="${OL}"/><rect x="-152" y="14" width="8" height="18" fill="#1d2a1d" stroke="${OL}"/><rect x="-154" y="44" width="12" height="14" fill="#e8dcc0"/>${y75?'<text x="-148" y="54" text-anchor="middle" font-size="5" font-family="Cormorant SC, serif" fill="#3a1a14">1947</text>':''}<path d="M-150 34 v34" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+    ${F.gloveTaken||y75?'':`<path d="M-124 72 C-124 64 -116 62 -110 64 L-96 62 Q-92 66 -96 70 L-104 72 Z" fill="#f4f0e8" stroke="#8f887a"/>`}
   </g>`;
   // camera on tripod
-  s+=`<path d="M78 410 L34 624 M78 410 L80 634 M78 410 L120 618" stroke="#2a1a10" stroke-width="5" stroke-linecap="round"/><path d="M78 410 L34 624 M78 410 L120 618" stroke="#6a4328" stroke-width="1.5"/><rect x="66" y="400" width="26" height="12" fill="#3a2416" stroke="${OL}"/>`;
+  if(!y75){ s+=`<path d="M78 410 L34 624 M78 410 L80 634 M78 410 L120 618" stroke="#2a1a10" stroke-width="5" stroke-linecap="round"/><path d="M78 410 L34 624 M78 410 L120 618" stroke="#6a4328" stroke-width="1.5"/><rect x="66" y="400" width="26" height="12" fill="#3a2416" stroke="${OL}"/>`;
   if(!F.cameraTaken) s+=`<g transform="translate(78 372)"><path d="M-46 -20 C-60 -10 -64 30 -56 60 L-40 60 C-44 30 -40 0 -30 -18 Z" fill="#0f0d0d" stroke="${OL}"/><rect x="-34" y="-28" width="40" height="52" fill="#4a2c1a" stroke="${OL}"/><rect x="-34" y="-28" width="40" height="52" fill="url(#pWood)" opacity=".6"/><path d="M6 -22 L32 -12 L32 14 L6 22 Z" fill="#241812" stroke="${OL}"/><path d="M12 -20 v40 M18 -18 v36 M24 -16 v32" stroke="#0e0905" stroke-width="1.2"/><circle cx="38" cy="1" r="11" fill="url(#gBrass)" stroke="${OL}"/><circle cx="38" cy="1" r="6" fill="#1a1f26"/><circle cx="36" cy="-1" r="2" fill="#fff" opacity=".5"/><rect x="-22" y="-36" width="14" height="8" fill="url(#gBrass)"/></g>`;
   // doctor's bag
   s+=`<ellipse cx="258" cy="602" rx="54" ry="6" fill="#000" opacity=".5"/><path d="M212 600 L218 560 Q222 548 236 546 L282 546 Q296 548 300 560 L306 600 Z" fill="#4e2a18" stroke="${OL}" stroke-width="1.5"/><path d="M220 556 L298 556" stroke="#b8924a" stroke-width="4"/><path d="M240 546 C240 524 278 524 278 546" stroke="#3a1f12" stroke-width="5" fill="none"/><rect x="250" y="552" width="18" height="12" rx="2" fill="url(#gBrass)" stroke="${OL}"/><path d="M222 590 h80" stroke="#2a160c" stroke-dasharray="3 3"/>`;
+  }
   // light & atmosphere
   s+=`<rect width="1000" height="640" fill="#ffb060" opacity=".05"/><rect width="1000" height="640" fill="url(#rDark)"/>`;
-  if(interactive){
+  if(interactive&&y75){
+    s+=hs('windowD',48,62,134,270)+hs('painting',424,48,152,170)+hs('clockD',734,96,70,312)+hs('door',862,96,126,58)+hs('door',862,150,22,330);
+    s+=hs('doctor',168,248,66,98)+hs('pickman',458,236,84,104)+hs('lady',616,246,70,106)+hs('butler',870,150,100,420)+hs('me',310,250,80,110);
+    s+=hs('tray',740,300,120,42)+hs('adaGlass',376,358,34,36)+hs('fan',684,368,50,26)+hs('crowD',570,6,70,48);
+  } else if(interactive){
     s+=hs('windowD',48,62,134,270)+hs('painting',424,48,152,170)+hs('clockD',734,96,70,312)+hs('door',862,96,40,388);
     s+=hs('motherChair',308,248,86,120);
     s+=hs('doctor',168,248,66,98)+hs('pickman',458,236,84,104)+hs('lady',616,246,70,106);
@@ -1382,13 +1414,131 @@ function trayView(){
   return s;
 }
 
+/* ==================== CHAPTER IV ==================== */
+const dinner75View=()=>renderDinner(true,true);
+const RAIN_KIT = (()=>{rnd=mulberry(41);return rainLines(62,178,82,248,40)+rainLines(62,178,82,248,24,'b');})();
+function lantern(x,y,lit=true){
+  return `<path d="M${x} ${y-34} q0 -10 8 -10" stroke="#2a2420" stroke-width="2" fill="none"/><path d="M${x-12} ${y-22} L${x+12} ${y-22} L${x+9} ${y-28} L${x-9} ${y-28} Z" fill="#2a2420"/><rect x="${x-11}" y="${y-22}" width="22" height="30" fill="${lit?'#ffd27a':'#3a3428'}" stroke="#2a2420" stroke-width="2.5"/><path d="M${x} ${y-22} v30" stroke="#2a2420" stroke-width="1.5"/><rect x="${x-13}" y="${y+8}" width="26" height="5" fill="#2a2420"/>${lit?`<circle cx="${x}" cy="${y-6}" r="70" fill="url(#rCandle)"/>`:''}`;
+}
+function kitchenView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="280" fill="#6a5a44"/><rect width="1000" height="280" fill="url(#pMottle)"/><rect width="1000" height="20" fill="#2a2218"/>`;
+  s+=`<rect y="270" width="1000" height="200" fill="#d8d2c4"/>`;
+  for(let y=270;y<470;y+=14) for(let x=(y/14)%2?-14:0;x<1000;x+=28) s+=`<rect x="${x+1}" y="${y+1}" width="26" height="12" rx="2" fill="#e6e0d2" stroke="#b8b0a0" stroke-width=".8"/>`;
+  s+=`<rect y="270" width="1000" height="200" fill="url(#pMottle)" opacity=".7"/><rect y="264" width="1000" height="8" fill="#4a3a28"/>`;
+  s+=`<rect y="470" width="1000" height="170" fill="#4a4440"/>`;
+  for(let r=0;r<4;r++){const y=470+r*44;for(let x=(r%2)*40-40;x<1000;x+=80) s+=`<rect x="${x+2}" y="${y+2}" width="76" height="40" fill="#57504a" stroke="#2a2622" stroke-width="2"/>`;}
+  s+=`<rect y="470" width="1000" height="170" fill="url(#pMottle)"/>`;
+  // window
+  s+=`<rect x="52" y="72" width="136" height="186" fill="#2a2218"/><clipPath id="cWinK"><rect x="62" y="82" width="116" height="166"/></clipPath><g clip-path="url(#cWinK)"><rect x="62" y="82" width="116" height="166" fill="url(#gNight)"/>${RAIN_KIT}${crow(150,244,.5,true)}<rect id="lightning" x="62" y="82" width="116" height="166" fill="#dfe8ff" opacity="0"/></g><path d="M120 82 V248 M62 165 H178" stroke="#2a2218" stroke-width="5"/>`;
+  // hood + range
+  s+=`<path d="M210 120 L470 120 L500 300 L180 300 Z" fill="#a8642e" stroke="${OL}" stroke-width="1.5"/><path d="M210 120 L470 120 L500 300 L180 300 Z" fill="url(#gBrassH)" opacity=".35"/><rect x="230" y="20" width="220" height="100" fill="#8a5226" stroke="${OL}"/><rect x="176" y="296" width="328" height="10" fill="#6a3a1a" stroke="${OL}"/>`;
+  s+=`<rect x="190" y="330" width="300" height="140" fill="#1d1d20" stroke="${OL}" stroke-width="2"/><rect x="182" y="322" width="316" height="12" fill="#2e2e32" stroke="${OL}"/>`;
+  s+=`<rect x="206" y="350" width="120" height="90" rx="4" fill="#26262a" stroke="${OL}"/><rect x="346" y="350" width="126" height="90" rx="4" fill="#26262a" stroke="${OL}"/><rect x="250" y="360" width="34" height="6" rx="3" fill="url(#gSilver)"/><rect x="392" y="360" width="34" height="6" rx="3" fill="url(#gSilver)"/><rect x="226" y="384" width="80" height="44" fill="#ff8a3a" opacity=".18"/>`;
+  s+=`<ellipse cx="300" cy="316" rx="46" ry="10" fill="#6a6a70" stroke="${OL}"/><path d="M256 316 L262 280 L338 280 L344 316" fill="#5a5a60" stroke="${OL}"/><ellipse cx="300" cy="280" rx="38" ry="7" fill="#7a7a80" stroke="${OL}"/><path d="M288 268 C280 240 300 230 292 200 M310 266 C318 240 300 226 310 196" stroke="#e8e2d4" stroke-width="4" fill="none" opacity=".35"/>`;
+  // pans
+  s+=`<rect x="520" y="86" width="250" height="5" fill="url(#gBrassH)"/>`;
+  [[548,30],[604,40],[666,34],[726,26]].forEach(([x,r])=>{s+=`<path d="M${x} 91 v14" stroke="#5a3a1a" stroke-width="2"/><rect x="${x-3}" y="104" width="6" height="30" fill="#8a5226"/><circle cx="${x}" cy="${134+r}" r="${r}" fill="#b0672e" stroke="${OL}"/><circle cx="${x-r*.3}" cy="${134+r*.7}" r="${r*.35}" fill="#e09a5a" opacity=".5"/>`;});
+  // spice shelf
+  s+=`<rect x="540" y="228" width="230" height="8" fill="#4a2e1a" stroke="${OL}"/>`;
+  [['СОЛЬ','#e8e2d4'],['САХАР','#e8e2d4'],['КОРИЦА','#8a4a22'],['ГВОЗДИКА','#4a2a1a'],['ГОРЬК. МИНДАЛЬ','#2a1a14']].forEach(([n,c],i)=>{const x=560+i*44;s+=`<rect x="${x-14}" y="${i===4?184:192}" width="28" height="${i===4?44:36}" rx="4" fill="#c8d4d8" fill-opacity=".35" stroke="#6a7478"/><rect x="${x-12}" y="${i===4?200:206}" width="24" height="${i===4?26:20}" fill="${c}" opacity=".8"/><rect x="${x-16}" y="${i===4?180:188}" width="32" height="6" fill="#4a2e1a"/><rect x="${x-13}" y="${i===4?204:210}" width="26" height="10" fill="#efe6cf"/><text x="${x}" y="${i===4?212:218}" text-anchor="middle" font-family="Cormorant SC, serif" font-size="${i===4?4.2:5}" fill="#211810">${n}</text>`;});
+  // cellar door
+  s+=`<rect x="830" y="190" width="140" height="284" fill="#1a110a"/><rect x="842" y="202" width="116" height="272" fill="${F.cellarOpen?'#0a0705':'#4a3020'}" stroke="${OL}"/>`;
+  if(F.cellarOpen) s+=`<path d="M842 202 L812 214 L812 476 L842 474 Z" fill="#4a3020" stroke="${OL}"/><path d="M860 474 L940 474 L930 440 L870 440 Z M872 436 L928 436 L920 410 L880 410 Z" fill="#2a1a10"/>`;
+  else s+=`<path d="M842 250 h116 M842 420 h116" stroke="#2a2a2e" stroke-width="10"/><circle cx="940" cy="336" r="6" fill="#2a2a2e"/><rect x="926" y="350" width="22" height="24" rx="4" fill="#3a3a40" stroke="${OL}"/><path d="M931 350 q6 -14 12 0" stroke="#5a5a60" stroke-width="3" fill="none"/>`;
+  s+=`<text x="900" y="186" text-anchor="middle" font-family="Cormorant SC, serif" font-size="12" letter-spacing="3" fill="#2a1a08">ПОГРЕБ</text>`;
+  // lantern on hook
+  s+=`<path d="M790 170 h18 v10" stroke="#2a2420" stroke-width="3" fill="none"/>`;
+  if(!F.lanternTaken) s+=lantern(808,214,true);
+  // Martha
+  if(!F.ended){
+    s+=standing(PEOPLE.martha75,640,330,.74,474,{look:-2});
+    s+=`<path d="M606 380 L674 380 L686 474 L594 474 Z" fill="#efe9dc" stroke="${OL}"/><path d="M618 380 L620 362 M662 380 L660 362" stroke="#efe9dc" stroke-width="4"/>`;
+  }
+  // table + pie
+  s+=`<path d="M300 450 L720 450 L740 474 L280 474 Z" fill="#8a6a44" stroke="${OL}"/><rect x="280" y="474" width="460" height="22" fill="#6a4a2c" stroke="${OL}"/><path d="M296 496 L300 600 M724 496 L720 600" stroke="#4a3020" stroke-width="12"/>`;
+  s+=`<ellipse cx="520" cy="458" rx="54" ry="11" fill="#f6f1e6" stroke="#b5a88f"/><path d="M478 456 Q480 432 520 430 Q560 432 562 456 Z" fill="#d89a52" stroke="#6a3a14"/><path d="M490 448 Q520 438 550 448 M494 440 Q520 432 546 440" stroke="#a8642e" stroke-width="2" fill="none"/>`;
+  for(let i=0;i<7;i++) s+=`<ellipse cx="${492+i*9}" cy="${444-(i%2)*4}" rx="3.2" ry="2" fill="#f0d8a8" stroke="#8a5a2a" stroke-width=".6"/>`;
+  s+=`<path d="M600 462 l70 -10" stroke="#c8a070" stroke-width="9" stroke-linecap="round"/><path d="M596 463 l-8 1 M674 451 l8 -1" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>`;
+  s+=`<rect width="1000" height="640" fill="#ffb060" opacity=".05"/><rect width="1000" height="640" fill="url(#rDark)" opacity=".85"/>`;
+  s+=hs('windowK',62,82,116,166)+hs('crowK',120,210,60,40)+hs('stove',182,300,316,170)+hs('pans',520,86,250,110)+hs('spices',540,176,230,60);
+  if(!F.ended) s+=hs('martha',590,262,100,210);
+  s+=hs('pie',470,424,100,44)+hs('cellarDoor',812,190,158,284);
+  if(!F.lanternTaken) s+=hs('lantern',790,170,40,64);
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- CELLAR (1975 / night of 15.XI.1953) ---------- */
+const YEARS=Array.from({length:20},(_,i)=>1940+i);
+function cellar(y53,interactive){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#2a2420"/>`;
+  for(let r=0;r<16;r++) for(let x=(r%2)*30-30;x<1000;x+=60) s+=`<rect x="${x+2}" y="${r*30+2}" width="56" height="26" rx="3" fill="#3a332c" stroke="#1a1612" stroke-width="2"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#pMottle)"/>`;
+  s+=`<path d="M0 0 L0 120 Q250 -20 500 120 Q750 -20 1000 120 L1000 0 Z" fill="#1a1612"/><path d="M0 120 Q250 -20 500 120 Q750 -20 1000 120" stroke="#4a4038" stroke-width="10" fill="none"/>`;
+  s+=`<rect y="480" width="1000" height="160" fill="#2a2420"/><rect y="480" width="1000" height="160" fill="url(#pMottle)"/><rect y="476" width="1000" height="6" fill="#141210"/>`;
+  // barrels
+  [[110,400,70],[230,420,56]].forEach(([x,y,r])=>{s+=`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*1.1}" fill="#5a3a20" stroke="${OL}" stroke-width="2"/><ellipse cx="${x}" cy="${y}" rx="${r*.75}" ry="${r*.82}" fill="none" stroke="#2a1a10" stroke-width="5"/><ellipse cx="${x}" cy="${y}" rx="${r*.25}" ry="${r*.28}" fill="#3a2414"/><path d="M${x-r} ${y} h${r*2}" stroke="#2a1a10" stroke-width="2" opacity=".5"/>`;});
+  s+=`<path d="M40 480 h270" stroke="#1a1612" stroke-width="6"/>`;
+  // stairs (right)
+  for(let i=0;i<7;i++) s+=`<rect x="${800+i*24}" y="${470-i*48}" width="${200-i*24}" height="12" fill="#4a4038" stroke="${OL}"/>`;
+  // alcove + rack
+  const open=y53||F.rackOpen;
+  s+=`<rect x="380" y="150" width="270" height="326" fill="#0a0806"/>`;
+  if(open){
+    if(y53){
+      const rows=6; // half-built wall
+      for(let r=0;r<rows;r++) for(let x=380+(r%2)*22;x<650;x+=44) s+=`<rect x="${x}" y="${452-r*22}" width="42" height="20" fill="#7a3a26" stroke="#2a120a" stroke-width="2"/>`;
+    } else {
+      for(let r=0;r<15;r++) for(let x=380+(r%2)*22;x<650;x+=44) if(!(r<9&&x>440&&x<600)) s+=`<rect x="${x}" y="${452-r*22}" width="42" height="20" fill="#5a2c1e" stroke="#2a120a" stroke-width="2"/>`;
+      s+=`<path d="M450 474 l20 -8 l26 6 l20 -10 l30 8 l20 -6" stroke="#5a2c1e" stroke-width="10" fill="none"/>`;
+      s+=`<g transform="translate(480 420)"><ellipse cx="0" cy="18" rx="44" ry="8" fill="#141110"/><path d="M-26 18 C-26 -14 26 -14 26 18 Z" fill="#2a2522" stroke="${OL}"/><rect x="-26" y="8" width="52" height="7" fill="#141110"/></g>`;
+      if(!F.camTaken) s+=`<g transform="translate(524 404) scale(1.1)">${icon('camera')}</g>`;
+      if(!F.ledgerTaken) s+=`<g transform="translate(600 452) rotate(-8)"><rect x="-30" y="-12" width="60" height="24" fill="#3a1a14" stroke="${OL}"/><rect x="-28" y="-10" width="56" height="4" fill="#d8ccb0"/><text x="0" y="8" text-anchor="middle" font-family="Cormorant SC, serif" font-size="7" fill="#c9a256">ОТПРАВКИ</text></g>`;
+    }
+    s+=`<g transform="translate(380 0)"><path d="M0 150 L-120 170 L-120 476 L0 476 Z" fill="#4a2e1a" stroke="${OL}" stroke-width="2"/>${[0,1,2,3,4].map(k=>`<path d="M-118 ${200+k*60} L-2 ${190+k*60}" stroke="#2a1a10" stroke-width="4"/>`).join('')}</g>`;
+  } else {
+    s+=`<rect x="370" y="140" width="290" height="340" fill="#4a2e1a" stroke="${OL}" stroke-width="3"/><rect x="370" y="140" width="290" height="340" fill="url(#pWood)" opacity=".5"/>`;
+    YEARS.forEach((yr,i)=>{const x=410+(i%5)*52, y=180+Math.floor(i/5)*74;
+      s+=`<rect x="${x-24}" y="${y-28}" width="48" height="56" fill="#1a0e08"/><circle cx="${x}" cy="${y}" r="17" fill="#1d2a1d" stroke="${OL}"/><circle cx="${x}" cy="${y}" r="8" fill="#0d120d"/><circle cx="${x-5}" cy="${y-5}" r="3" fill="#fff" opacity=".2"/><rect x="${x-16}" y="${y+18}" width="32" height="10" fill="#efe6cf" stroke="#6f6550"/><text x="${x}" y="${y+26}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="9" fill="#211810">${yr}</text>`;});
+  }
+  // people (memory)
+  if(y53){
+    s+=standing(PEOPLE.rook,515,260,.74,470);
+    for(let r=0;r<6;r++) for(let x=380+(r%2)*22;x<650;x+=44) s+=`<rect x="${x}" y="${452-r*22}" width="42" height="20" fill="#7a3a26" stroke="#2a120a" stroke-width="2"/>`;
+    s+=standing(PEOPLE.pickman,300,268,.76,488,{look:3});
+    s+=`<path d="M340 330 L372 300" stroke="${PEOPLE.pickman.coat}" stroke-width="14" stroke-linecap="round"/><path d="M372 300 l14 -6" stroke="${PEOPLE.pickman.skin}" stroke-width="7" stroke-linecap="round"/>`;
+    s+=standing(PEOPLE.butler,700,262,.76,494,{look:-3});
+    s+=`<path d="M660 350 L640 386" stroke="#131113" stroke-width="14" stroke-linecap="round"/><path d="M640 386 l-20 6 l-4 -10 Z" fill="#8a8a90" stroke="${OL}"/><rect x="672" y="460" width="44" height="20" fill="#7a3a26" stroke="#2a120a"/><rect x="680" y="440" width="44" height="20" fill="#7a3a26" stroke="#2a120a"/>`;
+    s+=standing(PEOPLE.martha53,880,300,.68,452,{look:-3});
+    s+=lantern(846,372,true);
+    if(F.rookCrow) s+=`<g class="drop">${crow(540,150,.8,true)}</g>`;
+  }
+  // light
+  const lit=y53||F.lanternTaken;
+  s+=`<rect width="1000" height="640" fill="#000" opacity="${lit?.35:.85}"/>`;
+  if(lit&&!y53) s+=lantern(860,330,true);
+  s+=`<rect width="1000" height="640" fill="url(#rDark)"/>`;
+  if(interactive){
+    s+=hs('barrels',40,320,260,160)+hs('stairs',800,180,200,300);
+    if(y53){ s+=hs('rook53',470,190,92,284)+hs('pickman53',250,200,100,290)+hs('butler53',640,190,110,300)+hs('martha53',830,240,90,214)+hs('wall53',380,330,90,140); }
+    else if(!F.rackOpen) YEARS.forEach((yr,i)=>{const x=410+(i%5)*52, y=180+Math.floor(i/5)*74; s+=hs('y'+yr,x-25,y-30,50,64);});
+    else { s+=hs('hat',440,390,90,56)+hs('bricks',380,150,270,180); if(!F.camTaken) s+=hs('rookcam',520,404,80,60); if(!F.ledgerTaken) s+=hs('ledger',566,436,72,36); }
+    s+=arrow(500,612);
+  }
+  return s;
+}
+const cellarView=()=>cellar(false,true), cellar53View=()=>cellar(true,true);
+
 /* ---------- scenes & rendering ---------- */
 const SCENES={room,board:()=>boardArt(true),clock:clockView,trunk:trunkView,dinner:()=>renderDinner(true),bag:bagView,watch:watchView,
   office:officeView,office53:office53View,cabinet:cabinetView,darkroom:darkroomView,rookboard:rookBoard,
-  dorm:dormView,dorm31:dorm31View,office3:office3View,tray:trayView,locker:lockerView};
-const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room',cabinet:'office',darkroom:'office',rookboard:'darkroom',office53:'office',dorm31:'dorm',office3:'dorm',tray:'office3',locker:'dorm'};
-const MEMORY=new Set(['dinner','bag','watch','office53','dorm31']);
-const INDOOR=new Set(['darkroom','rookboard']);
+  dorm:dormView,dorm31:dorm31View,office3:office3View,tray:trayView,locker:lockerView,
+  dinner75:dinner75View,kitchen:kitchenView,cellar:cellarView,cellar53:cellar53View};
+const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room',cabinet:'office',darkroom:'office',rookboard:'darkroom',office53:'office',dorm31:'dorm',office3:'dorm',tray:'office3',locker:'dorm',kitchen:'dinner75',cellar:'kitchen',cellar53:'cellar'};
+const MEMORY=new Set(['dinner','bag','watch','office53','dorm31','cellar53']);
+const INDOOR=new Set(['darkroom','rookboard','cellar']);
 const sceneEl=$('#scene');
 function render(){
   sceneEl.classList.toggle('memory',MEMORY.has(S.scene));
@@ -1440,6 +1590,9 @@ function inspect(id){
   }
   if(it.special==='note'){openOv(`<div class="note card hand">Держись подальше от Огастеса, Элеонора.<br>Ты пожалеешь, если не остановишься.<div style="text-align:right;margin-top:10px">— К.</div></div>`);return;}
   if(it.special==='page'){openOv(`<div class="page card hand">П. — приют св. Агнессы.<br>40&nbsp;000 фунтов исчезли.<br>Доказательства у меня.<br>Статья — в понедельник!</div>`);return;}
+  if(it.special==='invite75'){openOv(`<div class="invite"><div class="inv-card card"><div class="sm">ПИКМАН-ХОЛЛ · БЛЭКВУД-ЛЕЙН</div><div class="script" style="margin-top:12px">Мистер Огастес Пикман</div><p>имеет честь пригласить</p><div class="script">мисс Аду Лэнг</div><p>на ужин в пятницу, 14&nbsp;ноября 1975&nbsp;года,<br>к девяти часам вечера</p><p style="font-size:14px">Ваше место за столом — прежнее.</p></div></div>`);return;}
+  if(it.special==='ledger'){S.f.ledgerRead=1;openOv(`<div class="ledger card"><div class="sm">ПРИЮТ СВЯТОЙ АГНЕССЫ → ЛИВЕРПУЛЬ → ГАЛИФАКС</div><h3>Книга отправок</h3><table><tr><td>1932</td><td>Мэри Олдридж, Сара Финч, Эмили Слоун</td><td>по 40 ф.</td></tr><tr><td>1933</td><td>Джон Эббот, Питер Кэмпбелл, Анна Кларк, Роберт Вейл</td><td>по 40 ф.</td></tr><tr><td>1934</td><td>Уильям Дойл, Томас Грин, Джеймс Рид</td><td>по 40 ф.</td></tr><tr class="hl"><td></td><td>Фермы Манитобы. Документы не оформлять.</td><td></td></tr></table><div class="sig">Получено: <span class="hand">О. П.</span></div></div>`);setTimeout(()=>msg('Их не «переводили». Их продали — в Канаду, на фермы. По сорок фунтов за ребёнка.',6500),400);return;}
+  if(it.special==='rookcam'){openOv(`<div class="itemcard card"><svg viewBox="0 0 64 64">${icon('camera')}</svg><h3>Камера Рука</h3><p>Складная камера с мехами. На ремне выжжено «С. Р.». В видоискателе темно — но если вглядеться...</p></div><div class="close" style="font-size:17px;color:#e9dfc7" id="pin">Коснитесь, чтобы заглянуть в видоискатель</div>`,e=>{if(e.target.closest('.itemcard,#pin')){closeOv();enterMemory();return true;}});return;}
   if(it.special==='ringphoto'){openOv(`<div class="photo-insp" style="cursor:default"><svg viewBox="0 0 300 200"><g filter="url(#fSepia)">${printArt(4)}</g><circle cx="172" cy="62" r="34" fill="none" stroke="#a3221b" stroke-width="2.5" stroke-dasharray="5 4"/></svg><div class="lbl">21:35 · ворон с ключом</div></div>`);return;}
   if(it.special==='boxphoto'){openOv(`<div class="photo-insp" id="pin"><svg viewBox="0 0 1000 640">${dorm(true,false)}</svg><div class="lbl">Март 1931 · Н. и М.</div></div><div class="close" style="font-size:17px;color:#e9dfc7">Коснитесь снимка, чтобы вглядеться</div>`,e=>{if(e.target.closest('#pin')){closeOv();enterMemory();return true;}});return;}
   if(it.special==='recipe'){openOv(`<div class="note card hand" style="font-size:clamp(20px,4.4vw,26px)">Миндальный пирог для мистера П.<br>Сливочное масло, мука, сахар.<br>Миндаль — горький, побольше.<br>Хозяин любит, когда горчит.<div style="text-align:right;margin-top:10px">— М.</div></div>`);return;}
@@ -1457,6 +1610,7 @@ function newsOv(){openOv(`<div class="news card"><div class="mast">Вечерн�
 function hint(){
   if(S.ch===2) return hint2();
   if(S.ch===3) return hint3();
+  if(S.ch===4) return hint4();
   const F=S.f, mem=MEMORY.has(S.scene);
   const allShot=['doctor','pickman','lady','butler'].every(p=>F.shot[p]);
   const allEv=F.sediment&&F.vialTaken&&F.noteTaken&&F.gloveTaken&&F.pageTaken;
@@ -1535,12 +1689,14 @@ function act(id,sel){
   if(id==='back'){
     if(sc==='dinner'){go('room',false);setTimeout(()=>msg('Я отпускаю воспоминание. Снова 1975 год, и снова дождь.'),400);}
     else if(sc==='office53'){go('office',false);setTimeout(()=>msg('Снова семьдесят пятый. Пыль, коробки, тишина.'),400);}
+    else if(sc==='cellar53'){go('cellar',false);if(!S.f.poured){S.f.poured=1;setTimeout(()=>msg('Снова семьдесят пятый. Сверху, из столовой, звякнуло стекло: Хиггс наливает вино в мой бокал.',6000),400);}else setTimeout(()=>msg('Снова семьдесят пятый. Кирпичи, плесень, тишина.'),400);}
     else if(sc==='dorm31'){go('dorm',false);setTimeout(()=>msg('Снова семьдесят пятый. Пустые кровати, холодная печь.'),400);}
     else go(PARENT[sc]);
     return true;}
-  if(id==='crow'||id==='crowD'||id==='crowO'||id==='crowA'){sfx.caw();msg(hint(),6500);return true;}
+  if(id==='crow'||id==='crowD'||id==='crowO'||id==='crowA'||id==='crowK'){sfx.caw();msg(hint(),6500);return true;}
   if(S.ch===2) return act2(id,sel);
   if(S.ch===3) return act3(id,sel);
+  if(S.ch===4) return act4(id,sel);
   switch(sc+':'+id){
   /* room */
   case 'room:board': go('board'); return true;
@@ -1941,7 +2097,130 @@ function checkEnd3(){
   setTimeout(showEnding3,7200);
 }
 function showEnding3(){
-  openOv(`<div class="ending"><div class="ch">ГЛАВА III · КОНЕЦ</div><h2>Марта</h2><p>Перстень № 9 — Марта Хиггс. Мамина подруга по приюту: «М. + Н. навсегда». Сестра дворецкого, кухарка Пикман-холла. Это её рука была над бокалом — в перчатке брата с вышитой «Х».</p><p>Сайлас Рук понял это раньше меня. Он оставил записку в её гнезде и пошёл к Пикману. Больше его никто не видел. Из десяти «переведённых» детей тоже не вернулся никто.</p><p>А Марта Хиггс жива. Ей пятьдесят шесть, и она до сих пор печёт для мистера Пикмана миндальный пирог.</p><div class="q">«Мистер Огастес Пикман имеет честь пригласить мисс Аду Лэнг на ужин. 14 ноября 1975 года»</div><p style="font-size:16px;color:var(--paper-dim)">Глава IV. Ужин у Пикмана. Снова — скоро.</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Остаться в приюте</button><button class="btn" id="eMenu">Главы</button><button class="btn red" id="eNew">Начать главу заново</button></div></div>`,e=>{
+  openOv(`<div class="ending"><div class="ch">ГЛАВА III · КОНЕЦ</div><h2>Марта</h2><p>Перстень № 9 — Марта Хиггс. Мамина подруга по приюту: «М. + Н. навсегда». Сестра дворецкого, кухарка Пикман-холла. Это её рука была над бокалом — в перчатке брата с вышитой «Х».</p><p>Сайлас Рук понял это раньше меня. Он оставил записку в её гнезде и пошёл к Пикману. Больше его никто не видел. Из десяти «переведённых» детей тоже не вернулся никто.</p><p>А Марта Хиггс жива. Ей пятьдесят шесть, и она до сих пор печёт для мистера Пикмана миндальный пирог.</p><div class="q">«Мистер Огастес Пикман имеет честь пригласить мисс Аду Лэнг на ужин. 14 ноября 1975 года»</div><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Остаться в приюте</button><button class="btn" id="eNew">Начать главу заново</button><button class="btn red" id="eNext">Глава IV →</button></div></div>`,e=>{
+    if(e.target.id==='eNext'){closeOv();switchChapter(4);return true;}
+    if(e.target.id==='eNew'){closeOv();restart();return true;}
+    if(e.target.id==='eMenu'){closeOv();setTimeout(()=>$('#bMenu').click(),350);return true;}
+    if(e.target.id==='eStay'){closeOv();return true;}
+    return true;
+  });
+  ovIn.querySelector('.close').remove();
+}
+
+function hint4(){
+  const F=S.f, A=F.acc;
+  if(F.ended) return 'Кар! Всё. Ты нашла их всех, Ада.';
+  if(S.scene==='cellar53'){
+    if(!F.sawWall) return 'Кар! Посмотри, что делает Хиггс.';
+    if(!F.rookCrow) return 'Кар! Сайлас смотрит на тебя. Подойди к нему.';
+    return 'Кар! Возвращайся. Наверху тебе нальют вина.';
+  }
+  if(!F.keyGiven) return F.kitchenSeen?'Кар! Покажи Марте её перстень.':'Кар! Дверь на кухню — справа, за Хиггсом. Оттуда пахнет миндалём.';
+  if(!F.lanternTaken) return 'Кар! В погребе темно. На кухне висит фонарь.';
+  if(!F.cellarOpen) return 'Кар! Ключ Марты — к двери погреба.';
+  if(!F.rackOpen) return 'Кар! Хиггс сказал: хозяин пьёт только сорок седьмой. Найди эту бутылку.';
+  if(!F.camTaken||!F.ledgerTaken) return 'Кар! Забери всё, что он здесь оставил.';
+  if(!F.visited) return 'Кар! Загляни в видоискатель его камеры.';
+  if(!F.sawWall||!F.rookCrow) return 'Кар! Вернись в ту ночь. Досмотри до конца.';
+  if(!A.pickman) return 'Кар! Положи книгу отправок перед тем, кто её подписал.';
+  if(!F.sediment) return 'Кар! Тебе налили вина. Посмотри на него через лупу.';
+  if(!A.doctor) return 'Кар! Осадок — доктору. Пусть хоть раз скажет правду.';
+  if(!A.butler) return 'Кар! Камера Рука — дворецкому. Он знает, где стена.';
+  return 'Кар!';
+}
+const TALK4={
+  pickman:['«Мисс Лэнг. Вы так похожи на мать. Садитесь, прошу»','«Двадцать два года. Время лечит, не правда ли?»','«Хиггс, вина нашей гостье. Сорок седьмого»'],
+  lady:['«Я тогда всё видела, милочка. И молчала двадцать два года»','«Огастес всегда платил за молчание. Мне — тоже»','«Не пейте вино, Ада»'],
+  doctor:['«Сердце. Я тогда подписал: сердце. Я был трус»','«Ваш бокал, мисс Лэнг... Нет. Ничего»','«Посмотрите в бокал. Пожалуйста»'],
+  butler:['«Бордо сорок седьмого, мисс. Хозяин другого не держит»','«Сестра на кухне. Она не выходит к гостям»','«Простите, мисс. Мне велено не разговаривать с гостями»'],
+  martha:['«Ужин подан в девять, мисс. Пирог будет к десяти»','«Не здесь. Не сейчас»','«Вы так похожи на Нору...»']
+};
+function act4(id,sel){
+  const F=S.f, sc=S.scene, A=F.acc;
+  if(sc==='dinner75'&&['pickman','lady','doctor','butler'].includes(id)){
+    if(!sel){ const n=F.talk[id]||0; F.talk[id]=n+1; msg(TALK4[id][n%3]); return true; }
+    if(id==='pickman'&&sel==='ledger'){ if(A.pickman){msg('Пикман больше не смотрит на меня.');return true;} A.pickman=1;removeItem('ledger');sfx.thread();render();msg('«Галифакс. Десять детей по сорок фунтов. Это ваша подпись, мистер Пикман». Он побелел: «Уберите это. Хиггс!» Хиггс не двинулся.',8000);checkEnd4();return true; }
+    if(id==='doctor'&&sel==='sediment75'){ A.doctor=1;removeItem('sediment75');sfx.thread();render();msg('Доктор Грей долго смотрит на осадок. «Цианид. Как тогда. Тогда я солгал — он заплатил мне. Я дам показания. На этот раз правду».',8500);checkEnd4();return true; }
+    if(id==='butler'&&sel==='rookcam'){
+      if(!F.sawWall){msg('Хиггс бледнеет, но молчит. Мне нужно знать, что случилось в ту ночь.');return true;}
+      A.butler=1;removeItem('rookcam');sfx.thread();render();msg('Хиггс ставит поднос. «Я заложил его кирпичами. Сам. Мистер Пикман сказал: или он — или Марта». Он снимает перчатки.',8500);checkEnd4();return true; }
+    if(sel==='ring9'){msg(id==='butler'?'«Это кольцо моей сестры. Откуда оно у вас, мисс?»':'Перстень № 9 здесь никому не нужен. Кроме Марты.');return true;}
+    if(sel==='invite75'){msg(id==='pickman'?'«Я рад, что вы пришли, мисс Лэнг». Он улыбается одними губами.':'Они все получили такие же.');return true;}
+    if(sel==='magnifier'){msg(id==='lady'?'Её руки дрожат. Веер всё тот же.':'Двадцать два года — на каждом лице.');return true;}
+    sfx.wrong();msg(['Не сейчас.','Не ему.','Не та улика.'][Math.floor(Math.random()*3)]);S.sel=null;renderInv();return true;
+  }
+  switch(sc+':'+id){
+  case 'dinner75:door': if(sel) return false; F.kitchenSeen=1; go('kitchen'); return true;
+  case 'dinner75:me': if(sel) return false; msg('Я сижу на мамином месте. Шали нет — её шаль теперь у меня.');return true;
+  case 'dinner75:adaGlass':
+    if(!F.poured){ if(sel) return false; msg('Мой бокал. Пока пустой.');return true; }
+    if(sel==='magnifier'){ if(F.sediment){msg('Я уже видела всё, что нужно.');return true;} F.sediment=1;addItem('sediment75');msg('На дне — белёсый осадок. Горький миндаль. Он решил повторить — со мной.',6000);return true; }
+    if(sel) return false;
+    msg(F.sediment?'Бокал я больше не трону.':'Бордо сорок седьмого. Пахнет... миндалём?');return true;
+  case 'dinner75:clockD': if(sel) return false; msg(F.ended?'Часы идут. Впервые за двадцать два года.':'Без двадцати десять. Двадцать два года их никто не заводил.');return true;
+  case 'dinner75:painting': if(sel) return false; msg('Портрет хозяина. Краска потрескалась.');return true;
+  case 'dinner75:windowD': if(sel) return false; msg('Тот же дождь, что и в пятьдесят третьем.');return true;
+  case 'dinner75:tray': if(sel) return false; msg('Бутылка на подносе: «1947». Хозяин пьёт только сорок седьмой.');return true;
+  case 'dinner75:fan': if(sel) return false; msg('Веер леди Вейн. Тот же самый. Записки в нём больше нет.');return true;
+  /* kitchen */
+  case 'kitchen:martha':
+    if(sel==='ring9'){
+      if(F.keyGiven){msg('Марта отворачивается к плите.');return true;}
+      F.keyGiven=1;removeItem('ring9');addItem('cellarkey');render();
+      say(['Марта долго смотрит на перстень. «Мой. Девятый...»','«Это я написала Норе то письмо. Хотела рассказать про детей, про Канаду. Он прочёл»','«Сказал: или она — или Альфред. Я выбрала брата». Она протягивает мне ключ от погреба.']);return true; }
+    if(sel==='recipe'){msg('«Хозяин любит, когда горчит», — шепчет Марта.');return true;}
+    if(sel) return false;
+    { const n=F.talk.martha||0; F.talk.martha=n+1; msg(TALK4.martha[n%3]); } return true;
+  case 'kitchen:pie': if(sel) return false; msg('Миндальный пирог. Пахнет горьким миндалём. Я не буду его есть.');return true;
+  case 'kitchen:spices': if(sel) return false; msg('Банка «Горький миндаль». Почти пустая.');return true;
+  case 'kitchen:stove': if(sel) return false; msg('В кастрюле что-то булькает. Пахнет лавровым листом — и ничем больше.');return true;
+  case 'kitchen:pans': if(sel) return false; msg('Медные сковороды начищены до блеска. Марта всю жизнь здесь.');return true;
+  case 'kitchen:windowK': if(sel) return false; msg('Окно во двор. Дождь.');return true;
+  case 'kitchen:lantern': if(sel) return false; F.lanternTaken=1;addItem('lantern');render();msg('Фонарь со свечой. Ещё тёплый.');return true;
+  case 'kitchen:cellarDoor':
+    if(sel==='cellarkey'){removeItem('cellarkey');F.cellarOpen=1;sfx.unlock();sfx.creak();render();msg('Замок поддался. Вниз уходят каменные ступени.');return true;}
+    if(sel==='lantern'&&!F.cellarOpen){msg('Сначала дверь. Она заперта.');return true;}
+    if(sel&&sel!=='lantern') return false;
+    if(!F.cellarOpen){sfx.wrong();msg('Дверь в погреб. Заперта на висячий замок.');return true;}
+    if(!F.lanternTaken){msg('Внизу темно, хоть глаз выколи. Нужен свет.');return true;}
+    go('cellar');return true;
+  /* cellar */
+  case 'cellar:barrels': if(sel) return false; msg('Бочки с вином. На одной мелом: «Не трогать. О. П.»');return true;
+  case 'cellar:stairs': if(sel) return false; go('kitchen');return true;
+  case 'cellar:hat': if(sel) return false; msg('Шляпа. Та самая — с фотографии без лица. Сайлас Рук не ушёл отсюда.',5000);return true;
+  case 'cellar:bricks': if(sel) return false; msg('Кирпичная кладка. Кто-то разобрал её до меня. Марта?');return true;
+  case 'cellar:rookcam': if(sel) return false; F.camTaken=1;addItem('rookcam');render();msg('Его камера. Мехи сгнили, но видоискатель цел.');return true;
+  case 'cellar:ledger': if(sel) return false; F.ledgerTaken=1;addItem('ledger');render();msg('Книга в кожаном переплёте. «Отправки».');return true;
+  /* memory: cellar, 15.XI.1953 */
+  case 'cellar53:pickman53': if(sel) return false; msg(['«Кто ещё знает, Рук? Кто?»','«Плёнку. Где плёнка?»','«Хиггс. Заканчивай»'][(F.talk.p53=(F.talk.p53||0)+1)%3]);return true;
+  case 'cellar53:martha53': if(sel) return false; msg('Марта держит фонарь. Ей тридцать четыре, как маме. Она плачет без звука.');return true;
+  case 'cellar53:butler53': case 'cellar53:wall53':
+    if(sel) return false;
+    F.sawWall=1; msg('Хиггс кладёт кирпичи. Ряд за рядом. Руки у него не дрожат.',5000);return true;
+  case 'cellar53:rook53':
+    if(sel) return false;
+    if(!F.sawWall){msg('Рук стоит в нише спиной к стене. Лица не видно — только тень.');return true;}
+    if(!F.rookCrow){F.rookCrow=1;sfx.caw();render();say(['Рук поднимает голову. Он смотрит прямо на меня — сквозь двадцать два года.','«Ты смотришь туда, Ада»','Свеча гаснет. Под сводом бьются крылья.']);return true;}
+    msg('В нише пусто. Только перо на кирпичах.');return true;
+  case 'cellar53:barrels': case 'cellar53:stairs': if(sel) return false; msg('Здесь всё так же. Только на двадцать два года раньше.');return true;
+  }
+  if(sc==='cellar'&&/^y\d+$/.test(id)){
+    if(sel) return false; const yr=+id.slice(1);
+    if(yr===1947){F.rackOpen=1;sfx.creak();render();msg('Я потянула бутылку сорок седьмого — и стеллаж отъехал в сторону. За ним ниша.',6000);return true;}
+    msg('Урожай '+yr+' года. Пыль в палец толщиной.');return true;
+  }
+  return false;
+}
+function checkEnd4(){
+  const F=S.f, A=F.acc;
+  if(F.ended||!(A.pickman&&A.doctor&&A.butler)) return;
+  F.ended=1; save();
+  setTimeout(()=>{sfx.chime();msg('В углу дрогнули и пошли часы. Впервые за двадцать два года.',5000);render();},2600);
+  setTimeout(()=>{lightning(true);sfx.caw();msg('Ворон влетел в зал и сел на спинку маминого стула.',5000);},7000);
+  setTimeout(showEnding4,11500);
+}
+function showEnding4(){
+  openOv(`<div class="ending"><div class="ch">ГЛАВА IV · КОНЕЦ</div><h2>Красная нить</h2><p>Доктор Грей дал показания. Альфред Хиггс показал полиции кирпичную стену в погребе. Марта сама вышла из кухни и сняла фартук. Мистера Огастеса Пикмана увели в половине одиннадцатого.</p><p>Из десяти «переведённых» детей нашлись шестеро — на фермах Манитобы. Они не знали, что их кто-то искал.</p><p>В понедельник «Вечерний вестник» вышел снова — один-единственный номер. «Приют святой Агнессы: куда исчезли дети». Подпись: Элеонора и Ада Лэнг.</p><div class="q">«Ты смотришь туда, Ада. Спасибо»</div><p>Ворон посмотрел на меня глазами Сайласа Рука и улетел в дождь.</p><p style="font-size:16px;color:var(--paper-dim)">Конец истории.</p><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Остаться за столом</button><button class="btn" id="eMenu">Главы</button><button class="btn red" id="eNew">Начать главу заново</button></div></div>`,e=>{
     if(e.target.id==='eNew'){closeOv();restart();return true;}
     if(e.target.id==='eMenu'){closeOv();setTimeout(()=>$('#bMenu').click(),350);return true;}
     if(e.target.id==='eStay'){closeOv();return true;}
@@ -1961,6 +2240,7 @@ sceneEl.addEventListener('click',e=>{
 function enterMemory(){
   if(MEMORY.has(S.scene)){msg('Я уже здесь.');return;}
   sfx.whoosh(); S.f.visited=1; S.sel=null; renderInv();
+  if(S.ch===4){go('cellar53',true);setTimeout(()=>say(['15 ноября 1953 года. Ночь после ужина.','Погреб Пикман-холла. Сайлас Рук пришёл сюда сам.']),1100);return;}
   if(S.ch===3){go('dorm31',true);setTimeout(()=>say(['Март 1931 года. Ночь после отбоя.','Маме двенадцать. Здесь её зовут Нора.']),1100);return;}
   if(S.ch===2){go('office53',true);setTimeout(()=>say(['13 ноября 1953 года. Пятница, без четверти семь.','За день до ужина у Пикмана. Мама ещё здесь.']),1100);return;}
   go('dinner',true);
@@ -2095,7 +2375,7 @@ $('#bHint').onclick=()=>{if(!started)return;sfx.caw();msg(hint(),6500);};
 $('#bSound').onclick=()=>{A.on=!A.on;if(A.master)A.master.gain.setTargetAtTime(A.on?.85:0,A.ctx.currentTime,.1);$('#bSound').style.opacity=A.on?1:.45;};
 $('#bMenu').onclick=()=>{
   let armed=false;
-  const open=[1,2,3].filter(unlocked);
+  const open=[1,2,3,4].filter(unlocked);
   const chs=open.length>1?open.map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
   openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button></div>`,e=>{
     const id=e.target.id;
@@ -2108,6 +2388,7 @@ $('#bMenu').onclick=()=>{
 };
 function restart(){S=fresh(S.ch);save();render();renderInv();amb();setTimeout(intro,500);}
 function intro(){
+  if(S.ch===4){say(['14 ноября 1975 года. Пикман-холл. Тот же стол, те же гости — на двадцать два года старше.','Мамино место накрыто для меня.','За дверью, на кухне, печётся миндальный пирог.']);return;}
   if(S.ch===3){say(['Приют святой Агнессы. Закрыт в пятьдесят четвёртом, через год после маминой смерти.','Над каждой дверью здесь — ворон с ключом в клюве. Как на том перстне.','Мама писала об этом приюте свою последнюю статью. Теперь я знаю почему.']);return;}
   if(S.ch===2){say(['Редакция «Вечернего вестника». Газету закрыли год назад, здание продают.','Здесь мама работала до того ноября. Здесь работал и человек, который снимал тот ужин.','Сторож пустил меня до утра. У меня есть мамина лупа и фотография без лица.']);return;}
   say(['1975 год. Двадцать два года назад, на ужине у мистера Пикмана, умерла моя мать.','Полиция сказала: сердце. Я никогда в это не верила.','Всё, что у меня есть, — газетная вырезка на доске. И эта комната.']);
