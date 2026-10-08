@@ -1,0 +1,20 @@
+{
+  "name": "krasnaya-nit-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Красная нить — Android-версия (Capacitor)",
+  "scripts": {
+    "prepare-app": "node scripts/prepare.mjs",
+    "sync": "npm run prepare-app && npx cap sync android",
+    "icons": "node scripts/icons.mjs",
+    "store-assets": "npm run prepare-app && node scripts/store-assets.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

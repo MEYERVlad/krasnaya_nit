@@ -147,6 +147,22 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
 .ledger .hand{font-size:17px}
 .ledger .sig{text-align:right;margin-top:8px;font-style:italic}
 @media (max-width:520px){.brand span{display:none}}
+/* phones in landscape: tools on the left, inventory column on the right */
+@media (orientation:landscape) and (max-height:520px){
+  #app{flex-direction:row;gap:6px;padding:6px max(8px,env(safe-area-inset-right)) 6px max(8px,env(safe-area-inset-left));--w:min(calc(100vw - 150px), calc((100vh - 12px) * 1.5625))}
+  @supports (height:100dvh){#app{--w:min(calc(100vw - 150px), calc((100dvh - 12px) * 1.5625))}}
+  .bar{width:auto;flex-direction:column;justify-content:center;min-height:0}
+  .brand{display:none}
+  .tools{flex-direction:column;gap:10px}
+  .invrow{width:auto;height:calc(var(--w) / 1.5625)}
+  .shelf{flex-direction:column;overflow-x:hidden;overflow-y:auto;min-height:0;height:100%;width:70px;padding:6px 7px;border-top:0;border-left:2px solid #4b3020}
+  .slot{flex:0 0 54px;height:54px}
+  .empty{font-size:12px;padding:0;text-align:center}
+  .ilabel{display:none}
+}
+.rotate{display:none}
+@media (orientation:portrait) and (max-width:600px){.rotate{display:flex;position:fixed;inset:0;z-index:40;background:var(--ink);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;font-style:italic;font-size:20px;color:var(--paper-dim)}.rotate svg{width:72px;height:72px;animation:turn 2.4s ease-in-out infinite}}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
 @media (prefers-reduced-motion:reduce){.blink,.rain,.flame,.grain,.spin,#scene.memory>svg,.title .thread path{animation:none}.title .thread path{stroke-dashoffset:0}}
 </style>
 
@@ -184,6 +200,7 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow
     <div class="ilabel" id="ilabel"></div>
   </div>
 </div>
+<div class="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg>Поверните телефон горизонтально</div>
 <div class="ov" id="ov" hidden><div class="inner" id="ovIn"></div></div>
 
 <script>
@@ -2377,7 +2394,7 @@ $('#bMenu').onclick=()=>{
   let armed=false;
   const open=[1,2,3,4].filter(unlocked);
   const chs=open.length>1?open.map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
-  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button>${window.desktop?'<button class="btn" id="mFull">Во весь экран / в окне</button><button class="btn" id="mQuit">Выйти из игры</button>':''}</div>`,e=>{
+  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button>${window.desktop?.toggleFullscreen?'<button class="btn" id="mFull">Во весь экран / в окне</button>':''}${window.desktop?.quit?'<button class="btn" id="mQuit">Выйти из игры</button>':''}</div>`,e=>{
     const id=e.target.id;
     if(id==='mFull'){window.desktop.toggleFullscreen();return true;}
     if(id==='mQuit'){save();window.desktop.quit();return true;}
@@ -2408,6 +2425,19 @@ function switchChapter(n){
     if(!started) begin(!d); else if(!d) setTimeout(intro,600); else msg(hint().replace('Кар! ',''));
   },700);
 }
+
+/* ---------- mobile (Capacitor) ---------- */
+const CapApp=window.Capacitor?.Plugins?.App;
+if(CapApp){
+  if(!window.desktop) window.desktop={quit:()=>CapApp.exitApp()};
+  CapApp.addListener('backButton',()=>{
+    if(!ov.hidden){closeOv();return;}
+    if(!started){CapApp.exitApp();return;}
+    const b=document.querySelector('#scene [data-h="back"]');
+    if(b) b.dispatchEvent(new MouseEvent('click',{bubbles:true})); else $('#bMenu').click();
+  });
+}
+document.addEventListener('visibilitychange',()=>{if(!A.ctx)return;if(document.hidden)A.ctx.suspend();else if(A.on)A.ctx.resume();});
 
 /* ---------- boot ---------- */
 let started=false;

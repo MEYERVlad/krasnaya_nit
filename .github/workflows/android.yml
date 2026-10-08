@@ -1,0 +1,69 @@
+name: Android (RuStore)
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'mobile/**'
+      - 'steam/fonts/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install and copy the game into the Android project
+        working-directory: mobile
+        run: |
+          npm ci
+          npm run sync
+
+      - name: Restore signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Секреты подписи не заданы — собираю только отладочный APK."
+          fi
+
+      - name: Build APK
+        working-directory: mobile/android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+          if [ -n "$KEYSTORE_FILE" ]; then ./gradlew --no-daemon assembleRelease; fi
+
+      - name: Upload debug APK (для проверки на телефоне)
+        uses: actions/upload-artifact@v4
+        with:
+          name: krasnaya-nit-debug
+          path: mobile/android/app/build/outputs/apk/debug/*.apk
+
+      - name: Upload release APK (для RuStore)
+        if: env.KEYSTORE_FILE != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: krasnaya-nit-release-rustore
+          path: mobile/android/app/build/outputs/apk/release/*.apk

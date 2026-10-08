@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Красная нить</string>
+    <string name="title_activity_main">Красная нить</string>
+    <string name="package_name">ru.krasnayanit.game</string>
+    <string name="custom_url_scheme">ru.krasnayanit.game</string>
+</resources>

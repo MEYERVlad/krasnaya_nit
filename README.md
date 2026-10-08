@@ -88,7 +88,8 @@
 ## Техника
 
 - Один файл `index.html`, без сборки и зависимостей.
-- Настольная версия для Steam (Electron, шрифты внутри, работает без интернета) — в папке `steam/`, инструкция в `steam/README.md`. Шрифты — Google Fonts (Cormorant, Marck Script, Old Standard TT).
+- Настольная версия для Steam (Electron, шрифты внутри, работает без интернета) — в папке `steam/`, инструкция в `steam/README.md`.
+- Android-версия для RuStore (Capacitor, собирается в GitHub Actions) — в папке `mobile/`, инструкция в `mobile/README.md`. Шрифты — Google Fonts (Cormorant, Marck Script, Old Standard TT).
 - Вся графика нарисована SVG-кодом, текстуры (пробка, дерево, бумага, зерно) генерируются на canvas при запуске.
 - Звук синтезируется Web Audio API: дождь, гул воспоминания, вальс-шкатулка, бой часов, карканье, вспышка, гром.
 - Прогресс сохраняется в `localStorage`: `krasnaya-nit-ch1-v1`, `krasnaya-nit-ch2-v1`, `krasnaya-nit-ch3-v1`, `krasnaya-nit-ch4-v1`, последняя открытая глава — `krasnaya-nit-last`.

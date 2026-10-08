@@ -1,0 +1,11 @@
+{
+  "appId": "ru.krasnayanit.game",
+  "appName": "Красная нить",
+  "webDir": "www",
+  "backgroundColor": "#0b0908",
+  "android": {
+    "backgroundColor": "#0b0908",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

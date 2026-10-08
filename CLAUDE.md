@@ -20,6 +20,10 @@
 
 `steam/` — обёртка на Electron. `npm run prepare-app` копирует `../index.html` в `steam/app/`, заменяя Google Fonts на локальные `steam/fonts/`; ссылку на шрифты в `index.html` не меняйте, иначе `prepare.mjs` упадёт. Если в игре в `window.desktop` есть мост, в меню появляются «Во весь экран» и «Выйти». После новых глав перегенерируйте `store/` (`npm run store-assets`) и пересоберите.
 
+## Android (RuStore)
+
+`mobile/` — Capacitor 8. `npm run sync` копирует `../index.html` в `mobile/www/` (шрифты из `../steam/fonts`) и в Android-проект. APK собирает GitHub Actions (`.github/workflows/android.yml`); локально Android SDK недоступен. Ключ подписи — только в секретах GitHub, не в репозитории. В игре: телефонная раскладка — `@media (orientation:landscape) and (max-height:520px)`, кнопка «Назад» Android — через `window.Capacitor.Plugins.App`.
+
 ## Проверка
 
 Прогон всей главы через Playwright (Chromium установлен в окружении): кликать по `[data-h="..."]` и `.slot[data-i="..."]`, следить за ошибками консоли. Повторный клик по уже выбранному предмету открывает его осмотр, а не снимает выбор. Чтобы сразу попасть в главу II, положите в localStorage сохранение главы I с `f.ended=1` (или `krasnaya-nit-last=2`); для главы N можно просто поставить `krasnaya-nit-last=N` и перезагрузить.
