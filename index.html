@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<title>Красная нить</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=Cormorant+SC:wght@500;600&family=Marck+Script&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* layout: a single letterboxed 1000×640 painted stage; chapter bar above, inventory shelf below */
+:root{
+  --ink:#0b0908; --soot:#17120f; --paper:#e9dfc7; --paper-dim:#a99d86; --blood:#a3221b; --brass:#c09a52;
+  --f-display:'Cormorant SC','Cormorant Garamond',Georgia,serif;
+  --f-body:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --f-hand:'Marck Script','Segoe Script','Brush Script MT',cursive;
+  --f-news:'Old Standard TT',Georgia,serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+#app{--w:min(100%, calc((100vh - 176px) * 1.5625));height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding-inline:16px;padding-block:8px;box-sizing:border-box}
+@supports (height:100dvh){#app{--w:min(100%, calc((100dvh - 176px) * 1.5625))}}
+.bar{width:var(--w);display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px}
+.brand{display:flex;align-items:baseline;gap:12px;min-width:0}
+.brand b{font-family:var(--f-display);font-weight:600;font-size:20px;letter-spacing:.16em;color:var(--paper);white-space:nowrap}
+.brand span{font-style:italic;color:var(--paper-dim);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{display:flex;gap:6px}
+.ib{width:34px;height:34px;display:grid;place-items:center;background:transparent;border:1px solid rgba(233,223,199,.18);border-radius:50%;color:var(--paper);cursor:pointer;padding:0}
+.ib:hover{border-color:var(--blood);background:rgba(163,34,27,.14)}
+.ib:focus-visible,.btn:focus-visible,.slot:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.ib svg{width:18px;height:18px}
+.stage{width:var(--w);aspect-ratio:1000/640;max-width:100%;position:relative;overflow:hidden;background:#000;container-type:inline-size;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px #2a211b}
+#scene,#scene>svg{display:block;width:100%;height:100%}
+.hs{fill:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.arrow{cursor:pointer}.arrow path{stroke:#efe5cd;opacity:.6;transition:opacity .2s}.arrow:hover path{opacity:1}
+#scene.memory>svg{filter:sepia(.42) saturate(.85) contrast(1.06);animation:memflick 5s infinite}
+@keyframes memflick{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.93}49%{opacity:1}72%{opacity:.97}}
+.flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick .16s infinite alternate ease-in-out}
+@keyframes flick{from{transform:scale(1,1) skewX(-2deg)}to{transform:scale(.9,1.08) skewX(3deg)}}
+.rain{animation:rain .55s linear infinite}.rain.b{animation-duration:.72s;opacity:.6}
+@keyframes rain{from{transform:translate(8px,-90px)}to{transform:translate(-8px,90px)}}
+.drop{animation:drop 1.4s cubic-bezier(.3,.6,.4,1) both}
+@keyframes drop{0%{transform:translate(120px,-420px) rotate(40deg);opacity:0}30%{opacity:1}100%{transform:none}}
+.spin{animation:shimmer 1.4s linear infinite}
+@keyframes shimmer{0%,100%{opacity:.15}50%{opacity:.45}}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.grain{position:absolute;inset:-50%;pointer-events:none;opacity:.10;animation:grain .9s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-7%,4%)}40%{transform:translate(5%,-6%)}60%{transform:translate(-3%,8%)}80%{transform:translate(8%,2%)}100%{transform:translate(0,0)}}
+.vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 9cqw rgba(0,0,0,.8)}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:6cqw 7cqw 2.6cqw;text-align:center;font-style:italic;font-size:clamp(13px,2.35cqw,23px);line-height:1.35;color:#f3e9d2;text-shadow:0 1px 2px #000,0 0 14px #000;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.72));opacity:0;transition:opacity .45s;pointer-events:none;text-wrap:balance}
+.cap.on{opacity:1}
+#fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .28s}
+#fade.white{background:#f2e8d2;transition:opacity .7s}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.title{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6cqw;text-align:center;background:radial-gradient(ellipse at 50% 55%,rgba(14,8,6,.55),rgba(4,2,2,.95) 75%);transition:opacity .9s}
+.title.gone{opacity:0;pointer-events:none}
+.title h1{margin:0;font-family:var(--f-display);font-weight:500;font-size:9.5cqw;letter-spacing:.1em;line-height:1;color:#efe4ca;text-shadow:0 0 30px rgba(0,0,0,.9);text-wrap:balance}
+.title .thread{width:56cqw;height:5cqw;overflow:visible}
+.title .thread path{stroke:var(--blood);stroke-width:2.2;fill:none;stroke-dasharray:700;stroke-dashoffset:700;animation:draw 3s .4s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.title p{margin:0;font-style:italic;font-size:clamp(13px,2.3cqw,22px);color:var(--paper-dim);max-width:62cqw;line-height:1.4}
+.title .ch{font-family:var(--f-display);letter-spacing:.3em;font-size:clamp(11px,1.6cqw,16px);color:var(--brass);font-style:normal}
+.title .row{display:flex;gap:2cqw;margin-top:1cqw;flex-wrap:wrap;justify-content:center}
+.btn{font-family:var(--f-display);font-size:clamp(14px,2cqw,19px);letter-spacing:.14em;color:var(--paper);background:rgba(10,6,5,.4);border:1px solid rgba(233,223,199,.32);padding:.55em 1.5em;cursor:pointer}
+.btn:hover{border-color:var(--blood);color:#fff;background:rgba(163,34,27,.2)}
+.btn.red{border-color:var(--blood)}
+.invrow{width:var(--w);display:flex;flex-direction:column;gap:4px}
+.shelf{display:flex;gap:8px;overflow-x:auto;padding:7px 8px;min-height:70px;box-sizing:border-box;background:linear-gradient(#2a1a11,#170e09);border-top:2px solid #4b3020;box-shadow:inset 0 8px 14px rgba(0,0,0,.55);scrollbar-width:thin}
+.slot{flex:0 0 56px;height:56px;border-radius:3px;background:radial-gradient(circle at 50% 38%,#3b2a1e,#1a110b);border:1px solid #3e2c1f;cursor:pointer;display:grid;place-items:center;padding:0;transition:box-shadow .2s,border-color .2s}
+.slot:hover{border-color:#7a5a3c}
+.slot.sel{border-color:var(--blood);box-shadow:0 0 0 2px var(--blood),0 0 16px rgba(163,34,27,.55)}
+.slot>svg{width:50px;height:50px;pointer-events:none}
+.slot.new{animation:newi 1s ease}
+@keyframes newi{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:none}}
+.empty{font-style:italic;color:#6d5f4f;font-size:15px;align-self:center;padding-left:6px}
+.ilabel{font-style:italic;color:var(--paper-dim);font-size:15px;min-height:20px;text-align:center}
+.ilabel b{font-weight:600;color:var(--paper);font-style:normal}
+.ov{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(6,4,3,.86);opacity:0;transition:opacity .3s;overflow:auto}
+.ov.on{opacity:1}
+.ov[hidden],[hidden]{display:none!important}
+.ov .inner{max-width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;align-items:center;gap:14px}
+.ov .close{font-style:italic;color:var(--paper-dim);font-size:15px}
+.card{background:#e9dfc6;color:#2a1d14;box-shadow:0 20px 60px rgba(0,0,0,.8);position:relative}
+.card::before{content:"";position:absolute;inset:0;background-image:var(--paper-tex);opacity:.55;pointer-events:none}
+.itemcard{width:min(440px,100%);padding:26px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;transform:rotate(-1deg)}
+.itemcard>svg{width:150px;height:150px}
+.itemcard h3{margin:0;font-family:var(--f-display);font-size:24px;letter-spacing:.1em;font-weight:600}
+.itemcard p{margin:0;font-size:19px;line-height:1.4;font-style:italic;max-width:34ch}
+.news{width:min(640px,100%);padding:26px 30px 30px;font-family:var(--f-news);background:#ddd0b1;color:#211810;transform:rotate(-.8deg)}
+.news .mast{text-align:center;font-weight:700;font-size:clamp(26px,6vw,40px);letter-spacing:.06em;border-bottom:3px double #211810;padding-bottom:4px}
+.news .date{display:flex;justify-content:space-between;gap:10px;font-size:13px;border-bottom:1px solid #211810;padding:4px 0;font-style:italic;flex-wrap:wrap}
+.news h2{font-size:clamp(22px,4.6vw,32px);text-align:center;margin:14px 0 4px;line-height:1.05;text-wrap:balance}
+.news .sub{text-align:center;font-style:italic;font-size:15px;margin-bottom:12px}
+.news .cols{columns:2 220px;column-gap:24px;column-rule:1px solid rgba(33,24,16,.4);font-size:15px;line-height:1.45;text-align:justify;hyphens:auto}
+.news .cols p{margin:0 0 .6em}
+.news .cols p:first-child::first-letter{font-size:3em;float:left;line-height:.8;padding:4px 6px 0 0;font-weight:700}
+.hand{font-family:var(--f-hand);color:#23324f}
+.note{width:min(420px,100%);padding:34px 34px 30px;transform:rotate(1.4deg);background:#efe6d3;font-size:clamp(22px,5vw,30px);line-height:1.35}
+.page{width:min(420px,100%);padding:30px 30px 28px 54px;transform:rotate(-1.2deg);background:#ece4cf;font-size:clamp(21px,4.6vw,27px);line-height:1.5;background-image:linear-gradient(transparent 39px,rgba(80,110,160,.35) 40px);background-size:100% 40.5px;background-position:0 12px}
+.page::after{content:"";position:absolute;left:38px;top:0;bottom:0;width:1px;background:rgba(170,40,40,.5)}
+.invite{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.inv-card{width:min(330px,100%);padding:26px 24px;background:#efe5cd;color:#2a1d14;text-align:center;border:1px solid #b8924a;outline:6px double rgba(184,146,74,.6);outline-offset:-14px;box-sizing:border-box}
+.inv-card .script{font-family:var(--f-hand);font-size:27px;color:#3a2410;line-height:1.2}
+.inv-card p{margin:.5em 0;font-size:17px;line-height:1.35;font-style:italic}
+.inv-card .sm{font-family:var(--f-display);letter-spacing:.14em;font-size:13px;font-style:normal;color:#6a5030}
+.inv-card ul{list-style:none;padding:0;margin:.6em 0;font-size:17px;line-height:1.55}
+.photo-insp{background:#e6dbc1;padding:14px 14px 46px;box-shadow:0 20px 60px rgba(0,0,0,.8);transform:rotate(-1.5deg);position:relative;cursor:zoom-in;width:min(620px,100%);box-sizing:border-box}
+.photo-insp>svg{display:block;width:100%;height:auto;filter:sepia(.9) contrast(.95) brightness(.88)}
+.photo-insp .lbl{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-family:var(--f-hand);font-size:22px;color:#3b2b1c}
+.photo-insp:hover{box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 0 2px var(--blood)}
+.ending{width:min(600px,100%);text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.ending .ch{font-family:var(--f-display);letter-spacing:.3em;color:var(--brass);font-size:14px}
+.ending h2{margin:0;font-family:var(--f-display);font-weight:500;font-size:clamp(30px,6vw,48px);letter-spacing:.08em}
+.ending p{margin:0;font-size:clamp(17px,2.4vw,21px);line-height:1.5;font-style:italic;color:#d9ceb6;max-width:46ch}
+.ending .q{font-family:var(--f-hand);font-style:normal;color:#e2b0a6;font-size:clamp(22px,3.4vw,28px)}
+.menu{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.menu h2{margin:0 0 6px;font-family:var(--f-display);font-weight:500;letter-spacing:.12em;font-size:30px}
+@media (max-width:520px){.brand span{display:none}}
+@media (prefers-reduced-motion:reduce){.rain,.flame,.grain,.spin,#scene.memory>svg,.title .thread path{animation:none}.title .thread path{stroke-dashoffset:0}}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="gdefs"></defs></svg>
+
+<div id="app">
+  <div class="bar">
+    <div class="brand"><b>КРАСНАЯ НИТЬ</b><span>Глава I. Ужин у Пикмана</span></div>
+    <div class="tools">
+      <button class="ib" id="bHint" title="Спросить ворона" aria-label="Подсказка"><svg viewBox="0 0 24 24"><path d="M3 15c2-5 6-8 10-7l3-2 4 1-3 2c1 3 0 6-3 8l2 4h-2l-2-3c-3 1-6 0-9-3z" fill="currentColor"/></svg></button>
+      <button class="ib" id="bSound" title="Звук" aria-label="Звук"><svg viewBox="0 0 24 24" id="sndIco"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8c2 2 2 6 0 8M19 5c4 4 4 10 0 14" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
+      <button class="ib" id="bMenu" title="Меню" aria-label="Меню"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
+  <div class="stage" id="stage">
+    <div id="scene"></div>
+    <canvas id="fx"></canvas>
+    <div class="grain" id="grain"></div>
+    <div class="vig"></div>
+    <div class="cap" id="cap"></div>
+    <div id="flash"></div>
+    <div id="fade"></div>
+    <div class="title" id="title">
+      <span class="ch">ГЛАВА I · УЖИН У ПИКМАНА</span>
+      <h1>Красная нить</h1>
+      <svg class="thread" viewBox="0 0 560 50" preserveAspectRatio="none"><path d="M4 30 C90 6 150 44 230 24 S380 8 440 30 S530 40 556 14"/></svg>
+      <p>Ноябрь 1953 года. Званый ужин у мистера Пикмана. Без двадцати десять моя мать упала лицом в скатерть, и больше не поднялась.</p>
+      <div class="row"><button class="btn red" id="bStart">Начать</button><button class="btn" id="bCont" hidden>Продолжить</button></div>
+    </div>
+  </div>
+  <div class="invrow">
+    <div class="shelf" id="shelf"></div>
+    <div class="ilabel" id="ilabel"></div>
+  </div>
+</div>
+<div class="ov" id="ov" hidden><div class="inner" id="ovIn"></div></div>
+
+<script>
+(() => {
+'use strict';
+const OL = '#1a110d';
+const SAVE_KEY = 'krasnaya-nit-ch1-v1';
+const $ = s => document.querySelector(s);
+
+/* ---------- helpers ---------- */
+function shade(hex, a){
+  const n = parseInt(hex.slice(1),16); let r=n>>16, g=(n>>8)&255, b=n&255;
+  const t = a<0?0:255, p=Math.abs(a);
+  r=Math.round(r+(t-r)*p); g=Math.round(g+(t-g)*p); b=Math.round(b+(t-b)*p);
+  return '#'+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1);
+}
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+let rnd = mulberry(1953);
+const R = (a,b)=>a+rnd()*(b-a);
+const hs = (id,x,y,w,h)=>`<rect class="hs" data-h="${id}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
+const hse = (id,cx,cy,rx,ry)=>`<ellipse class="hs" data-h="${id}" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>`;
+const arrow = (x=500,y=608)=>`<g class="arrow" data-h="back"><rect class="hs" data-h="back" x="${x-50}" y="${y-26}" width="100" height="46"/><path d="M${x-16} ${y-6} L${x} ${y+7} L${x+16} ${y-6}" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/></g>`;
+
+/* ---------- textures (painted once on canvas) ---------- */
+function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);return c.toDataURL('image/png');}
+const T = {};
+T.cork = tex(256,256,(g,w,h)=>{for(let i=0;i<5200;i++){const x=R(0,w),y=R(0,h),r=R(.4,2.1),dark=rnd()<.62;g.fillStyle=dark?`rgba(55,28,10,${R(.18,.45)})`:`rgba(240,200,145,${R(.1,.28)})`;const rot=R(0,3),q=R(.5,1.1);for(const dx of[-w,0,w])for(const dy of[-h,0,h]){g.beginPath();g.ellipse(x+dx,y+dy,r,r*q,rot,0,7);g.fill();}}});
+T.wood = tex(512,256,(g,w,h)=>{for(let i=0;i<150;i++){const y0=R(0,h),k=1+Math.floor(R(0,3)),amp=R(1,6),ph=R(0,6.28);g.strokeStyle=`rgba(18,9,3,${R(.04,.22)})`;g.lineWidth=R(.5,2.2);for(const dy of[-h,0,h]){g.beginPath();for(let x=0;x<=w;x+=8){const y=y0+dy+Math.sin(x/w*6.2832*k+ph)*amp;x?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();}}for(let i=0;i<60;i++){g.strokeStyle=`rgba(255,220,170,${R(.02,.06)})`;g.lineWidth=R(.5,1.5);const y0=R(0,h);g.beginPath();g.moveTo(0,y0);g.lineTo(w,y0+R(-2,2));g.stroke();}});
+T.mottle = tex(512,512,(g,w,h)=>{for(let i=0;i<70;i++){const x=R(0,w),y=R(0,h),r=R(30,140),dark=rnd()<.6;for(const dx of[-w,0,w])for(const dy of[-h,0,h]){const gr=g.createRadialGradient(x+dx,y+dy,0,x+dx,y+dy,r);gr.addColorStop(0,dark?`rgba(0,0,0,${R(.06,.16)})`:`rgba(255,240,210,${R(.02,.06)})`);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(x+dx-r,y+dy-r,r*2,r*2);}}});
+T.paper = tex(256,256,(g,w,h)=>{const d=g.createImageData(w,h);for(let i=0;i<d.data.length;i+=4){const v=R(0,1);d.data[i]=120;d.data[i+1]=95;d.data[i+2]=60;d.data[i+3]=v*38;}g.putImageData(d,0,0);for(let i=0;i<90;i++){g.strokeStyle=`rgba(110,80,50,${R(.05,.14)})`;g.lineWidth=R(.3,.8);g.beginPath();const x=R(0,w),y=R(0,h);g.moveTo(x,y);g.quadraticCurveTo(x+R(-12,12),y+R(-12,12),x+R(-20,20),y+R(-20,20));g.stroke();}});
+T.grain = tex(220,220,(g,w,h)=>{const d=g.createImageData(w,h);for(let i=0;i<d.data.length;i+=4){const v=rnd()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=rnd()<.5?90:0;}g.putImageData(d,0,0);});
+$('#grain').style.backgroundImage=`url(${T.grain})`;
+document.documentElement.style.setProperty('--paper-tex',`url(${T.paper})`);
+
+$('#gdefs').innerHTML = `
+<linearGradient id="gBrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d995"/><stop offset=".45" stop-color="#c09a52"/><stop offset="1" stop-color="#6b4f22"/></linearGradient>
+<linearGradient id="gBrassH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b4f22"/><stop offset=".35" stop-color="#f0d38e"/><stop offset=".6" stop-color="#b8924a"/><stop offset="1" stop-color="#5a411a"/></linearGradient>
+<linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc96"/><stop offset=".3" stop-color="#b38a3e"/><stop offset=".55" stop-color="#e8c67a"/><stop offset=".8" stop-color="#8a6526"/><stop offset="1" stop-color="#c9a256"/></linearGradient>
+<linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a4328"/><stop offset="1" stop-color="#3b2416"/></linearGradient>
+<linearGradient id="gWoodD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3e2617"/><stop offset="1" stop-color="#1f130b"/></linearGradient>
+<linearGradient id="gWoodH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c1a0f"/><stop offset=".5" stop-color="#5a3922"/><stop offset="1" stop-color="#2c1a0f"/></linearGradient>
+<linearGradient id="gNight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22324a"/><stop offset=".7" stop-color="#121c2a"/><stop offset="1" stop-color="#0a0f17"/></linearGradient>
+<linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e1d12"/><stop offset="1" stop-color="#4a2f1d"/></linearGradient>
+<linearGradient id="gCurtain" x1="0" y1="0" x2="26" y2="0" gradientUnits="userSpaceOnUse" spreadMethod="reflect"><stop offset="0" stop-color="#2a0709"/><stop offset=".45" stop-color="#5c1418"/><stop offset=".7" stop-color="#74201f"/><stop offset="1" stop-color="#3a0b0e"/></linearGradient>
+<linearGradient id="gCurtainG" x1="0" y1="0" x2="30" y2="0" gradientUnits="userSpaceOnUse" spreadMethod="reflect"><stop offset="0" stop-color="#1c2a22"/><stop offset=".5" stop-color="#355042"/><stop offset="1" stop-color="#22362c"/></linearGradient>
+<linearGradient id="gCloth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1e8d4"/><stop offset="1" stop-color="#c8b994"/></linearGradient>
+<linearGradient id="gShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6b46"/><stop offset=".6" stop-color="#1b4a2e"/><stop offset="1" stop-color="#0f2b1a"/></linearGradient>
+<linearGradient id="gSilver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f2ec"/><stop offset=".5" stop-color="#9a978f"/><stop offset="1" stop-color="#e2ded4"/></linearGradient>
+<linearGradient id="gCyl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2014"/><stop offset=".3" stop-color="#c9b48a"/><stop offset=".5" stop-color="#f3e6c6"/><stop offset=".7" stop-color="#c9b48a"/><stop offset="1" stop-color="#2a2014"/></linearGradient>
+<linearGradient id="gAmber" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a2306"/><stop offset=".4" stop-color="#a3611c"/><stop offset=".55" stop-color="#e2a24e"/><stop offset="1" stop-color="#4a2306"/></linearGradient>
+<radialGradient id="rHead" cx=".45" cy=".4" r=".65"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#5a2410" stop-opacity=".38"/></radialGradient>
+<radialGradient id="rLamp" cx="350" cy="350" r="420" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc977" stop-opacity=".42"/><stop offset=".45" stop-color="#ff9d4a" stop-opacity=".12"/><stop offset="1" stop-color="#ff9d4a" stop-opacity="0"/></radialGradient>
+<radialGradient id="rDark" cx=".42" cy=".5" r=".75"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity=".78"/></radialGradient>
+<radialGradient id="rCandle"><stop offset="0" stop-color="#ffd38a" stop-opacity=".55"/><stop offset=".4" stop-color="#ff9f45" stop-opacity=".16"/><stop offset="1" stop-color="#ff9f45" stop-opacity="0"/></radialGradient>
+<radialGradient id="rHorn" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0d0905"/><stop offset=".55" stop-color="#3d2a12"/><stop offset="1" stop-color="#b8924a"/></radialGradient>
+<radialGradient id="rDial" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#f6efdc"/><stop offset=".8" stop-color="#e3d6b6"/><stop offset="1" stop-color="#b9a47a"/></radialGradient>
+<radialGradient id="rPortraitBg" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#3d5a45"/><stop offset="1" stop-color="#101a14"/></radialGradient>
+<radialGradient id="rCork" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#fff2d6" stop-opacity=".14"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
+<g id="dmMotif">
+ <path d="M35 4 C42 15 48 22 48 32 C48 41 41 45 35 47 C29 45 22 41 22 32 C22 22 28 15 35 4 Z"/>
+ <path d="M35 47 C45 49 53 55 51 64 C46 59 40 57 35 59 C30 57 24 59 19 64 C17 55 25 49 35 47 Z"/>
+ <path d="M34 59 h2 v16 h-2 Z"/>
+ <path d="M22 32 C12 31 8 22 14 17 C19 14 23 18 20 22 C18 20 16 21 17 23 C18 27 20 29 22 30 Z"/>
+ <path d="M48 32 C58 31 62 22 56 17 C51 14 47 18 50 22 C52 20 54 21 53 23 C52 27 50 29 48 30 Z"/>
+</g>
+<pattern id="pDamask" width="70" height="96" patternUnits="userSpaceOnUse">
+ <use href="#dmMotif" fill="#203733" opacity=".8"/>
+ <use href="#dmMotif" fill="#3e605a" opacity=".22" x="-1" y="-1"/>
+ <circle cx="0" cy="58" r="4" fill="#203733" opacity=".7"/><circle cx="70" cy="58" r="4" fill="#203733" opacity=".7"/>
+ <circle cx="0" cy="58" r="1.5" fill="#4f716a" opacity=".35"/><circle cx="70" cy="58" r="1.5" fill="#4f716a" opacity=".35"/>
+</pattern>
+<pattern id="pStripe" width="48" height="60" patternUnits="userSpaceOnUse">
+ <rect width="48" height="60" fill="#4a1417"/><rect width="22" height="60" fill="#56191c"/>
+ <rect x="22" width="1.4" height="60" fill="#a8843f" opacity=".38"/><rect x="47" width="1" height="60" fill="#a8843f" opacity=".2"/>
+ <path d="M11 22 l4 6 l-4 6 l-4 -6 Z" fill="#a8843f" opacity=".22"/>
+</pattern>
+<pattern id="pQuilt" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M0 0 L34 34 M34 0 L0 34" stroke="#2a080b" stroke-width="1.6" opacity=".55"/><circle cx="17" cy="17" r="2" fill="#c9a256" opacity=".55"/><circle cx="0" cy="0" r="2" fill="#c9a256" opacity=".55"/></pattern>
+<pattern id="pPin" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#3a3c41"/><rect x="0" width="1" height="10" fill="#5a5d63" opacity=".6"/></pattern>
+<pattern id="pCork" width="256" height="256" patternUnits="userSpaceOnUse"><image href="${T.cork}" width="256" height="256"/></pattern>
+<pattern id="pWood" width="512" height="256" patternUnits="userSpaceOnUse"><image href="${T.wood}" width="512" height="256"/></pattern>
+<pattern id="pWoodV" width="256" height="512" patternUnits="userSpaceOnUse" patternTransform="rotate(90)"><image href="${T.wood}" width="512" height="256"/></pattern>
+<pattern id="pMottle" width="512" height="512" patternUnits="userSpaceOnUse"><image href="${T.mottle}" width="512" height="512"/></pattern>
+<pattern id="pPaper" width="256" height="256" patternUnits="userSpaceOnUse"><image href="${T.paper}" width="256" height="256"/></pattern>
+<filter id="fSepia" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".38 .72 .18 0 0  .33 .64 .15 0 0  .25 .5 .12 0 0  0 0 0 1 0"/></filter>
+<filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+<filter id="fBlurS" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.5"/></filter>
+`;
+
+/* ---------- characters ---------- */
+const PEOPLE = {
+  doctor:{name:'Доктор Альберт Грей',role:'Семейный врач. Это он сказал: «сердце».',skin:'#e4cfb6',hair:'#97938d',brow:'#77736d',style:'side',coat:'#3c3e44',shirt:'#ece6da',tie:'#191a20',glasses:true,mus:'thin',he:true,short:'Доктор Грей'},
+  pickman:{name:'Мистер Огастес Пикман',role:'Хозяин дома. Меценат, попечитель приюта.',skin:'#e9c8aa',hair:'#3b2a20',style:'bald',coat:'#1d1a1f',vest:'#6b1d22',shirt:'#efe7d6',tie:'#6b1d22',mus:'walrus',monocle:true,wide:true,he:true,short:'Мистер Пикман'},
+  lady:{name:'Леди Корделия Вейн',role:'Вдова. «Близкий друг» хозяина.',skin:'#f0ddcc',hair:'#7d3420',brow:'#5a2a1a',style:'bun',female:true,dress:'#1f4a3a',pearls:true,lips:'#8e2a2a',short:'Леди Вейн'},
+  butler:{name:'Хиггс',role:'Дворецкий. Разливал вино весь вечер.',skin:'#e2d4c4',hair:'#141111',style:'slick',coat:'#131113',shirt:'#f0ebe2',tie:'#131113',long:true,he:true},
+  mother:{name:'Мама',skin:'#f1ddcb',hair:'#2a1a14',brow:'#2a1a14',style:'wave',female:true,dress:'#2a3854',lips:'#9a2c2c'},
+  stranger:{name:'???',skin:'#ddd2c2',hair:'#1f1c1a',style:'slick',coat:'#2b2826',shirt:'#e8e2d4',tie:'#2b2826',hat:true,scratched:true,he:true}
+};
+function bust(p,o={}){
+  const W=p.wide?78:62, hrx=p.wide?28:25, hry=p.long?34:31, hy=-50, skinD=shade(p.skin,-.13);
+  const ex=p.wide?11:10, ey=hy-2;
+  let s=`<path d="M-10 -24 L-10 6 Q0 12 10 6 L10 -24 Z" fill="${skinD}"/>`;
+  if(p.female){
+    s+=`<path d="M-11 -8 L-11 8 C-26 12 -46 14 -55 24 C-61 32 -63 48 -63 76 L63 76 C63 48 61 32 55 24 C46 14 26 12 11 8 L11 -8 Z" fill="${p.skin}" stroke="${OL}" stroke-width="1.4"/>`;
+    s+=`<path d="M-12 5 Q0 13 12 5" fill="none" stroke="${skinD}" stroke-width="1.3" opacity=".7"/>`;
+    s+=`<path d="M-63 76 C-63 50 -60 36 -52 30 C-40 27 -28 31 -19 38 Q-10 28 0 36 Q10 28 19 38 C28 31 40 27 52 30 C60 36 63 50 63 76 Z" fill="${p.dress}" stroke="${OL}" stroke-width="1.4"/>`;
+    s+=`<path d="M-44 42 C-36 54 -31 64 -29 76 M44 42 C36 54 31 64 29 76" stroke="${shade(p.dress,.2)}" stroke-width="3" fill="none" opacity=".45"/>`;
+    if(p.pearls){for(let i=-5;i<=5;i++){s+=`<circle cx="${i*4.4}" cy="${15+i*i*.33}" r="2.4" fill="#f4efe5" stroke="#9d937f" stroke-width=".6"/>`;}}
+  } else {
+    s+=`<path d="M${-W} 76 C${-W} 42 ${-W+8} 20 -20 6 L20 6 C${W-8} 20 ${W} 42 ${W} 76 Z" fill="${p.coat}" stroke="${OL}" stroke-width="1.4"/>`;
+    s+=`<path d="M-15 4 L0 50 L15 4 Z" fill="${p.shirt}"/>`;
+    if(p.vest) s+=`<path d="M-12 24 L0 50 L12 24 L18 76 L-18 76 Z" fill="${p.vest}" stroke="${OL}" stroke-width="1"/><circle cx="0" cy="60" r="1.8" fill="#d2ae62"/><circle cx="0" cy="69" r="1.8" fill="#d2ae62"/><path d="M4 62 Q16 66 22 60" stroke="#d2ae62" stroke-width="1" fill="none"/>`;
+    s+=`<path d="M-20 6 L-3 52 L-32 28 Z M20 6 L3 52 L32 28 Z" fill="${shade(p.coat,.13)}" stroke="${OL}" stroke-width="1"/>`;
+    s+=`<path d="M-11 -3 L-16 7 L-3 7 Z M11 -3 L16 7 L3 7 Z" fill="${p.shirt}" stroke="${OL}" stroke-width=".8"/>`;
+    s+=`<path d="M0 9 L-12 3 L-12 15 Z M0 9 L12 3 L12 15 Z" fill="${p.tie}" stroke="${OL}" stroke-width=".8"/><circle cx="0" cy="9" r="3" fill="${p.tie}" stroke="${OL}" stroke-width=".8"/>`;
+    if(!p.vest) s+=`<path d="M-44 30 L-30 30 L-32 36 L-44 36 Z" fill="${shade(p.shirt,-.05)}" opacity=".8"/>`;
+  }
+  if(p.wide) s+=`<ellipse cx="0" cy="${hy+27}" rx="19" ry="9" fill="${p.skin}" stroke="${OL}" stroke-width="1.2"/>`;
+  s+=`<ellipse cx="${-hrx}" cy="${hy+2}" rx="5" ry="8" fill="${p.skin}" stroke="${OL}" stroke-width="1.2"/><ellipse cx="${hrx}" cy="${hy+2}" rx="5" ry="8" fill="${p.skin}" stroke="${OL}" stroke-width="1.2"/>`;
+  s+=`<ellipse cx="0" cy="${hy}" rx="${hrx}" ry="${hry}" fill="${p.skin}" stroke="${OL}" stroke-width="1.5"/><ellipse cx="0" cy="${hy}" rx="${hrx}" ry="${hry}" fill="url(#rHead)"/>`;
+  s+=`<ellipse cx="${-ex}" cy="${ey}" rx="7.5" ry="5.5" fill="#5a2a22" opacity=".22"/><ellipse cx="${ex}" cy="${ey}" rx="7.5" ry="5.5" fill="#5a2a22" opacity=".22"/>`;
+  if(o.closed){s+=`<path d="M${-ex-6} ${ey} Q${-ex} ${ey+4} ${-ex+6} ${ey} M${ex-6} ${ey} Q${ex} ${ey+4} ${ex+6} ${ey}" stroke="${OL}" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;}
+  else{const pr=o.stare?3.5:2.7,lx=o.look||0;s+=`<circle cx="${-ex+lx}" cy="${ey}" r="${pr}" fill="#110a08"/><circle cx="${ex+lx}" cy="${ey}" r="${pr}" fill="#110a08"/>`;}
+  s+=`<path d="M${-ex-6} ${ey-8} Q${-ex} ${ey-11.5} ${-ex+6} ${ey-8.5} M${ex-6} ${ey-8.5} Q${ex} ${ey-11.5} ${ex+6} ${ey-8}" stroke="${p.brow||shade(p.hair,-.15)}" stroke-width="${p.female?1.6:2.3}" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M-1 ${hy+1} Q3.5 ${hy+11} -2 ${hy+13}" stroke="${skinD}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  if(p.female){s+=`<circle cx="-13" cy="${hy+10}" r="5" fill="#d77a6a" opacity=".2"/><circle cx="13" cy="${hy+10}" r="5" fill="#d77a6a" opacity=".2"/><path d="M-6 ${hy+21} Q-3 ${hy+18.4} 0 ${hy+20} Q3 ${hy+18.4} 6 ${hy+21} Q0 ${hy+25.5} -6 ${hy+21} Z" fill="${p.lips}"/>`;}
+  else s+=`<path d="M-7 ${hy+21} Q0 ${hy+22.6} 7 ${hy+21}" stroke="#5e3128" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  const H=p.hair;
+  switch(p.style){
+    case 'side': s+=`<path d="M-26 -50 C-30 -78 -12 -88 6 -86 C21 -85 31 -74 27 -52 C25 -66 17 -72 5 -73 C-5 -71 -13 -69 -19 -64 C-22 -60 -24 -56 -26 -50 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-26 -50 L-24 -38 L-22 -52 Z M26 -50 L24 -38 L22 -52 Z" fill="${H}"/><path d="M-8 -84 Q-2 -78 4 -73" stroke="${shade(H,.25)}" stroke-width="1.2" fill="none"/>`;break;
+    case 'slick': s+=`<path d="M-26 -48 C-29 -80 -9 -87 4 -86 C22 -85 31 -72 26 -48 C25 -63 15 -71 0 -72 C-12 -72 -22 -64 -26 -48 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-14 -80 Q2 -84 16 -78" stroke="#fff" stroke-opacity=".18" stroke-width="2" fill="none"/>`;break;
+    case 'bald': s+=`<path d="M-29 -48 C-32 -58 -29 -66 -24 -67 C-26 -58 -25 -52 -22 -42 Z M29 -48 C32 -58 29 -66 24 -67 C26 -58 25 -52 22 -42 Z" fill="${H}"/><ellipse cx="-9" cy="-72" rx="9" ry="4" fill="#fff" opacity=".22" transform="rotate(-18 -9 -72)"/>`;break;
+    case 'bun': s+=`<circle cx="7" cy="-86" r="13" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-27 -44 C-32 -78 -10 -88 4 -86 C24 -84 32 -70 27 -44 C24 -58 18 -70 6 -72 C-2 -66 -14 -64 -22 -58 C-25 -54 -26 -50 -27 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-18 -74 Q-6 -82 8 -78 M2 -92 Q8 -96 14 -90" stroke="${shade(H,.25)}" stroke-width="1.2" fill="none"/>`;break;
+    case 'wave': s+=`<path d="M-28 -44 C-36 -70 -20 -90 2 -88 C26 -88 37 -68 29 -42 C35 -33 31 -22 24 -25 C27 -40 25 -55 15 -66 C3 -60 -9 -62 -19 -57 C-24 -46 -24 -36 -21 -25 C-30 -23 -35 -35 -28 -44 Z" fill="${H}" stroke="${OL}" stroke-width="1.2"/><path d="M-16 -78 Q-4 -70 10 -76 Q20 -80 26 -70" stroke="${shade(H,.22)}" stroke-width="1.3" fill="none"/>`;break;
+  }
+  if(p.mus==='walrus') s+=`<path d="M-17 ${hy+21} C-13 ${hy+10} -4 ${hy+12} 0 ${hy+14} C4 ${hy+12} 13 ${hy+10} 17 ${hy+21} C11 ${hy+17} 5 ${hy+18} 0 ${hy+17} C-5 ${hy+18} -11 ${hy+17} -17 ${hy+21} Z" fill="${H}" stroke="${OL}" stroke-width=".8"/>`;
+  if(p.mus==='thin') s+=`<path d="M-9 ${hy+17} Q-4 ${hy+14} 0 ${hy+16} Q4 ${hy+14} 9 ${hy+17} Q4 ${hy+18} 0 ${hy+17.5} Q-4 ${hy+18} -9 ${hy+17} Z" fill="${shade(H,-.2)}"/>`;
+  if(p.glasses) s+=`<g fill="#d6e2ea" fill-opacity=".14" stroke="#2c2420" stroke-width="1.5"><circle cx="${-ex}" cy="${ey}" r="7.8"/><circle cx="${ex}" cy="${ey}" r="7.8"/></g><path d="M-2.5 ${ey} Q0 ${ey-2} 2.5 ${ey} M${-ex-7.8} ${ey} L-24 ${ey-2} M${ex+7.8} ${ey} L24 ${ey-2}" stroke="#2c2420" stroke-width="1.3" fill="none"/>`;
+  if(p.monocle) s+=`<circle cx="${ex}" cy="${ey}" r="9" fill="#fff" fill-opacity=".1" stroke="#d2ae62" stroke-width="1.8"/><path d="M${ex+8} ${ey+4} Q34 -10 26 26" stroke="#d2ae62" stroke-width=".9" fill="none"/>`;
+  if(p.hat) s+=`<path d="M-24 -74 C-24 -100 24 -100 24 -74 Z" fill="#2a2522" stroke="${OL}" stroke-width="1.2"/><path d="M-6 -97 Q0 -90 6 -97" stroke="${OL}" fill="none"/><rect x="-24" y="-80" width="48" height="6" fill="#141110"/><ellipse cx="0" cy="-74" rx="38" ry="6.5" fill="#2a2522" stroke="${OL}" stroke-width="1.2"/>`;
+  if(p.scratched) s+=`<path d="M-24 -70 L19 -64 L-22 -57 L23 -50 L-25 -42 L21 -35 L-19 -28 L17 -22 M-16 -74 L-4 -20 M8 -76 L14 -22" stroke="#f3eee2" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/><path d="M-22 -60 L20 -46 L-20 -34" stroke="#8a7f70" stroke-width="1" fill="none"/>`;
+  return s;
+}
+
+/* ---------- items ---------- */
+const ITEMS = {
+  magnifier:{name:'Лупа',desc:'Мамина лупа в латунной оправе. Она читала через неё корректуру.'},
+  key:{name:'Латунный ключ',desc:'Маленький ключ с узорной головкой. Он был спрятан в часах.'},
+  record:{name:'Пластинка',desc:'«Вальс для Элеоноры». На конверте — мамин почерк.'},
+  invite:{name:'Приглашение',special:'invite'},
+  photo:{name:'Снимок ужина',special:'photo'},
+  camera:{name:'Фотоаппарат',desc:'Складная камера с мехами. На ней нет имени владельца.'},
+  ph_doctor:{name:'Снимок: доктор Грей',person:'doctor'},
+  ph_pickman:{name:'Снимок: мистер Пикман',person:'pickman'},
+  ph_lady:{name:'Снимок: леди Вейн',person:'lady'},
+  ph_butler:{name:'Снимок: Хиггс',person:'butler'},
+  sediment:{name:'Осадок из бокала',desc:'Белёсый осадок со дна маминого бокала. Пахнет горьким миндалём. Так пахнет цианид.'},
+  vial:{name:'Пустой флакон',desc:'Аптечный флакон тёмного стекла, пустой. Этикетка: «Kalium cyanatum. Отпущено по рецепту д-ра А. Г.».'},
+  note:{name:'Записка из веера',special:'note'},
+  glove:{name:'Перчатка',desc:'Белая перчатка прислуги, на манжете вышита буква «Х». На пальцах — пятна вина и запах горького миндаля.'},
+  page:{name:'Страница блокнота',special:'page'}
+};
+const EVIDENCE = {vial:'doctor',note:'lady',glove:'butler',page:'pickman'};
+const LINKMSG = {
+  vial:'Флакон доктора Грея. Яд был у него в саквояже.',
+  note:'«К.» — Корделия. Она угрожала маме за неделю до ужина.',
+  glove:'Перчатка Хиггса. Он касался маминого бокала.',
+  page:'Мама собиралась разоблачить Пикмана. Статья вышла бы в понедельник.'
+};
+function icon(id){
+  switch(id){
+    case 'magnifier':return `<line x1="37" y1="37" x2="55" y2="55" stroke="#3a2416" stroke-width="8" stroke-linecap="round"/><line x1="37" y1="37" x2="55" y2="55" stroke="#6a4328" stroke-width="3" stroke-linecap="round"/><circle cx="26" cy="26" r="15" fill="#cfe0e6" fill-opacity=".28" stroke="url(#gBrass)" stroke-width="5"/><path d="M17 21 Q20 15 27 14" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/>`;
+    case 'key':return `<circle cx="17" cy="32" r="10" fill="none" stroke="url(#gBrass)" stroke-width="4.5"/><circle cx="17" cy="32" r="3" fill="url(#gBrass)"/><rect x="26" y="29.5" width="30" height="5" fill="url(#gBrass)"/><rect x="45" y="34" width="4" height="9" fill="url(#gBrass)"/><rect x="52" y="34" width="4" height="7" fill="url(#gBrass)"/>`;
+    case 'record':return `<circle cx="32" cy="32" r="27" fill="#0f0e0e"/><circle cx="32" cy="32" r="22" fill="none" stroke="#2c2a2a" stroke-width="1"/><circle cx="32" cy="32" r="17" fill="none" stroke="#2c2a2a" stroke-width="1"/><path d="M14 20 Q22 10 34 9" stroke="#fff" stroke-width="1.5" opacity=".25" fill="none"/><circle cx="32" cy="32" r="9" fill="#8e1f1a"/><circle cx="32" cy="32" r="1.6" fill="#e9dfc7"/>`;
+    case 'invite':return `<rect x="8" y="14" width="48" height="36" fill="#efe4cc" stroke="#b8924a" stroke-width="2"/><rect x="12" y="18" width="40" height="28" fill="none" stroke="#b8924a" stroke-width=".8"/><path d="M17 27 Q24 22 30 27 T44 27" stroke="#3a2410" stroke-width="1.5" fill="none"/><circle cx="32" cy="42" r="5" fill="#8e1f1a"/>`;
+    case 'photo':return `<g transform="rotate(-6 32 32)"><rect x="8" y="12" width="48" height="40" fill="#e6dbc1"/><rect x="11" y="15" width="42" height="28" fill="#5d4a36"/><rect x="11" y="33" width="42" height="10" fill="#cdbb98"/><circle cx="20" cy="27" r="3" fill="#2b2016"/><circle cx="32" cy="25" r="3.5" fill="#2b2016"/><circle cx="44" cy="27" r="3" fill="#2b2016"/><path d="M16 33 h32" stroke="#8e7a5a"/></g>`;
+    case 'camera':return `<rect x="8" y="20" width="24" height="26" fill="#4a2c1a" stroke="${OL}"/><path d="M32 22 L46 26 L46 40 L32 44 Z" fill="#2a1c14" stroke="${OL}"/><path d="M35 23 v20 M39 24 v18 M43 25 v16" stroke="#120c08" stroke-width="1"/><circle cx="50" cy="33" r="7" fill="url(#gBrass)" stroke="${OL}"/><circle cx="50" cy="33" r="3.5" fill="#1a1f26"/><rect x="12" y="15" width="10" height="5" fill="url(#gBrass)"/>`;
+    case 'sediment':return `<path d="M20 10 Q18 34 32 37 Q46 34 44 10 Z" fill="#dfe8ec" fill-opacity=".35" stroke="#e8eef0" stroke-width="1.5"/><path d="M22 28 Q26 36 32 36 Q38 36 42 28 Q32 31 22 28 Z" fill="#f2f0e8"/><path d="M32 37 V52" stroke="#e8eef0" stroke-width="2"/><ellipse cx="32" cy="53" rx="10" ry="3" fill="#e8eef0" opacity=".8"/><path d="M24 30 Q32 33 40 30" stroke="#6a0f14" stroke-width="1.2" fill="none"/>`;
+    case 'vial':return `<rect x="26" y="8" width="12" height="8" fill="#2b1d12"/><rect x="28" y="15" width="8" height="6" fill="url(#gAmber)"/><path d="M22 22 Q22 19 28 19 L36 19 Q42 19 42 22 L42 54 Q42 57 38 57 L26 57 Q22 57 22 54 Z" fill="url(#gAmber)" stroke="#2a1606"/><rect x="24" y="30" width="16" height="16" fill="#efe6cf"/><path d="M26 35 h12 M26 39 h9 M26 43 h11" stroke="#6b1d22" stroke-width="1.2"/>`;
+    case 'note':return `<path d="M12 14 L50 10 L54 50 L16 54 Z" fill="#efe6d3" stroke="#b9ab8e"/><path d="M18 22 Q28 18 36 22 T48 20 M19 30 Q30 27 40 30 M20 38 Q30 35 46 37" stroke="#23324f" stroke-width="1.6" fill="none"/><path d="M36 46 l10 -1" stroke="#23324f" stroke-width="1.6"/>`;
+    case 'glove':return `<path d="M20 56 L20 36 L17 17 Q17 12 21 12 Q24 12 25 17 L26 31 L26 9 Q26 5 30 5 Q33 5 33 9 L33 31 L35 11 Q35 7 39 7 Q42 8 42 12 L40 32 L43 18 Q44 14 47 15 Q50 16 49 20 L45 40 Q43 50 41 56 Z" fill="#f3efe6" stroke="#8f887a" stroke-width="1.2"/><path d="M20 42 L12 33 Q9 29 12 27 Q15 26 18 30 L22 35" fill="#f3efe6" stroke="#8f887a" stroke-width="1.2"/><circle cx="30" cy="12" r="3" fill="#7a1a1f" opacity=".7"/><circle cx="38" cy="16" r="2" fill="#7a1a1f" opacity=".6"/><rect x="20" y="50" width="21" height="6" fill="#e6e0d2" stroke="#8f887a"/>`;
+    case 'page':return `<path d="M12 8 L52 8 L52 56 L46 53 L40 57 L34 53 L28 57 L22 53 L16 57 L12 54 Z" fill="#ece4cf" stroke="#b5a988"/><path d="M14 18 h36 M14 26 h36 M14 34 h36 M14 42 h36" stroke="#7d93b8" stroke-width=".7"/><path d="M18 16 Q26 12 32 16 M18 24 Q30 20 44 24 M18 32 Q26 29 40 32" stroke="#23324f" stroke-width="1.5" fill="none"/>`;
+  }
+  if(id.startsWith('ph_')){const p=PEOPLE[id.slice(3)];return `<g transform="rotate(-4 32 32)"><rect x="9" y="5" width="46" height="55" fill="#e7dcc3"/><svg x="13" y="9" width="38" height="40" viewBox="-60 -100 120 126" preserveAspectRatio="xMidYMid slice"><rect x="-60" y="-100" width="120" height="126" fill="#6d5a44"/><g filter="url(#fSepia)">${bust(p)}</g></svg></g>`;}
+  return '';
+}
+
+/* ---------- state ---------- */
+let S;
+function fresh(){return{scene:'room',inv:[],sel:null,f:{ch:3,cm:3,bag:[0,0,0],slots:[null,null,null,null],linked:{},shot:{},talk:{}}};}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+function load(){try{const t=localStorage.getItem(SAVE_KEY);return t?JSON.parse(t):null;}catch(e){return null;}}
+const has = id=>S.inv.includes(id);
+function addItem(id){if(!has(id)){S.inv.push(id);sfx.pick();renderInv(id);}}
+function removeItem(id){S.inv=S.inv.filter(i=>i!==id);if(S.sel===id)S.sel=null;renderInv();}
+
+/* ---------- shared scene pieces ---------- */
+function crow(x,y,s=1,flip=false,id){
+  return `<g transform="translate(${x} ${y}) scale(${flip?-s:s} ${s})">
+   <path d="M-6 -1 L-8 7 M3 0 L3 7" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+   <path d="M-30 -38 C-28 -49 -18 -55 -8 -53 C0 -51 4 -45 6 -37 C14 -35 24 -29 30 -19 C38 -9 46 -1 60 5 L55 10 C45 7 36 3 28 -1 C20 1 10 3 0 1 C-10 -1 -16 -9 -18 -19 C-20 -25 -23 -30 -27 -33 Z" fill="#0d0c11" stroke="#262531" stroke-width="1"/>
+   <path d="M-29 -41 L-47 -36 L-29 -32 Z" fill="#17161c" stroke="#2b2a33" stroke-width=".8"/>
+   <path d="M-8 -31 C4 -27 18 -19 32 -9" stroke="#3a3a48" stroke-width="1.4" fill="none"/>
+   <path d="M-4 -24 C6 -20 16 -14 26 -6" stroke="#2c2c38" stroke-width="1" fill="none"/>
+   <circle cx="-20" cy="-43" r="2.6" fill="#d9cfa8"/><circle cx="-20.5" cy="-43" r="1.4" fill="#000"/>
+  </g>`;
+}
+function handsAt(x1,y1,x2,y2,skin,cuff='#ece6da'){
+  return `<rect x="${x1-9}" y="${y1-6}" width="7" height="10" rx="2" fill="${cuff}"/><rect x="${x2+2}" y="${y2-6}" width="7" height="10" rx="2" fill="${cuff}"/><ellipse cx="${x1}" cy="${y1}" rx="8" ry="5.5" fill="${skin}" stroke="${OL}" stroke-width="1"/><ellipse cx="${x2}" cy="${y2}" rx="8" ry="5.5" fill="${skin}" stroke="${OL}" stroke-width="1"/>`;
+}
+function sleeve(x0,y0,x1,y1,c){return `<path d="M${x0} ${y0} Q${(x0+x1)/2} ${y1+4} ${x1} ${y1}" stroke="${OL}" stroke-width="19" fill="none" stroke-linecap="round"/><path d="M${x0} ${y0} Q${(x0+x1)/2} ${y1+4} ${x1} ${y1}" stroke="${c}" stroke-width="16" fill="none" stroke-linecap="round"/>`;}
+function clockHands(cx,cy,r,h,mi,col='#1b1410'){
+  const m=mi*5, am=m*6, ah=(h%12)*30+m*.5, pt=(a,l)=>[cx+Math.sin(a*Math.PI/180)*l,cy-Math.cos(a*Math.PI/180)*l];
+  const [hx,hy]=pt(ah,r*.52),[mx,my]=pt(am,r*.8);
+  return `<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="${col}" stroke-width="${r*.09}" stroke-linecap="round"/><line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="${col}" stroke-width="${r*.05}" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="${r*.07}" fill="${col}"/>`;
+}
+function dialTicks(cx,cy,r,w=1){let s='';for(let i=0;i<12;i++){const a=i*Math.PI/6,x1=cx+Math.sin(a)*r*.86,y1=cy-Math.cos(a)*r*.86,x2=cx+Math.sin(a)*r*.97,y2=cy-Math.cos(a)*r*.97;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2a1d12" stroke-width="${w}"/>`;}return s;}
+function rainLines(x0,x1,y0,y1,n,cls){let s=`<g class="rain ${cls||''}">`;for(let i=0;i<n;i++){const x=R(x0,x1+30),y=R(y0-90,y1+90),l=R(10,22);s+=`<line x1="${x}" y1="${y}" x2="${x-3}" y2="${y+l}" stroke="#a9bfd2" stroke-width="${R(.6,1.3)}" opacity="${R(.18,.5)}"/>`;}return s+'</g>';}
+const RAIN_ROOM = (()=>{rnd=mulberry(11);return rainLines(752,898,95,365,70)+rainLines(752,898,95,365,45,'b');})();
+const RAIN_DIN = (()=>{rnd=mulberry(12);return rainLines(58,172,72,340,50)+rainLines(58,172,72,340,30,'b');})();
+const DROPS = (()=>{rnd=mulberry(13);let s='';for(let i=0;i<40;i++){s+=`<circle cx="${R(756,896)}" cy="${R(110,360)}" r="${R(.8,2.6)}" fill="#cfe0ee" opacity="${R(.15,.4)}"/>`;}return s;})();
+
+function photoCard(pid,cx,cy,w,h,o={}){
+  const p=PEOPLE[pid];
+  const iw=w-16, ih=h-42;
+  return `<g transform="translate(${cx} ${cy}) rotate(${o.rot||0})" ${o.cls?`class="${o.cls}"`:''}>
+   <rect x="${-w/2+4}" y="${-h/2+6}" width="${w}" height="${h}" fill="#000" opacity=".35"/>
+   <rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" fill="#e6dbc1" stroke="#a8977a" stroke-width="1"/>
+   <rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" fill="url(#pPaper)" opacity=".7"/>
+   <svg x="${-w/2+8}" y="${-h/2+8}" width="${iw}" height="${ih}" viewBox="-62 -104 124 ${124*ih/iw}" preserveAspectRatio="xMidYMin slice">
+     <rect x="-62" y="-104" width="124" height="200" fill="${o.bg||'#6b5842'}"/><rect x="-62" y="-104" width="124" height="200" fill="url(#rCork)" opacity=".5"/>
+     <g filter="url(#fSepia)">${bust(p,o.bo||{})}</g>
+   </svg>
+   <rect x="${-w/2+8}" y="${-h/2+8}" width="${iw}" height="${ih}" fill="none" stroke="#3b2c1e" stroke-width="1" opacity=".5"/>
+   <text x="0" y="${h/2-12}" text-anchor="middle" font-family="Marck Script, cursive" font-size="${o.fs||17}" fill="#2a1d14" ${(o.label||p.short||p.name).length>14?`textLength="${w-20}" lengthAdjust="spacingAndGlyphs"`:''}>${o.label||p.short||p.name}</text>
+  </g>`;
+}
+function pin(x,y,c='#a3221b'){return `<circle cx="${x+1.5}" cy="${y+2.5}" r="6.5" fill="#000" opacity=".35"/><circle cx="${x}" cy="${y}" r="6.5" fill="${c}" stroke="${OL}" stroke-width="1"/><circle cx="${x-2}" cy="${y-2}" r="2" fill="#fff" opacity=".55"/>`;}
+function thread(x1,y1,x2,y2,sag=30){const mx=(x1+x2)/2,my=(y1+y2)/2+sag;return `<path d="M${x1} ${y1+2} Q${mx} ${my+2} ${x2} ${y2+2}" stroke="#000" stroke-width="3" fill="none" opacity=".3"/><path d="M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}" stroke="#a51d17" stroke-width="2.6" fill="none"/><path d="M${x1} ${y1-.6} Q${mx} ${my-.6} ${x2} ${y2-.6}" stroke="#e05a4a" stroke-width=".7" fill="none" opacity=".6"/>`;}
+
+/* ---------- BOARD ---------- */
+const SLOTS=[[215,178],[785,178],[215,455],[785,455]];
+const EVPOS=[[368,112],[632,112],[338,572],[662,572]];
+function evCard(id,x,y,rot){
+  const [a,b]={vial:['флакон','KCN'],note:['«пожалеешь»','— К.'],glove:['перчатка','«Х»'],page:['мамин','блокнот'],sediment:['осадок','миндаль']}[id];
+  return `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-50" y="-33" width="104" height="72" fill="#000" opacity=".3"/><rect x="-52" y="-36" width="104" height="72" fill="#ece3cc" stroke="#ab9b7c"/><g transform="translate(-48 -34) scale(.72)">${icon(id)}</g><text text-anchor="middle" font-family="Marck Script, cursive" font-size="14" fill="#2a1d14"><tspan x="22" y="-2">${a}</tspan><tspan x="22" y="16">${b}</tspan></text></g>`;
+}
+function boardArt(interactive){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="url(#gWoodD)"/><rect width="1000" height="640" fill="url(#pWood)" opacity=".6"/>`;
+  s+=`<rect x="20" y="20" width="960" height="600" fill="#140c07"/><rect x="28" y="28" width="944" height="584" fill="#a26d40"/><rect x="28" y="28" width="944" height="584" fill="url(#pCork)"/><rect x="28" y="28" width="944" height="584" fill="url(#rCork)"/>`;
+  s+=`<rect x="28" y="28" width="944" height="584" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="14"/><rect x="6" y="6" width="988" height="628" fill="none" stroke="#7a5233" stroke-opacity=".5" stroke-width="2"/>`;
+  // decor cards
+  s+=`<g transform="translate(212 316) rotate(2)"><rect x="-80" y="-24" width="160" height="50" fill="#000" opacity=".25"/><rect x="-82" y="-27" width="160" height="50" fill="#efe7d4"/><path d="M-78 -12 h152 M-78 2 h152 M-78 16 h152" stroke="#8aa0c4" stroke-width=".6"/><text x="-2" y="4" text-anchor="middle" font-family="Marck Script, cursive" font-size="19" fill="#23324f">Пикман-холл, 14.XI.53</text>${pin(-2,-20,'#2f4d6b')}</g>`;
+  s+=`<g transform="translate(790 318) rotate(-3)"><rect x="-58" y="-30" width="116" height="60" fill="#000" opacity=".25"/><rect x="-60" y="-32" width="116" height="60" fill="#efe7d4"/><text x="-2" y="12" text-anchor="middle" font-family="Marck Script, cursive" font-size="36" fill="#9a1d17">Кто?</text>${pin(-2,-26,'#2f4d6b')}</g>`;
+  // clipping
+  s+=`<g transform="translate(500 470) rotate(-2)"><rect x="-114" y="-76" width="236" height="160" fill="#000" opacity=".3"/><rect x="-118" y="-80" width="236" height="160" fill="#dcceaf"/><rect x="-118" y="-80" width="236" height="160" fill="url(#pPaper)"/>
+   <text x="0" y="-58" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="15" fill="#211810" letter-spacing="1">ВЕЧЕРНИЙ ВЕСТНИК</text><line x1="-108" y1="-52" x2="108" y2="-52" stroke="#211810" stroke-width="1.5"/>
+   <text x="0" y="-32" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="15" fill="#211810">ТРАГЕДИЯ В ОСОБНЯКЕ</text><text x="0" y="-15" text-anchor="middle" font-family="Old Standard TT, serif" font-weight="700" font-size="15" fill="#211810">ПИКМАНА</text>
+   <rect x="-106" y="-4" width="62" height="54" fill="#4c3d2c"/><path d="M-102 40 L-90 18 L-80 26 L-66 8 L-48 40 Z" fill="#2c2219"/>`;
+  for(let i=0;i<9;i++) s+=`<rect x="-36" y="${-2+i*7}" width="${i%4==3?70:140}" height="2.6" fill="#3a2e22" opacity=".55"/>`;
+  s+=`<rect x="-106" y="56" width="${210}" height="2.6" fill="#3a2e22" opacity=".55"/><rect x="-106" y="63" width="150" height="2.6" fill="#3a2e22" opacity=".55"/>${pin(0,-72,'#c9a256')}</g>`;
+  // mother
+  s+=photoCard('mother',500,250,142,180,{rot:-1.5,label:'Мама, 1919–1953',fs:16,bg:'#5a4a38',bo:{}});
+  // threads first? pins later. Slots
+  SLOTS.forEach(([x,y],i)=>{
+    const pid=F.slots[i];
+    if(!pid){s+=`<rect x="${x-75}" y="${y-92}" width="150" height="184" fill="#3a220f" opacity=".18" stroke="#3a220f" stroke-opacity=".55" stroke-width="2" stroke-dasharray="8 7"/><text x="${x}" y="${y+16}" text-anchor="middle" font-family="Marck Script, cursive" font-size="54" fill="#3a220f" opacity=".45">?</text>`;}
+    else s+=photoCard(pid,x,y,150,186,{rot:[-3,2.5,2,-2.5][i]});
+  });
+  // evidence + threads
+  SLOTS.forEach(([x,y],i)=>{
+    const pid=F.slots[i]; if(!pid) return; const ev=F.linked[pid];
+    if(ev){const [ex,ey]=EVPOS[i];s+=evCard(ev,ex,ey,[4,-4,-3,3][i]);}
+  });
+  if(F.centerLinked) s+=evCard('sediment',655,300,5);
+  SLOTS.forEach(([x,y],i)=>{
+    const pid=F.slots[i]; if(!pid) return;
+    if(F.linked[pid]){const [ex,ey]=EVPOS[i]; s+=thread(x,y-84,500,170,28)+thread(ex,ey-30,x,y-84,18)+pin(ex,ey-30,'#c9a256');}
+    s+=pin(x,y-84);
+  });
+  if(F.centerLinked) s+=thread(655,268,500,170,14)+pin(655,268,'#c9a256');
+  if(F.sixth){ s+=`<g class="${F.sixthAnim?'drop':''}">`+photoCard('stranger',500,96,108,130,{rot:6,label:'«Ты смотришь не туда»',fs:12,bg:'#3a3026'})+pin(500,30)+`</g>`; }
+  s+=pin(500,170);
+  if(interactive){
+    s+=hs('clipping',382,388,236,165)+hs('center',428,160,144,182);
+    SLOTS.forEach(([x,y],i)=>{s+=hs('slot'+i,x-78,y-95,156,190);});
+    if(F.sixth) s+=hs('sixth',440,22,120,150);
+    s+=hs('cardA',130,290,165,55)+hs('cardB',730,286,120,64);
+    s+=arrow(500,612);
+  }
+  return s;
+}
+
+/* ---------- ROOM ---------- */
+function portrait(open,eyesOpen){
+  const cx=515, cy=178;
+  let frame=`<ellipse cx="${cx+4}" cy="${cy+7}" rx="66" ry="82" fill="#000" opacity=".4"/>
+   <ellipse cx="${cx}" cy="${cy}" rx="66" ry="82" fill="url(#gGold)" stroke="#3a2a12" stroke-width="2"/>
+   <ellipse cx="${cx}" cy="${cy}" rx="60" ry="76" fill="none" stroke="#6e5223" stroke-width="3"/>
+   <ellipse cx="${cx}" cy="${cy}" rx="63" ry="79" fill="none" stroke="#f6e2a8" stroke-width="1" opacity=".5" stroke-dasharray="3 5"/>
+   <clipPath id="cPort"><ellipse cx="${cx}" cy="${cy}" rx="55" ry="71"/></clipPath>
+   <g clip-path="url(#cPort)"><rect x="${cx-60}" y="${cy-80}" width="120" height="160" fill="url(#rPortraitBg)"/>
+   <g transform="translate(${cx} ${cy+50}) scale(.96)">${bust(PEOPLE.mother,{closed:!eyesOpen,look:-2.5})}</g>
+   <ellipse cx="${cx-18}" cy="${cy-40}" rx="30" ry="14" fill="#fff" opacity=".06" transform="rotate(-30 ${cx-18} ${cy-40})"/></g>
+   <ellipse cx="${cx}" cy="${cy}" rx="55" ry="71" fill="none" stroke="#2a1d0c" stroke-width="2"/>
+   <path d="M${cx} ${cy-96} m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0" fill="url(#gGold)"/>`;
+  let s=`<path d="M${cx} 92 L${cx-34} ${cy-74} M${cx} 92 L${cx+34} ${cy-74}" stroke="#15100c" stroke-width="1.3"/><circle cx="${cx}" cy="91" r="3.2" fill="url(#gBrass)"/>`;
+  if(!open) return s+frame;
+  s=`<circle cx="${cx}" cy="91" r="3.2" fill="url(#gBrass)"/>`;
+  s+=`<rect x="${cx-46}" y="${cy-60}" width="92" height="120" rx="4" fill="#0a0705" stroke="#2c1f15" stroke-width="3"/><rect x="${cx-40}" y="${cy-54}" width="80" height="108" fill="none" stroke="#000" stroke-width="10" opacity=".6"/>`;
+  if(!S.f.photoTaken) s+=`<g transform="translate(${cx} ${cy+14}) rotate(-8)"><rect x="-30" y="-22" width="60" height="46" fill="#e6dbc1"/><rect x="-26" y="-18" width="52" height="32" fill="#5d4a36"/><rect x="-26" y="2" width="52" height="12" fill="#cdbb98"/><circle cx="-14" cy="-6" r="4" fill="#2b2016"/><circle cx="0" cy="-8" r="4.5" fill="#2b2016"/><circle cx="14" cy="-6" r="4" fill="#2b2016"/></g>`;
+  s+=`<g transform="translate(${cx-66} 0) skewY(-12) scale(.3 1) translate(${-(cx-66)} 0)">${frame}</g>`;
+  return s;
+}
+function room(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="520" fill="#2b4440"/><rect width="1000" height="520" fill="url(#pDamask)"/><rect width="1000" height="520" fill="url(#pMottle)"/>`;
+  s+=`<rect width="1000" height="28" fill="#141d1b"/><rect y="28" width="1000" height="4" fill="#4a6862" opacity=".6"/><rect y="32" width="1000" height="7" fill="#000" opacity=".28"/>`;
+  s+=`<rect y="66" width="1000" height="5" fill="#1b2725"/><rect y="66" width="1000" height="1.5" fill="#6a8d86" opacity=".45"/>`;
+  // wainscot
+  s+=`<rect y="436" width="1000" height="80" fill="#34200f"/><rect y="436" width="1000" height="80" fill="url(#pWood)" opacity=".6"/><rect y="431" width="1000" height="9" fill="#4a2e1d"/><rect y="431" width="1000" height="2" fill="#8a5f3e" opacity=".7"/>`;
+  for(let x=8;x<1000;x+=124) s+=`<rect x="${x}" y="450" width="108" height="50" fill="#2b190e" stroke="#170d06" stroke-width="2"/><path d="M${x+108} 450 v50 h-108" stroke="#6a4630" stroke-width="1" fill="none" opacity=".5"/>`;
+  // floor
+  s+=`<rect y="516" width="1000" height="124" fill="url(#gFloor)"/>`;
+  for(let i=-16;i<=16;i++) s+=`<line x1="${500+i*34}" y1="516" x2="${500+i*92}" y2="640" stroke="#0e0804" stroke-width="1.3" opacity=".6"/>`;
+  [548,590].forEach((y,r)=>{for(let i=-16;i<16;i++){if((i+r*2)%3)continue;const t=(y-516)/124,xa=500+i*34+(i*58)*t,xb=500+(i+1)*34+((i+1)*58)*t;s+=`<line x1="${xa}" y1="${y}" x2="${xb}" y2="${y}" stroke="#0e0804" stroke-width="1" opacity=".5"/>`;}});
+  s+=`<rect y="516" width="1000" height="124" fill="url(#pWood)" opacity=".35"/>`;
+  s+=`<rect y="508" width="1000" height="12" fill="#1c1009"/><rect y="508" width="1000" height="2" fill="#6a4630" opacity=".55"/>`;
+  // rug
+  s+=`<path d="M244 556 L756 556 L866 640 L134 640 Z" fill="#3e1111"/><path d="M262 562 L738 562 L838 640 L162 640 Z" fill="#5a1b19" stroke="#a87a3f" stroke-width="2" stroke-opacity=".6"/><path d="M290 572 L710 572 L796 640 L204 640 Z" fill="none" stroke="#a87a3f" stroke-width="1" stroke-opacity=".45" stroke-dasharray="6 5"/><path d="M500 585 L590 610 L500 636 L410 610 Z" fill="#2e0b0b" stroke="#a87a3f" stroke-opacity=".6"/><path d="M500 598 L540 610 L500 622 L460 610 Z" fill="#7a2a1f" opacity=".7"/>`;
+  for(let x=250;x<752;x+=7) s+=`<line x1="${x}" y1="551" x2="${x}" y2="556" stroke="#b39466" stroke-width="1" opacity=".5"/>`;
+  // window
+  s+=`<path d="M733 380 V168 A92 92 0 0 1 917 168 V380 Z" fill="#120c08"/><path d="M745 372 V170 A80 80 0 0 1 905 170 V372 Z" fill="#2a1d14"/>`;
+  s+=`<clipPath id="cWin"><path d="M752 364 V172 A73 73 0 0 1 898 172 V364 Z"/></clipPath><g clip-path="url(#cWin)">
+   <rect x="745" y="90" width="160" height="285" fill="url(#gNight)"/>
+   <circle cx="862" cy="150" r="26" fill="#cfd8dc" opacity=".16" filter="url(#fBlur)"/>
+   <path d="M745 300 L768 300 L768 278 L788 278 L788 290 L811 266 L834 290 L834 300 L858 300 L858 284 L864 284 L864 266 L871 266 L871 284 L905 284 L905 375 L745 375 Z" fill="#090d13"/>
+   <rect x="797" y="290" width="5" height="6" fill="#e8c06a" opacity=".55"/><rect x="884" y="294" width="4" height="5" fill="#e8c06a" opacity=".35"/>
+   <path d="M760 300 C766 260 772 240 790 222 M772 250 L760 238 M782 232 L790 214" stroke="#0b1018" stroke-width="2" fill="none"/>
+   ${RAIN_ROOM}
+   ${F.ended?'':crow(858,352,.78,false)}
+   <rect id="lightning" x="745" y="90" width="160" height="285" fill="#dfe8ff" opacity="0"/>
+   ${DROPS}
+   <path d="M752 330 L898 180 L898 200 L752 350 Z" fill="#fff" opacity=".035"/>
+  </g>`;
+  s+=`<rect x="822" y="96" width="6" height="270" fill="#20160f"/><rect x="752" y="232" width="146" height="5" fill="#20160f"/><rect x="752" y="300" width="146" height="5" fill="#20160f"/><path d="M752 364 V172 A73 73 0 0 1 898 172 V364" fill="none" stroke="#2c1f16" stroke-width="7"/>`;
+  s+=`<rect x="726" y="364" width="198" height="13" fill="#3e2919"/><rect x="726" y="364" width="198" height="2" fill="#7a5638" opacity=".7"/><rect x="730" y="377" width="190" height="5" fill="#000" opacity=".35"/>`;
+  // board
+  s+=`<rect x="70" y="92" width="346" height="222" fill="#000" opacity=".4"/><svg x="62" y="82" width="346" height="221.4" viewBox="0 0 1000 640">${boardArt(false)}</svg>`;
+  // portrait
+  s+=portrait(F.portraitOpen,F.eyesOpen);
+  // clock
+  const ccx=660;
+  s+=`<rect x="633" y="98" width="64" height="240" fill="#000" opacity=".35"/>
+   <path d="M626 96 Q660 62 694 96 Z" fill="#2a190e" stroke="${OL}" stroke-width="1.5"/><circle cx="660" cy="68" r="4.5" fill="url(#gBrass)"/>
+   <rect x="628" y="94" width="64" height="86" rx="3" fill="url(#gWood)" stroke="${OL}" stroke-width="1.5"/><rect x="628" y="94" width="64" height="86" fill="url(#pWood)" opacity=".5"/>
+   <circle cx="${ccx}" cy="136" r="27" fill="url(#gBrass)" stroke="${OL}"/><circle cx="${ccx}" cy="136" r="23.5" fill="url(#rDial)"/>${dialTicks(ccx,136,23,1.2)}${clockHands(ccx,136,23,F.ch,F.cm)}
+   <rect x="636" y="180" width="48" height="132" fill="url(#gWood)" stroke="${OL}" stroke-width="1.5"/><rect x="636" y="180" width="48" height="132" fill="url(#pWood)" opacity=".5"/>
+   <rect x="642" y="187" width="36" height="116" fill="#0f0b08"/>
+   <line x1="${ccx}" y1="187" x2="${ccx}" y2="276" stroke="url(#gBrassH)" stroke-width="2.4"/><circle cx="${ccx}" cy="280" r="11" fill="url(#gGold)" stroke="${OL}"/>`;
+  if(F.clockOpen&&!F.keyTaken) s+=`<g transform="translate(652 240) rotate(80) scale(.42)">${icon('key')}</g><circle cx="656" cy="252" r="2" fill="#fff" class="spin"/>`;
+  if(F.clockOpen) s+=`<path d="M642 187 L628 194 L628 296 L642 303 Z" fill="#2e1c10" stroke="${OL}"/><path d="M641 192 L631 197 L631 293 L641 298 Z" fill="#9fb4bf" opacity=".12"/>`;
+  else s+=`<rect x="642" y="187" width="36" height="116" fill="#9fb4bf" opacity=".08"/><path d="M646 200 L660 190 M646 230 L674 196" stroke="#fff" opacity=".12"/>`;
+  s+=`<path d="M636 312 L684 312 L672 334 L648 334 Z" fill="#2a190e" stroke="${OL}" stroke-width="1.5"/><circle cx="660" cy="339" r="4" fill="url(#gBrass)"/>`;
+  // desk
+  s+=`<path d="M70 470 L88 470 L84 590 L74 590 Z M392 470 L410 470 L406 590 L396 590 Z" fill="#2c1a0e" stroke="${OL}"/><ellipse cx="240" cy="592" rx="190" ry="8" fill="#000" opacity=".45"/>`;
+  s+=`<rect x="64" y="408" width="352" height="62" fill="url(#gWood)" stroke="${OL}" stroke-width="1.5"/><rect x="64" y="408" width="352" height="62" fill="url(#pWood)" opacity=".7"/>`;
+  s+=`<rect x="76" y="416" width="158" height="46" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="246" y="416" width="158" height="46" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="143" y="434" width="24" height="7" rx="3" fill="url(#gBrass)"/><rect x="313" y="434" width="24" height="7" rx="3" fill="url(#gBrass)"/>`;
+  s+=`<rect x="54" y="394" width="372" height="15" fill="#5a3a22" stroke="${OL}" stroke-width="1.5"/><rect x="54" y="394" width="372" height="15" fill="url(#pWood)" opacity=".7"/><rect x="54" y="394" width="372" height="2" fill="#a07650" opacity=".7"/>`;
+  // desk items
+  s+=`<path d="M88 393 L150 388 L156 393 Z" fill="#e6dcc4" opacity=".9"/><path d="M96 392 L158 386 L165 392 Z" fill="#d8ccb0"/>`;
+  s+=`<rect x="98" y="378" width="18" height="15" rx="3" fill="#1d2430" stroke="${OL}"/><path d="M110 378 Q126 340 150 322" stroke="#e6dcc4" stroke-width="2" fill="none"/><path d="M150 322 Q138 336 128 352 Q140 336 150 322" fill="#e6dcc4"/>`;
+  s+=`<rect x="226" y="380" width="70" height="14" fill="#4b1c1a" stroke="${OL}"/><rect x="232" y="368" width="62" height="12" fill="#23382d" stroke="${OL}"/><rect x="229" y="357" width="58" height="11" fill="#5a4426" stroke="${OL}"/><path d="M234 386 h58 M238 374 h52 M234 362 h48" stroke="#c9a256" stroke-width=".8" opacity=".6"/>`;
+  if(!F.magTaken) s+=`<line x1="150" y1="392" x2="174" y2="389" stroke="#3a2416" stroke-width="5" stroke-linecap="round"/><ellipse cx="192" cy="387" rx="19" ry="7" fill="#cfe0e6" fill-opacity=".25" stroke="url(#gBrass)" stroke-width="3.5"/><path d="M180 385 Q186 382 194 382" stroke="#fff" stroke-width="1.4" opacity=".6"/>`;
+  // lamp
+  s+=`<ellipse cx="352" cy="393" rx="26" ry="5.5" fill="url(#gBrass)" stroke="${OL}"/><rect x="348" y="346" width="7" height="46" fill="url(#gBrassH)"/>`;
+  s+=`<path d="M302 352 Q352 314 402 352 Q352 342 302 352 Z" fill="url(#gShade)" stroke="${OL}" stroke-width="1.5"/><path d="M318 340 Q340 326 356 327" stroke="#9ad0a6" stroke-width="1.5" fill="none" opacity=".5"/>`;
+  if(!F.lampOff) s+=`<path d="M306 352 Q352 344 398 352 Q352 358 306 352 Z" fill="#ffe6a8" opacity=".9"/>`;
+  // gramophone
+  s+=`<ellipse cx="516" cy="590" rx="80" ry="7" fill="#000" opacity=".5"/><rect x="454" y="432" width="124" height="154" fill="url(#gWood)" stroke="${OL}" stroke-width="1.5"/><rect x="454" y="432" width="124" height="154" fill="url(#pWood)" opacity=".7"/>`;
+  s+=`<rect x="466" y="446" width="46" height="126" fill="none" stroke="#1f1209" stroke-width="2"/><rect x="520" y="446" width="46" height="126" fill="none" stroke="#1f1209" stroke-width="2"/><circle cx="508" cy="510" r="3" fill="url(#gBrass)"/><circle cx="524" cy="510" r="3" fill="url(#gBrass)"/>`;
+  s+=`<rect x="460" y="406" width="112" height="27" fill="#5a3a22" stroke="${OL}" stroke-width="1.5"/><rect x="460" y="406" width="112" height="27" fill="url(#pWood)" opacity=".7"/><circle cx="566" cy="420" r="5" fill="url(#gBrass)" stroke="${OL}"/><path d="M570 420 h12 v-4" stroke="url(#gBrass)" stroke-width="2" fill="none"/>`;
+  s+=`<ellipse cx="510" cy="405" rx="42" ry="7.5" fill="#1d3426" stroke="${OL}"/>`;
+  if(F.recordPlaced) s+=`<ellipse cx="510" cy="403" rx="38" ry="6.5" fill="#0d0c0c"/><ellipse cx="510" cy="403" rx="10" ry="2" fill="#8e1f1a"/><path d="M482 402 Q500 398 520 399" stroke="#fff" stroke-width="1" fill="none" class="spin"/>`;
+  s+=`<path d="M553 404 Q552 384 536 352" stroke="url(#gBrassH)" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M553 404 L528 401" stroke="#2a2a2a" stroke-width="3"/><circle cx="527" cy="401" r="3" fill="url(#gBrass)"/>`;
+  s+=`<path d="M531 346 Q520 302 515.7 263.6 A46 28 -35 0 0 440.3 316.4 Q492 340 540 354 Z" fill="url(#gBrassH)" stroke="${OL}" stroke-width="1.5"/>`;
+  s+=`<path d="M535 350 L497 266 M535 350 L470 284 M535 350 L452 304 M535 350 L470 324" stroke="#5a411a" stroke-width="1" opacity=".6"/>`;
+  s+=`<ellipse cx="478" cy="290" rx="46" ry="28" transform="rotate(-35 478 290)" fill="url(#rHorn)" stroke="#e8c67a" stroke-width="2.5"/>`;
+  // trunk
+  s+=`<ellipse cx="830" cy="588" rx="104" ry="8" fill="#000" opacity=".5"/>`;
+  if(F.trunkOpen) s+=`<path d="M744 494 L916 494 L904 418 L756 418 Z" fill="#2a170c" stroke="${OL}" stroke-width="1.5"/><path d="M752 492 L908 492 L898 426 L762 426 Z" fill="#4e1a1f"/><path d="M752 492 L908 492 L898 426 L762 426 Z" fill="url(#pQuilt)"/>`;
+  s+=`<rect x="738" y="494" width="184" height="90" rx="3" fill="#4a2a17" stroke="${OL}" stroke-width="1.5"/><rect x="738" y="494" width="184" height="90" fill="url(#pWood)" opacity=".5"/>`;
+  if(!F.trunkOpen) s+=`<path d="M738 498 Q830 452 922 498 Z" fill="#55301b" stroke="${OL}" stroke-width="1.5"/><path d="M738 498 Q830 452 922 498" fill="none" stroke="#8a5a36" stroke-width="1" opacity=".6"/><rect x="738" y="494" width="184" height="9" fill="#3a2010" stroke="${OL}"/>`;
+  else s+=`<rect x="738" y="494" width="184" height="9" fill="#3a2010" stroke="${OL}"/>`;
+  s+=`<rect x="778" y="${F.trunkOpen?494:470}" width="14" height="${F.trunkOpen?90:114}" fill="#2a160c" stroke="${OL}"/><rect x="868" y="${F.trunkOpen?494:470}" width="14" height="${F.trunkOpen?90:114}" fill="#2a160c" stroke="${OL}"/>`;
+  s+=`<path d="M738 494 h18 v8 h-10 v14 h-8 Z M922 494 h-18 v8 h10 v14 h8 Z M738 584 h18 v-8 h-10 v-14 h-8 Z M922 584 h-18 v-8 h10 v-14 h8 Z" fill="url(#gBrass)"/>`;
+  s+=`<rect x="818" y="498" width="24" height="28" rx="3" fill="url(#gBrass)" stroke="${OL}"/><path d="M830 508 v8" stroke="#1a110d" stroke-width="3"/><circle cx="830" cy="507" r="2.5" fill="#1a110d"/>`;
+  // curtains & valance
+  s+=`<path d="M712 66 L776 66 C771 180 792 250 777 300 C762 332 742 364 737 456 L712 456 Z" fill="url(#gCurtain)" stroke="${OL}"/><path d="M938 66 L874 66 C879 180 858 250 873 300 C888 332 908 364 913 456 L938 456 Z" fill="url(#gCurtain)" stroke="${OL}"/>`;
+  s+=`<path d="M744 296 Q770 304 784 294" stroke="#c9a256" stroke-width="3" fill="none"/><circle cx="785" cy="296" r="5" fill="url(#gBrass)"/><path d="M906 296 Q880 304 866 294" stroke="#c9a256" stroke-width="3" fill="none"/><circle cx="865" cy="296" r="5" fill="url(#gBrass)"/>`;
+  s+=`<rect x="698" y="56" width="254" height="5" fill="url(#gBrassH)"/><circle cx="698" cy="58" r="6" fill="url(#gBrass)"/><circle cx="952" cy="58" r="6" fill="url(#gBrass)"/>`;
+  let val='M704 60 L946 60 L946 88';for(let x=946;x>704;x-=30.25) val+=` Q${x-15} 108 ${x-30.25} 88`;
+  s+=`<path d="${val} Z" fill="#4e1013" stroke="${OL}"/><path d="${val.replace('M704 60 L946 60 L946 88','M946 88')}" fill="none" stroke="#c9a256" stroke-width="1.2" opacity=".6"/>`;
+  // lighting
+  s+=`<path d="M760 516 L898 516 L970 640 L690 640 Z" fill="#9ab8d8" opacity=".05"/>`;
+  if(!F.lampOff) s+=`<rect width="1000" height="640" fill="url(#rLamp)"/><path d="M306 352 L398 352 L440 396 L264 396 Z" fill="#ffd590" opacity=".13"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)"/>`;
+  if(F.lampOff) s+=`<rect width="1000" height="640" fill="#03060c" opacity=".5"/>`;
+  // hotspots
+  s+=hs('board',62,82,346,222);
+  s+=hs('clock',624,62,72,280);
+  s+=hs('window',752,96,146,240);
+  if(!F.ended) s+=hs('crow',808,300,90,62);
+  s+=hs('trunk',736,450,190,140);
+  s+=hs('gramo',446,400,140,190);
+  s+=hs('horn',436,260,110,90);
+  if(F.portraitOpen) s+=hs('niche',466,116,98,124); else s+=hse('portrait',515,178,66,82);
+  if(!F.magTaken) s+=hs('magnifier',146,374,70,24);
+  s+=hs('lamp',298,318,108,40);
+  s+=hs('desk',64,408,352,62);
+  s+=hs('books',224,354,74,40);
+  return s;
+}
+
+/* ---------- CLOCK close-up ---------- */
+function clockView(){
+  const F=S.f, cx=500, cy=268, r=172; let s='';
+  s+=`<rect width="1000" height="640" fill="#2b4440"/><rect width="1000" height="640" fill="url(#pDamask)"/><rect width="1000" height="640" fill="url(#pMottle)"/>`;
+  s+=`<rect x="262" y="40" width="490" height="610" fill="#000" opacity=".4"/>`;
+  s+=`<rect x="250" y="28" width="500" height="620" rx="8" fill="url(#gWood)" stroke="${OL}" stroke-width="3"/><rect x="250" y="28" width="500" height="620" fill="url(#pWood)" opacity=".8"/>`;
+  s+=`<rect x="270" y="48" width="460" height="440" rx="6" fill="none" stroke="#1d1108" stroke-width="4"/><rect x="274" y="52" width="452" height="432" rx="5" fill="none" stroke="#8a5f3e" stroke-width="1" opacity=".5"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r+14}" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#rDial)" stroke="#6e5223" stroke-width="2"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r*.62}" fill="none" stroke="#2a1d12" stroke-width="1" opacity=".5"/><circle cx="${cx}" cy="${cy}" r="${r*.94}" fill="none" stroke="#2a1d12" stroke-width="1.2"/><circle cx="${cx}" cy="${cy}" r="${r*.86}" fill="none" stroke="#2a1d12" stroke-width=".8"/>`;
+  for(let i=0;i<60;i++){const a=i*Math.PI/30;s+=`<line x1="${cx+Math.sin(a)*r*.9}" y1="${cy-Math.cos(a)*r*.9}" x2="${cx+Math.sin(a)*r*.94}" y2="${cy-Math.cos(a)*r*.94}" stroke="#2a1d12" stroke-width="${i%5?1:2.5}"/>`;}
+  const RN=['XII','I','II','III','IIII','V','VI','VII','VIII','IX','X','XI'];
+  RN.forEach((n,i)=>{const a=i*Math.PI/6,x=cx+Math.sin(a)*r*.74,y=cy-Math.cos(a)*r*.74;s+=`<text x="${x}" y="${y+10}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="30" fill="#24180e" transform="rotate(${i*30} ${x} ${y})">${n}</text>`;});
+  s+=`<text x="${cx}" y="${cy-62}" text-anchor="middle" font-family="Cormorant SC, serif" font-size="16" letter-spacing="3" fill="#4a3420">Ф. ВИНТЕР · ВЕНА</text>`;
+  [[430,'wH'],[570,'wM']].forEach(([x])=>{s+=`<circle cx="${x}" cy="${cy+64}" r="14" fill="url(#gBrass)" stroke="${OL}"/><circle cx="${x}" cy="${cy+64}" r="8" fill="#0d0905"/><rect x="${x-2}" y="${cy+58}" width="4" height="12" fill="#3a2a18"/>`;});
+  // ornate hands
+  const m=F.cm*5, am=m*6, ah=(F.ch%12)*30+m*.5;
+  s+=`<g transform="rotate(${ah} ${cx} ${cy})"><path d="M${cx-6} ${cy+22} L${cx-4} ${cy-70} Q${cx-16} ${cy-82} ${cx} ${cy-102} Q${cx+16} ${cy-82} ${cx+4} ${cy-70} L${cx+6} ${cy+22} Z" fill="#1b1410"/><circle cx="${cx}" cy="${cy-82}" r="5" fill="url(#rDial)"/></g>`;
+  s+=`<g transform="rotate(${am} ${cx} ${cy})"><path d="M${cx-4} ${cy+34} L${cx-2.5} ${cy-130} L${cx} ${cy-150} L${cx+2.5} ${cy-130} L${cx+4} ${cy+34} Z" fill="#1b1410"/><circle cx="${cx}" cy="${cy+30}" r="8" fill="#1b1410"/></g>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="11" fill="url(#gBrass)" stroke="${OL}"/><circle cx="${cx}" cy="${cy}" r="3" fill="${OL}"/>`;
+  s+=`<path d="M${cx-110} ${cy-130} Q${cx-40} ${cy-170} ${cx+60} ${cy-150}" stroke="#fff" stroke-width="10" opacity=".08" fill="none" stroke-linecap="round"/>`;
+  // pendulum window
+  s+=`<rect x="380" y="500" width="240" height="160" fill="#0d0905" stroke="#1d1108" stroke-width="4"/><line x1="500" y1="500" x2="500" y2="610" stroke="url(#gBrassH)" stroke-width="6"/><circle cx="500" cy="630" r="36" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><circle cx="490" cy="620" r="10" fill="#fff" opacity=".25"/>`;
+  if(F.clockOpen){
+    s+=`<path d="M380 500 L330 520 L330 650 L380 660 Z" fill="#3a2414" stroke="${OL}" stroke-width="2"/><path d="M376 508 L338 524 L338 640 L376 650 Z" fill="#b8ccd8" opacity=".1"/>`;
+    if(!F.keyTaken) s+=`<line x1="470" y1="512" x2="470" y2="540" stroke="#3a2a18" stroke-width="2"/><g transform="translate(440 540) rotate(90 0 0) scale(1.15)"><g transform="translate(-10 -60)">${icon('key')}</g></g><circle cx="458" cy="560" r="3" fill="#fff" class="spin"/>`;
+  } else s+=`<rect x="380" y="500" width="240" height="160" fill="#b8ccd8" opacity=".08"/><path d="M400 520 L440 504 M396 560 L480 506" stroke="#fff" opacity=".12" stroke-width="2"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".7"/>`;
+  s+=hse('wH',430,cy+64,34,34)+hse('wM',570,cy+64,34,34)+hs('face',340,110,320,120);
+  if(F.clockOpen&&!F.keyTaken) s+=hs('ckey',418,500,100,110);
+  s+=arrow(860,612);
+  return s;
+}
+
+/* ---------- TRUNK close-up ---------- */
+function trunkView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#2c1b10"/><rect width="1000" height="640" fill="url(#pWood)" opacity=".6"/>`;
+  s+=`<path d="M100 236 L900 236 L866 34 L134 34 Z" fill="#3a2214" stroke="${OL}" stroke-width="3"/><path d="M128 226 L872 226 L846 52 L154 52 Z" fill="#4c181d"/><path d="M128 226 L872 226 L846 52 L154 52 Z" fill="url(#pQuilt)"/>`;
+  s+=`<g transform="translate(500 128) rotate(-2)"><rect x="-70" y="-36" width="140" height="72" fill="#d8cba8"/><rect x="-62" y="-28" width="124" height="56" fill="none" stroke="#7a5a2a"/><text x="0" y="8" text-anchor="middle" font-family="Marck Script, cursive" font-size="28" fill="#3a2410">Э. Лэнг</text></g>`;
+  s+=`<path d="M100 236 L900 236 L880 628 L120 628 Z" fill="#4a2a17" stroke="${OL}" stroke-width="3"/><path d="M140 256 L860 256 L842 606 L158 606 Z" fill="#5a1b22"/><path d="M140 256 L860 256 L842 606 L158 606 Z" fill="url(#pQuilt)"/><path d="M140 256 L860 256 L842 606 L158 606 Z" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="22"/>`;
+  s+=`<path d="M100 236 h40 v14 h-26 v30 h-14 Z M900 236 h-40 v14 h26 v30 h14 Z" fill="url(#gBrass)"/>`;
+  // scarf
+  s+=`<path d="M170 580 C260 520 330 600 430 560 C520 528 580 600 680 570 C760 548 800 590 840 560" stroke="#7f6f95" stroke-width="44" fill="none" stroke-linecap="round"/><path d="M170 580 C260 520 330 600 430 560 C520 528 580 600 680 570 C760 548 800 590 840 560" stroke="#a798ba" stroke-width="10" fill="none" opacity=".4"/>`;
+  // drawing
+  s+=`<g transform="translate(676 486) rotate(-5)"><rect x="-92" y="-62" width="184" height="124" fill="#000" opacity=".3" transform="translate(4 5)"/><rect x="-92" y="-62" width="184" height="124" fill="#f1ead8"/><circle cx="66" cy="-38" r="13" fill="none" stroke="#e1a52a" stroke-width="3"/><path d="M-40 34 L-22 -14 L-4 34 Z" fill="none" stroke="#2c4f9a" stroke-width="3"/><circle cx="-22" cy="-26" r="10" fill="none" stroke="#3a2416" stroke-width="3"/><path d="M14 34 L24 4 L34 34 Z" fill="none" stroke="#c0392b" stroke-width="3"/><circle cx="24" cy="-4" r="7" fill="none" stroke="#3a2416" stroke-width="3"/><path d="M-12 6 L18 10" stroke="#3a2416" stroke-width="2.5"/><text x="0" y="54" text-anchor="middle" font-family="Marck Script, cursive" font-size="16" fill="#b0322a">мама и я</text></g>`;
+  if(!F.recordTaken) s+=`<g transform="translate(330 404) rotate(-8)"><rect x="-108" y="-104" width="216" height="216" fill="#000" opacity=".35"/><rect x="-112" y="-110" width="216" height="216" fill="#b89a6a" stroke="#6e5530"/><rect x="-112" y="-110" width="216" height="216" fill="url(#pPaper)"/><circle cx="-4" cy="-2" r="54" fill="#0e0d0d"/><circle cx="-4" cy="-2" r="46" fill="none" stroke="#2a2828"/><circle cx="-4" cy="-2" r="20" fill="#8e1f1a"/><circle cx="-4" cy="-2" r="2.5" fill="#d8ccb0"/><text x="-4" y="88" text-anchor="middle" font-family="Marck Script, cursive" font-size="22" fill="#3a2410">Вальс для Элеоноры</text></g>`;
+  if(!F.inviteTaken) s+=`<g transform="translate(616 352) rotate(7)"><rect x="-98" y="-60" width="200" height="130" fill="#000" opacity=".35"/><rect x="-102" y="-66" width="200" height="130" fill="#efe4cc" stroke="#b8924a" stroke-width="3"/><rect x="-92" y="-56" width="180" height="110" fill="none" stroke="#b8924a"/><text x="-2" y="-10" text-anchor="middle" font-family="Marck Script, cursive" font-size="28" fill="#3a2410">Приглашение</text><text x="-2" y="18" text-anchor="middle" font-family="Cormorant SC, serif" font-size="13" letter-spacing="2" fill="#6a5030">ПИКМАН-ХОЛЛ</text><circle cx="62" cy="38" r="13" fill="#8e1f1a"/><text x="62" y="43" text-anchor="middle" font-family="Cormorant SC, serif" font-size="14" fill="#c9604f">П</text></g>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".6"/>`;
+  s+=hs('scarf',160,540,700,70)+hs('drawing',584,424,186,128);
+  if(!F.recordTaken) s+=hs('record',214,290,232,232);
+  if(!F.inviteTaken) s+=hs('invite',508,282,214,144);
+  s+=hs('lidlabel',430,90,140,76);
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- DINNER (memory) ---------- */
+function chairBack(x,top,w,col='#3a2116',vel='#5e1a1c'){
+  return `<path d="M${x-w/2} 380 L${x-w/2} ${top+18} Q${x-w/2} ${top} ${x-w/2+16} ${top-2} Q${x} ${top-14} ${x+w/2-16} ${top-2} Q${x+w/2} ${top} ${x+w/2} ${top+18} L${x+w/2} 380 Z" fill="${col}" stroke="${OL}" stroke-width="1.5"/><rect x="${x-w/2+9}" y="${top+10}" width="${w-18}" height="${370-top}" rx="8" fill="${vel}" stroke="${OL}"/><circle cx="${x}" cy="${top+28}" r="2" fill="#c9a256" opacity=".7"/><circle cx="${x-14}" cy="${top+44}" r="2" fill="#c9a256" opacity=".7"/><circle cx="${x+14}" cy="${top+44}" r="2" fill="#c9a256" opacity=".7"/>`;
+}
+function candelabra(x){
+  let s=`<circle cx="${x}" cy="292" r="64" fill="url(#rCandle)"/>`;
+  s+=`<path d="M${x-17} 392 Q${x} 378 ${x+17} 392 Z" fill="url(#gBrass)" stroke="${OL}"/><rect x="${x-2.5}" y="300" width="5" height="84" fill="url(#gBrassH)"/><path d="M${x-28} 318 Q${x-28} 334 ${x} 336 Q${x+28} 334 ${x+28} 318" fill="none" stroke="#b8924a" stroke-width="4"/>`;
+  [[x-28,318],[x,300],[x+28,318]].forEach(([cx,cy],i)=>{
+    s+=`<path d="M${cx-7} ${cy} L${cx+7} ${cy} L${cx+4} ${cy+5} L${cx-4} ${cy+5} Z" fill="url(#gBrass)"/><rect x="${cx-4}" y="${cy-32}" width="8" height="32" fill="#efe6cf" stroke="#b9ad92" stroke-width=".6"/><path d="M${cx-4} ${cy-30} q2 8 0 12" stroke="#fffaf0" stroke-width="2" fill="none"/>`;
+    s+=`<path class="flame" style="animation-duration:${.13+i*.04}s" d="M${cx} ${cy-33} C${cx-5} ${cy-40} ${cx-3} ${cy-47} ${cx} ${cy-54} C${cx+3} ${cy-47} ${cx+5} ${cy-40} ${cx} ${cy-33} Z" fill="#ffcf6a"/><path d="M${cx} ${cy-34} C${cx-2} ${cy-38} ${cx-1.5} ${cy-42} ${cx} ${cy-45} C${cx+1.5} ${cy-42} ${cx+2} ${cy-38} ${cx} ${cy-34} Z" fill="#fff6d8"/>`;
+  });
+  return s;
+}
+function wineGlass(x,y,full=true){return `<path d="M${x-7} ${y-18} Q${x-8} ${y-5} ${x} ${y-3} Q${x+8} ${y-5} ${x+7} ${y-18} Z" fill="#dfeaf0" fill-opacity=".25" stroke="#f3f6f6" stroke-opacity=".6"/>${full?`<path d="M${x-6.5} ${y-11} Q${x-7} ${y-5} ${x} ${y-4} Q${x+7} ${y-5} ${x+6.5} ${y-11} Z" fill="#6a0f14"/>`:''}<line x1="${x}" y1="${y-3}" x2="${x}" y2="${y+8}" stroke="#e8eef0" stroke-width="1.5"/><ellipse cx="${x}" cy="${y+8}" rx="6" ry="1.6" fill="#e8eef0" opacity=".7"/>`;}
+function plate(x,y=383){return `<ellipse cx="${x}" cy="${y}" rx="30" ry="6.5" fill="#f6f1e6" stroke="#b5a88f"/><ellipse cx="${x}" cy="${y}" rx="20" ry="4" fill="none" stroke="#c9a256" stroke-width=".8"/>`;}
+function renderDinner(interactive){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="480" fill="url(#pStripe)"/><rect width="1000" height="480" fill="url(#pMottle)"/>`;
+  s+=`<rect width="1000" height="30" fill="#2a0c0c"/><rect y="30" width="1000" height="6" fill="#a8843f" opacity=".6"/><rect y="36" width="1000" height="6" fill="#000" opacity=".3"/>`;
+  s+=`<rect y="400" width="1000" height="84" fill="#2a1009"/><rect y="400" width="1000" height="84" fill="url(#pWood)" opacity=".6"/><rect y="396" width="1000" height="7" fill="#a8843f" opacity=".5"/>`;
+  s+=`<rect y="480" width="1000" height="160" fill="#2a160d"/>`;
+  for(let i=-18;i<=18;i++) s+=`<line x1="${500+i*30}" y1="480" x2="${500+i*80}" y2="640" stroke="#120804" stroke-width="1.2" opacity=".7"/>`;
+  s+=`<rect y="480" width="1000" height="160" fill="url(#pWood)" opacity=".4"/><path d="M130 520 L870 520 L960 640 L40 640 Z" fill="#3e0c10" opacity=".85"/><path d="M150 528 L850 528 L928 640 L72 640 Z" fill="none" stroke="#a8843f" stroke-opacity=".4" stroke-width="2"/>`;
+  // left window
+  s+=`<rect x="48" y="62" width="134" height="288" fill="#160808"/><clipPath id="cWinD"><rect x="58" y="72" width="114" height="268"/></clipPath><g clip-path="url(#cWinD)"><rect x="58" y="72" width="114" height="268" fill="url(#gNight)"/>${RAIN_DIN}<path d="M58 290 L80 290 L80 270 L110 250 L140 270 L140 290 L172 290 L172 340 L58 340 Z" fill="#090d13"/></g><rect x="112" y="72" width="5" height="268" fill="#160808"/><rect x="58" y="160" width="114" height="5" fill="#160808"/><rect x="58" y="250" width="114" height="5" fill="#160808"/>`;
+  s+=`<path d="M30 40 L80 40 C70 140 92 220 70 300 C58 340 52 400 48 480 L30 480 Z" fill="url(#gCurtainG)" stroke="${OL}"/><path d="M200 40 L150 40 C160 140 138 220 160 300 C172 340 178 400 182 480 L200 480 Z" fill="url(#gCurtainG)" stroke="${OL}"/><rect x="22" y="34" width="186" height="8" fill="url(#gBrassH)"/>`;
+  // door right
+  s+=`<rect x="862" y="96" width="126" height="388" fill="#1a0a08"/><rect x="872" y="106" width="104" height="378" fill="#3a1c14" stroke="${OL}"/><rect x="884" y="122" width="80" height="150" fill="none" stroke="#1f0d08" stroke-width="3"/><rect x="884" y="290" width="80" height="170" fill="none" stroke="#1f0d08" stroke-width="3"/><rect x="972" y="106" width="8" height="378" fill="#f2c878" opacity=".55"/><rect x="960" y="106" width="30" height="378" fill="#f2c878" opacity=".08"/>`;
+  // painting
+  s+=`<rect x="432" y="58" width="150" height="168" fill="#000" opacity=".35"/><rect x="424" y="48" width="152" height="170" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><rect x="436" y="60" width="128" height="146" fill="#2a1a10"/><clipPath id="cPaint"><rect x="436" y="60" width="128" height="146"/></clipPath><g clip-path="url(#cPaint)"><rect x="436" y="60" width="128" height="146" fill="url(#rPortraitBg)" opacity=".5"/><g transform="translate(500 186) scale(.82)">${bust(PEOPLE.pickman,{look:0})}</g></g><rect x="436" y="60" width="128" height="146" fill="none" stroke="#6e5223" stroke-width="2"/>`;
+  // grandfather clock
+  s+=`<rect x="736" y="118" width="66" height="290" fill="url(#gWoodD)" stroke="${OL}" stroke-width="1.5"/><path d="M730 120 Q769 84 808 120 Z" fill="#2a160c" stroke="${OL}"/><circle cx="769" cy="168" r="25" fill="url(#gBrass)" stroke="${OL}"/><circle cx="769" cy="168" r="21" fill="url(#rDial)"/>${dialTicks(769,168,21,1)}${clockHands(769,168,21,9,8)}<rect x="752" y="206" width="34" height="150" fill="#0d0705" stroke="#5a3a22"/><line x1="769" y1="206" x2="769" y2="320" stroke="#b8924a" stroke-width="2"/><circle cx="769" cy="326" r="10" fill="url(#gGold)"/>`;
+  // chandelier
+  s+=`<line x1="500" y1="0" x2="500" y2="26" stroke="#5a411a" stroke-width="3"/><ellipse cx="500" cy="36" rx="18" ry="11" fill="url(#gBrass)" stroke="${OL}"/>`;
+  [[410,46],[450,52],[550,52],[590,46]].forEach(([x,y])=>{s+=`<path d="M500 38 Q${(500+x)/2} ${y+18} ${x} ${y}" stroke="#b8924a" stroke-width="3.5" fill="none"/><rect x="${x-3}" y="${y-18}" width="6" height="18" fill="#efe6cf"/><path class="flame" style="animation-duration:${R(.12,.2)}s" d="M${x} ${y-19} C${x-3} ${y-23} ${x-2} ${y-27} ${x} ${y-31} C${x+2} ${y-27} ${x+3} ${y-23} ${x} ${y-19} Z" fill="#ffd87a"/><circle cx="${x}" cy="${y-24}" r="22" fill="url(#rCandle)"/><path d="M${x} ${y+2} l-3 8 l3 6 l3 -6 Z" fill="#e8f0f4" opacity=".7"/>`;});
+  for(let i=0;i<7;i++){const x=470+i*10;s+=`<path d="M${x} 46 l-2.5 7 l2.5 6 l2.5 -6 Z" fill="#e8f0f4" opacity=".6"/>`;}
+  s+=crow(612,47,.62,false);
+  // chairs
+  s+=chairBack(200,248,84)+chairBack(350,248,84)+chairBack(500,206,112,'#2e1a10','#6e1a1f')+chairBack(650,248,84);
+  s+=`<path d="M500 194 l-8 12 l8 -4 l8 4 Z" fill="url(#gBrass)"/>`;
+  // shawl on mother's chair
+  s+=`<path d="M312 290 C330 276 370 276 388 290 L394 372 C380 360 372 340 368 318 C356 330 344 330 332 318 C328 340 320 360 306 372 Z" fill="#7b8f7a" stroke="${OL}"/><path d="M306 372 l-2 10 M314 366 l-1 10 M386 368 l2 10 M394 372 l2 10" stroke="#7b8f7a" stroke-width="1.5"/>`;
+  // people
+  const st=pid=>({stare:!!F.shot[pid]});
+  s+=`<g transform="translate(200 334)">${bust(PEOPLE.doctor,st('doctor'))}</g>`;
+  s+=`<g transform="translate(500 334) scale(1.12)">${bust(PEOPLE.pickman,st('pickman'))}</g>`;
+  s+=`<g transform="translate(650 334)">${bust(PEOPLE.lady,{...st('lady'),look:-1.5})}</g>`;
+  // table
+  s+=`<ellipse cx="500" cy="528" rx="420" ry="16" fill="#000" opacity=".55"/>`;
+  s+=`<path d="M150 371 L850 371 L872 392 L128 392 Z" fill="#f2ead8" stroke="#a89a7c"/>`;
+  let cl='M128 392 L872 392 L874 514';for(let x=874;x>128;x-=37.3) cl+=` Q${x-18.65} 530 ${x-37.3} 514`;
+  s+=`<path d="${cl} Z" fill="url(#gCloth)" stroke="#a89a7c"/>`;
+  for(let x=170;x<860;x+=62) s+=`<path d="M${x} 396 Q${x+6} 450 ${x-2} 512" stroke="#8d7c5a" stroke-width="7" opacity=".16" fill="none"/>`;
+  s+=`<path d="${cl.replace('M128 392 L872 392 L874 514','M874 514')}" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 3" opacity=".6"/>`;
+  // child's eyes under lifted cloth
+  s+=`<path d="M582 517 Q596 494 626 500 L632 516 Q612 520 582 517 Z" fill="#0a0404"/><ellipse cx="603" cy="510" rx="2.6" ry="1.6" fill="#e9e1cf"/><ellipse cx="615" cy="509" rx="2.6" ry="1.6" fill="#e9e1cf"/><circle cx="603.4" cy="510" r="1" fill="#000"/><circle cx="615.4" cy="509" r="1" fill="#000"/>`;
+  // on the table
+  s+=plate(200)+plate(350)+plate(650);
+  s+=`<ellipse cx="500" cy="384" rx="46" ry="9" fill="url(#gSilver)" stroke="#6e6a62"/><path d="M468 380 C468 364 490 356 506 358 C524 360 536 368 532 380 Z" fill="#8a4a22" stroke="#3a1a0a"/><path d="M478 368 C490 362 508 362 520 366" stroke="#c07a3a" stroke-width="2" fill="none"/><path d="M530 374 q10 -6 8 -16" stroke="#3a1a0a" stroke-width="2.5" fill="none"/>`;
+  s+=candelabra(275)+candelabra(575);
+  s+=wineGlass(236,384)+wineGlass(686,384)+wineGlass(538,384)+wineGlass(162,384,false);
+  // mother's knocked glass + spill
+  s+=`<ellipse cx="392" cy="386" rx="26" ry="4.5" fill="#6a0f14" opacity=".9"/><path d="M402 391 Q404 410 401 430 Q399 438 403 442 Q406 436 405 428 Q408 406 410 392 Z" fill="#6a0f14"/><circle cx="404" cy="452" r="2.5" fill="#6a0f14"/>`;
+  s+=`<g transform="translate(386 382) rotate(-78)"><path d="M-7 -18 Q-8 -5 0 -3 Q8 -5 7 -18 Z" fill="#dfeaf0" fill-opacity=".3" stroke="#f3f6f6" stroke-opacity=".7"/><line x1="0" y1="-3" x2="0" y2="8" stroke="#e8eef0" stroke-width="1.5"/><ellipse cx="0" cy="8" rx="6" ry="1.6" fill="#e8eef0" opacity=".8"/></g>`;
+  // handbag
+  s+=`<path d="M302 389 Q302 372 320 372 Q338 372 338 389 Z" fill="#c9b08a" stroke="#4a3520"/><path d="M308 374 Q320 360 332 374" stroke="#c9a256" stroke-width="1.5" fill="none"/><rect x="316" y="370" width="8" height="4" fill="url(#gBrass)"/>`;
+  // fan
+  s+=`<path d="M690 388 L728 378 L730 383 L692 391 Z" fill="#141114" stroke="#3a3540"/><path d="M694 388 L726 380" stroke="#4a4552" stroke-width=".8" stroke-dasharray="2 2"/><circle cx="691" cy="389" r="2" fill="url(#gBrass)"/>`;
+  if(!F.noteTaken) s+=`<path d="M712 380 L722 372 L728 378 Z" fill="#efe6d3" stroke="#9d9077" stroke-width=".6"/>`;
+  // hands
+  s+=sleeve(-48+200,360,186,368,PEOPLE.doctor.coat)+sleeve(48+200,360,214,368,PEOPLE.doctor.coat)+handsAt(188,368,212,368,PEOPLE.doctor.skin);
+  s+=`<circle cx="200" cy="360" r="9" fill="url(#gGold)" stroke="${OL}"/><circle cx="200" cy="360" r="6.5" fill="#f3ead2"/><path d="M200 351 Q214 344 226 352" stroke="#d2ae62" stroke-width="1" fill="none"/>`;
+  s+=sleeve(500-78,362,470,378,PEOPLE.pickman.coat)+sleeve(500+78,362,530,378,PEOPLE.pickman.coat)+handsAt(468,378,532,378,PEOPLE.pickman.skin);
+  s+=`<line x1="466" y1="374" x2="462" y2="350" stroke="#d8d6d0" stroke-width="2.4"/><line x1="534" y1="374" x2="540" y2="352" stroke="#d8d6d0" stroke-width="2.4"/><path d="M538 352 l2 -6 M541 352 l1 -6 M544 353 l0 -6" stroke="#d8d6d0" stroke-width="1"/>`;
+  s+=`<ellipse cx="636" cy="376" rx="8" ry="5.5" fill="#151215" stroke="${OL}"/><ellipse cx="664" cy="376" rx="8" ry="5.5" fill="#151215" stroke="${OL}"/><path d="M620 370 Q600 380 612 330 M680 370 Q700 380 688 330" stroke="#151215" stroke-width="9" fill="none" stroke-linecap="round"/>`;
+  // butler
+  s+=`<g transform="translate(918 246)">
+    <path d="M-34 220 L-30 330 L-12 330 L-8 214 Z M8 214 L12 330 L30 330 L34 220 Z" fill="#0f0e10" stroke="${OL}"/><ellipse cx="-22" cy="332" rx="14" ry="5" fill="#050505"/><ellipse cx="22" cy="332" rx="14" ry="5" fill="#050505"/>
+    <path d="M-60 74 L-50 230 L-30 250 L-20 214 L20 214 L30 250 L50 230 L60 74 Z" fill="#131113" stroke="${OL}"/>
+    <path d="M58 30 C68 70 66 140 60 186" stroke="${OL}" stroke-width="21" fill="none" stroke-linecap="round"/><path d="M58 30 C68 70 66 140 60 186" stroke="#131113" stroke-width="18" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="194" rx="7" ry="9" fill="${PEOPLE.butler.skin}" stroke="${OL}"/>
+    ${bust(PEOPLE.butler,st('butler'))}
+    <path d="M-14 74 L0 214 L14 74" fill="${PEOPLE.butler.shirt}" opacity=".0"/>
+    <path d="M-56 30 C-64 54 -64 72 -60 84 L-104 82" stroke="${OL}" stroke-width="21" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M-56 30 C-64 54 -64 72 -60 84 L-104 82" stroke="#131113" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <ellipse cx="-110" cy="80" rx="8" ry="6" fill="#f4f0e8" stroke="#8f887a"/>
+    <ellipse cx="-130" cy="76" rx="44" ry="9" fill="url(#gSilver)" stroke="#5a5650"/><ellipse cx="-130" cy="74" rx="38" ry="6" fill="none" stroke="#fff" stroke-opacity=".5"/>
+    <rect x="-156" y="30" width="16" height="44" rx="5" fill="#1d2a1d" stroke="${OL}"/><rect x="-152" y="14" width="8" height="18" fill="#1d2a1d" stroke="${OL}"/><rect x="-154" y="44" width="12" height="14" fill="#e8dcc0"/><path d="M-150 34 v34" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+    ${F.gloveTaken?'':`<path d="M-124 72 C-124 64 -116 62 -110 64 L-96 62 Q-92 66 -96 70 L-104 72 Z" fill="#f4f0e8" stroke="#8f887a"/>`}
+  </g>`;
+  // camera on tripod
+  s+=`<path d="M78 410 L34 624 M78 410 L80 634 M78 410 L120 618" stroke="#2a1a10" stroke-width="5" stroke-linecap="round"/><path d="M78 410 L34 624 M78 410 L120 618" stroke="#6a4328" stroke-width="1.5"/><rect x="66" y="400" width="26" height="12" fill="#3a2416" stroke="${OL}"/>`;
+  if(!F.cameraTaken) s+=`<g transform="translate(78 372)"><path d="M-46 -20 C-60 -10 -64 30 -56 60 L-40 60 C-44 30 -40 0 -30 -18 Z" fill="#0f0d0d" stroke="${OL}"/><rect x="-34" y="-28" width="40" height="52" fill="#4a2c1a" stroke="${OL}"/><rect x="-34" y="-28" width="40" height="52" fill="url(#pWood)" opacity=".6"/><path d="M6 -22 L32 -12 L32 14 L6 22 Z" fill="#241812" stroke="${OL}"/><path d="M12 -20 v40 M18 -18 v36 M24 -16 v32" stroke="#0e0905" stroke-width="1.2"/><circle cx="38" cy="1" r="11" fill="url(#gBrass)" stroke="${OL}"/><circle cx="38" cy="1" r="6" fill="#1a1f26"/><circle cx="36" cy="-1" r="2" fill="#fff" opacity=".5"/><rect x="-22" y="-36" width="14" height="8" fill="url(#gBrass)"/></g>`;
+  // doctor's bag
+  s+=`<ellipse cx="258" cy="602" rx="54" ry="6" fill="#000" opacity=".5"/><path d="M212 600 L218 560 Q222 548 236 546 L282 546 Q296 548 300 560 L306 600 Z" fill="#4e2a18" stroke="${OL}" stroke-width="1.5"/><path d="M220 556 L298 556" stroke="#b8924a" stroke-width="4"/><path d="M240 546 C240 524 278 524 278 546" stroke="#3a1f12" stroke-width="5" fill="none"/><rect x="250" y="552" width="18" height="12" rx="2" fill="url(#gBrass)" stroke="${OL}"/><path d="M222 590 h80" stroke="#2a160c" stroke-dasharray="3 3"/>`;
+  // light & atmosphere
+  s+=`<rect width="1000" height="640" fill="#ffb060" opacity=".05"/><rect width="1000" height="640" fill="url(#rDark)"/>`;
+  if(interactive){
+    s+=hs('windowD',48,62,134,270)+hs('painting',424,48,152,170)+hs('clockD',734,96,70,312)+hs('door',862,96,40,388);
+    s+=hs('motherChair',308,248,86,120);
+    s+=hs('doctor',168,248,66,98)+hs('pickman',458,236,84,104)+hs('lady',616,246,70,106);
+    s+=hs('butler',870,150,100,420);
+    s+=hs('watchHand',178,346,46,30);
+    s+=hs('tray',740,300,120,42);
+    s+=hs('glass',366,370,52,26)+hs('handbag',298,362,44,30)+hs('fan',684,368,50,26);
+    s+=hs('eyes',580,496,56,26);
+    s+=hs('camera',26,334,112,92)+hs('bag',208,520,104,86);
+    s+=hs('crowD',570,6,70,48);
+    s+=arrow(500,612);
+  }
+  return s;
+}
+
+/* ---------- BAG close-up ---------- */
+function bagView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="#24120c"/><rect width="1000" height="640" fill="url(#pWood)" opacity=".5"/><path d="M0 420 L1000 420 L1000 640 L0 640 Z" fill="#3e0c10" opacity=".7"/>`;
+  s+=`<ellipse cx="500" cy="606" rx="330" ry="20" fill="#000" opacity=".55"/>`;
+  s+=`<path d="M380 196 C380 70 620 70 620 196" stroke="#2a160c" stroke-width="30" fill="none"/><path d="M380 196 C380 70 620 70 620 196" stroke="#5a3220" stroke-width="22" fill="none"/>`;
+  if(F.bagOpen){
+    s+=`<path d="M190 200 Q500 120 810 200 L800 224 Q500 166 200 224 Z" fill="#0d0705"/>`;
+    if(!F.vialTaken) s+=`<g transform="translate(600 60) rotate(12) scale(2.6)">${icon('vial')}</g>`;
+  }
+  s+=`<path d="M190 220 Q190 196 230 192 L770 192 Q810 196 810 220 L790 572 Q788 598 760 598 L240 598 Q212 598 210 572 Z" fill="#5a3220" stroke="${OL}" stroke-width="3"/><path d="M190 220 Q190 196 230 192 L770 192 Q810 196 810 220 L790 572 Q788 598 760 598 L240 598 Q212 598 210 572 Z" fill="url(#pWood)" opacity=".35"/>`;
+  s+=`<path d="M214 236 L232 574 M786 236 L768 574 M240 584 L760 584" stroke="#d9b98a" stroke-width="1.6" stroke-dasharray="6 6" opacity=".45"/>`;
+  s+=`<rect x="196" y="194" width="608" height="26" rx="6" fill="url(#gBrassH)" stroke="${OL}"/>`;
+  s+=`<rect x="314" y="276" width="372" height="170" rx="12" fill="url(#gBrass)" stroke="${OL}" stroke-width="2"/><rect x="326" y="288" width="348" height="146" rx="8" fill="none" stroke="#6b4f22" stroke-width="2"/>`;
+  s+=`<text x="500" y="316" text-anchor="middle" font-family="Cormorant SC, serif" font-size="18" letter-spacing="4" fill="#4a3412">Д-Р А. ГРЕЙ</text>`;
+  [410,500,590].forEach((x,i)=>{
+    const d=F.bag[i];
+    s+=`<rect x="${x-34}" y="328" width="68" height="96" rx="4" fill="#1a120a" stroke="${OL}"/><rect x="${x-28}" y="332" width="56" height="88" fill="url(#gCyl)"/>`;
+    s+=`<text x="${x}" y="350" text-anchor="middle" font-family="Cormorant SC, serif" font-size="20" fill="#3a2a18" opacity=".4">${(d+9)%10}</text><text x="${x}" y="392" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="40" fill="#1a120a">${d}</text><text x="${x}" y="418" text-anchor="middle" font-family="Cormorant SC, serif" font-size="20" fill="#3a2a18" opacity=".4">${(d+1)%10}</text>`;
+    s+=`<path d="M${x-28} 334 h56 M${x-28} 418 h56" stroke="#000" stroke-width="3" opacity=".4"/>`;
+  });
+  s+=`<rect x="470" y="450" width="60" height="22" rx="4" fill="url(#gBrass)" stroke="${OL}"/>`;
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".7"/>`;
+  s+=hs('bagBody',200,460,600,130);
+  if(!F.bagOpen) [410,500,590].forEach((x,i)=>{s+=hs('w'+i,x-40,322,80,108);});
+  if(F.bagOpen&&!F.vialTaken) s+=hs('vial',590,40,140,180);
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- WATCH close-up ---------- */
+function watchView(){
+  const F=S.f; let s='';
+  s+=`<rect width="1000" height="640" fill="url(#pPin)"/><rect width="1000" height="640" fill="#000" opacity=".25"/>`;
+  s+=`<path d="M980 -10 C900 60 820 90 760 180" stroke="#d2ae62" stroke-width="6" stroke-dasharray="7 4" fill="none"/>`;
+  s+=`<path d="M300 660 C320 560 420 520 560 520 C700 520 800 580 840 660 Z" fill="${PEOPLE.doctor.skin}" stroke="${OL}" stroke-width="2"/><path d="M430 560 Q500 540 600 552" stroke="${shade(PEOPLE.doctor.skin,-.15)}" stroke-width="2" fill="none"/>`;
+  s+=`<circle cx="306" cy="320" r="168" fill="#000" opacity=".35" transform="translate(6 10)"/><circle cx="300" cy="320" r="168" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><circle cx="300" cy="320" r="148" fill="#dcbf78"/><circle cx="300" cy="320" r="148" fill="url(#rCork)" opacity=".3"/>`;
+  s+=`<g opacity=".55"><text x="300" y="296" text-anchor="middle" font-family="Marck Script, cursive" font-size="9" fill="#5a3f14">Д-ру А. Грею</text><text x="300" y="312" text-anchor="middle" font-family="Marck Script, cursive" font-size="9" fill="#5a3f14">за 731 спасённую жизнь</text><text x="300" y="328" text-anchor="middle" font-family="Marck Script, cursive" font-size="9" fill="#5a3f14">от благодарных пациентов, 1950</text></g>`;
+  s+=`<rect x="458" y="300" width="26" height="40" rx="4" fill="url(#gBrassH)" stroke="${OL}"/>`;
+  s+=`<circle cx="646" cy="330" r="176" fill="#000" opacity=".35" transform="translate(6 10)"/><circle cx="640" cy="320" r="176" fill="url(#gGold)" stroke="${OL}" stroke-width="2"/><circle cx="640" cy="320" r="150" fill="url(#rDial)" stroke="#6e5223"/>${dialTicks(640,320,150,2.5)}`;
+  ['XII','III','VI','IX'].forEach((n,i)=>{const a=i*Math.PI/2;s+=`<text x="${640+Math.sin(a)*112}" y="${320-Math.cos(a)*112+10}" text-anchor="middle" font-family="Cormorant SC, serif" font-weight="600" font-size="30" fill="#24180e">${n}</text>`;});
+  s+=`<circle cx="640" cy="380" r="26" fill="none" stroke="#2a1d12"/>${clockHands(640,380,24,0,0)}${clockHands(640,320,150,9,8)}`;
+  s+=`<rect x="626" y="122" width="28" height="26" rx="4" fill="url(#gBrass)" stroke="${OL}"/><circle cx="640" cy="112" r="16" fill="none" stroke="url(#gBrass)" stroke-width="6"/>`;
+  s+=`<path d="M560 210 Q620 180 700 196" stroke="#fff" stroke-width="12" opacity=".1" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M100 470 C140 430 190 440 214 470 C230 500 200 520 160 520 Z" fill="${PEOPLE.doctor.skin}" stroke="${OL}" stroke-width="2"/><path d="M780 470 C830 440 890 460 900 500 C880 520 830 520 790 506 Z" fill="${PEOPLE.doctor.skin}" stroke="${OL}" stroke-width="2"/>`;
+  if(F.engr){
+    s+=`<circle cx="300" cy="312" r="128" fill="#f4e6b8" opacity=".55"/><circle cx="300" cy="312" r="128" fill="none" stroke="url(#gBrass)" stroke-width="12"/><text x="300" y="268" text-anchor="middle" font-family="Marck Script, cursive" font-size="30" fill="#4a3110">Д-ру А. Грею</text><text x="300" y="310" text-anchor="middle" font-family="Marck Script, cursive" font-size="30" fill="#4a3110">за 731</text><text x="300" y="346" text-anchor="middle" font-family="Marck Script, cursive" font-size="26" fill="#4a3110">спасённую жизнь</text><text x="300" y="380" text-anchor="middle" font-family="Marck Script, cursive" font-size="20" fill="#4a3110">1950</text><path d="M210 250 Q240 214 290 206" stroke="#fff" stroke-width="5" opacity=".5" fill="none"/><path d="M200 420 L140 520" stroke="#3a2416" stroke-width="18" stroke-linecap="round"/>`;
+  }
+  s+=`<rect width="1000" height="640" fill="url(#rDark)" opacity=".6"/>`;
+  s+=hse('engr',300,320,150,150)+hse('dial',640,320,160,160);
+  s+=arrow(500,612);
+  return s;
+}
+
+/* ---------- scenes & rendering ---------- */
+const SCENES={room,board:()=>boardArt(true),clock:clockView,trunk:trunkView,dinner:()=>renderDinner(true),bag:bagView,watch:watchView};
+const PARENT={board:'room',clock:'room',trunk:'room',bag:'dinner',watch:'dinner',dinner:'room'};
+const MEMORY=new Set(['dinner','bag','watch']);
+const sceneEl=$('#scene');
+function render(){
+  sceneEl.classList.toggle('memory',MEMORY.has(S.scene));
+  sceneEl.innerHTML=`<svg viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Сцена">${SCENES[S.scene]()}</svg>`;
+  S.f.sixthAnim=false;
+  save();
+}
+let busy=false;
+function go(scene,white){
+  if(busy) return; busy=true;
+  const fade=$('#fade'); fade.classList.toggle('white',!!white);
+  fade.style.opacity=1;
+  setTimeout(()=>{S.scene=scene;render();amb();fade.style.opacity=0;busy=false;},white?800:240);
+}
+const shelf=$('#shelf'), ilabel=$('#ilabel');
+function renderInv(newId){
+  if(!S.inv.length){shelf.innerHTML=`<span class="empty">Карманы пусты.</span>`;}
+  else shelf.innerHTML=S.inv.map(id=>`<button class="slot${S.sel===id?' sel':''}${newId===id?' new':''}" data-i="${id}" aria-label="${ITEMS[id].name}" title="${ITEMS[id].name}"><svg viewBox="0 0 64 64">${icon(id)}</svg></button>`).join('');
+  ilabel.innerHTML=S.sel?`<b>${ITEMS[S.sel].name}</b> · нажмите ещё раз, чтобы рассмотреть`:'';
+  save();
+}
+shelf.addEventListener('click',e=>{
+  const b=e.target.closest('.slot'); if(!b) return;
+  const id=b.dataset.i; sfx.click();
+  if(S.sel===id){inspect(id);} else {S.sel=id;}
+  renderInv();
+});
+
+/* ---------- captions ---------- */
+const cap=$('#cap'); let capT, queue=[];
+function msg(t,ms){clearTimeout(capT);queue=[];showCap(t,ms);}
+function showCap(t,ms){cap.textContent=t;cap.classList.add('on');capT=setTimeout(()=>{cap.classList.remove('on');if(queue.length){const n=queue.shift();setTimeout(()=>showCap(n),450);}},ms||Math.max(2600,t.length*62));}
+function say(list){clearTimeout(capT);queue=list.slice(1);showCap(list[0]);}
+
+/* ---------- overlay ---------- */
+const ov=$('#ov'), ovIn=$('#ovIn');
+function openOv(html,onClick){
+  ovIn.innerHTML=html+`<div class="close">коснитесь, чтобы вернуться</div>`;
+  ov.hidden=false; requestAnimationFrame(()=>ov.classList.add('on'));
+  ov.onclick=e=>{ if(onClick&&onClick(e)===true) return; closeOv(); };
+}
+function closeOv(){ov.classList.remove('on');setTimeout(()=>{ov.hidden=true;ovIn.innerHTML='';},300);}
+function inspect(id){
+  const it=ITEMS[id];
+  if(it.special==='invite'){openOv(`<div class="invite"><div class="inv-card card"><div class="sm">ПИКМАН-ХОЛЛ · БЛЭКВУД-ЛЕЙН</div><div class="script" style="margin-top:12px">Мистер Огастес Пикман</div><p>имеет честь пригласить</p><div class="script">миссис Элеонору Лэнг<br>с дочерью</div><p>на ужин в субботу, 14&nbsp;ноября 1953&nbsp;года,<br>к восьми часам вечера</p></div><div class="inv-card card" style="transform:rotate(1.5deg)"><div class="sm">ЗА СТОЛОМ</div><ul><li>Хозяин дома, мистер О. Пикман</li><li>Доктор Альберт Грей</li><li>Леди Корделия Вейн</li><li>Миссис Элеонора Лэнг</li><li>Мисс Ада Лэнг</li></ul><div class="sm">ПРИСЛУЖИВАЕТ</div><ul><li>Хиггс, дворецкий</li></ul></div></div>`);return;}
+  if(it.special==='photo'){
+    openOv(`<div class="photo-insp" id="pin"><svg viewBox="0 0 1000 640">${renderDinner(false)}</svg><div class="lbl">14.XI.1953 · Пикман-холл</div></div><div class="close" style="font-size:17px;color:#e9dfc7">Коснитесь снимка, чтобы вглядеться</div>`,e=>{if(e.target.closest('#pin')){closeOv();enterMemory();return true;}});return;
+  }
+  if(it.special==='note'){openOv(`<div class="note card hand">Держись подальше от Огастеса, Элеонора.<br>Ты пожалеешь, если не остановишься.<div style="text-align:right;margin-top:10px">— К.</div></div>`);return;}
+  if(it.special==='page'){openOv(`<div class="page card hand">П. — приют св. Агнессы.<br>40&nbsp;000 фунтов исчезли.<br>Доказательства у меня.<br>Статья — в понедельник!</div>`);return;}
+  if(it.person){const p=PEOPLE[it.person];openOv(`<div class="itemcard card"><svg viewBox="0 0 200 240">${photoCard(it.person,100,120,180,230,{rot:-2})}</svg><h3>${p.name}</h3><p>${p.role}</p></div>`);return;}
+  openOv(`<div class="itemcard card"><svg viewBox="0 0 64 64">${icon(id)}</svg><h3>${it.name}</h3><p>${it.desc}</p></div>`);
+}
+function newsOv(){openOv(`<div class="news card"><div class="mast">Вечерний вестник</div><div class="date"><span>Воскресенье, 15 ноября 1953</span><span>№ 4127</span><span>Цена 2 пенса</span></div><h2>Трагедия в особняке Пикмана</h2><div class="sub">Сотрудница нашей редакции скончалась во время званого ужина</div><div class="cols"><p>Вчера вечером во время званого ужина в доме мистера Огастеса Пикмана скоропостижно скончалась миссис Элеонора Лэнг, 34 лет, корреспондент «Вечернего вестника».</p><p>По заключению доктора Альберта Грея, присутствовавшего за столом, смерть наступила от внезапной остановки сердца. Мистер Пикман выразил семье глубочайшие соболезнования.</p><p>Слуги утверждают, что большие часы в обеденной зале остановились в ту же минуту — <i>без двадцати десять</i> — и с тех пор их никто не заводил.</p><p>Полиция не нашла оснований для расследования. У миссис Лэнг осталась семилетняя дочь.</p></div></div>`);}
+
+/* ---------- hints ---------- */
+function hint(){
+  const F=S.f, mem=MEMORY.has(S.scene);
+  const allShot=['doctor','pickman','lady','butler'].every(p=>F.shot[p]);
+  const allEv=F.sediment&&F.vialTaken&&F.noteTaken&&F.gloveTaken&&F.pageTaken;
+  if(mem){
+    if(!F.cameraTaken) return 'Кар! Кто-то снимал этот вечер. Его аппарат всё ещё стоит в углу.';
+    if(!allShot) return 'Кар! Лица. Забери их лица с собой — всех, кто был за столом.';
+    if(!F.sediment) return 'Кар! Мамин бокал. Взгляни на него поближе — через стекло.';
+    if(!F.engr) return 'Кар! Доктор не выпускает из рук свои часы. Что написано на крышке?';
+    if(!F.bagOpen) return 'Кар! Число с крышки часов откроет саквояж.';
+    if(!F.noteTaken) return 'Кар! Леди никогда не расстаётся с веером. Что в нём спрятано?';
+    if(!F.gloveTaken) return 'Кар! Что лежит на подносе у дворецкого?';
+    if(!F.pageTaken) return 'Кар! Мамина сумочка. Она всюду носила блокнот.';
+    return 'Кар! Ты собрала всё. Возвращайся к доске.';
+  }
+  if(!F.clockOpen) return 'Кар! Часы стоят не на том времени. Газета на доске помнит правильное.';
+  if(!F.keyTaken) return 'Кар! В часах что-то блеснуло.';
+  if(!F.trunkOpen) return 'Кар! Ключ подойдёт к маминому сундуку.';
+  if(!F.recordTaken) return 'Кар! В сундуке лежит её музыка.';
+  if(!F.recordPlaced) return 'Кар! Граммофон соскучился по вальсу.';
+  if(!F.portraitOpen) return 'Кар! Дослушай. Смотри на неё.';
+  if(!F.photoTaken) return 'Кар! За портретом — тайник.';
+  if(!F.magTaken) return 'Кар! Возьми лупу со стола. Она пригодится там, куда ты идёшь.';
+  if(!F.visited) return 'Кар! Рассмотри снимок. Вглядись в него как следует.';
+  if(!(allShot&&allEv)) return 'Кар! Вернись в тот вечер. Ты ещё не всё увидела.';
+  if(F.slots.filter(Boolean).length<4) return 'Кар! Приколи их лица к доске.';
+  if(Object.keys(F.linked).length<4) return 'Кар! Каждой улике — своё лицо. Приглашение подскажет, кто есть кто.';
+  if(!F.centerLinked) return 'Кар! Осадок из бокала — к маминой фотографии.';
+  return 'Кар! Ты смотришь не туда, Ада.';
+}
+
+/* ---------- actions ---------- */
+const TALK={
+  doctor:['«Сердце. Я же предупреждал её — сердце».','«Пульса нет. Ничего нельзя было сделать. Ничего»','«Который час? Запишите: без двадцати десять»'],
+  pickman:['«Ужасная потеря. Ужасная. Хиггс, подайте ещё вина»','«Элеонора всегда задавала слишком много вопросов»','«Уведите девочку. Детям не место за этим столом»'],
+  lady:['«Какая жалость. Ей так шло это платье»','«Огастес, милый, распорядитесь, чтобы её унесли»','«Я её предупреждала. Все её предупреждали»'],
+  butler:['«Я лишь разливал вино, мисс. Как всегда»','«Бокал миссис Лэнг я наполнял дважды. Нет — трижды»','«Простите, мисс. Мне велено не разговаривать с гостями»']
+};
+function talk(pid){const n=S.f.talk[pid]||0;S.f.talk[pid]=n+1;msg(TALK[pid][n%TALK[pid].length]);}
+const WRONG=['Это здесь ни к чему.','Не то.','Нет. Не сюда.','Ничего не происходит.'];
+function wrong(){sfx.wrong();msg(WRONG[Math.floor(Math.random()*WRONG.length)]);S.sel=null;renderInv();}
+
+function act(id,sel){
+  const F=S.f, sc=S.scene;
+  if(id==='back'){ if(sc==='dinner'){go('room',false);setTimeout(()=>msg('Я отпускаю воспоминание. Снова 1975 год, и снова дождь.'),400);} else go(PARENT[sc]); return true;}
+  if(id==='crow'||id==='crowD'){sfx.caw();msg(hint(),6500);return true;}
+  switch(sc+':'+id){
+  /* room */
+  case 'room:board': go('board'); return true;
+  case 'room:clock': go('clock'); return true;
+  case 'room:trunk':
+    if(sel==='key'&&!F.trunkOpen){removeItem('key');F.trunkOpen=1;sfx.unlock();render();msg('Ключ подошёл. Двадцать два года я не могла его открыть.');setTimeout(()=>go('trunk'),900);return true;}
+    if(sel) return false;
+    if(F.trunkOpen) go('trunk'); else {sfx.wrong();msg('Мамин сундук. Заперт, а ключ я так и не нашла.');}
+    return true;
+  case 'room:gramo': case 'room:horn':
+    if(sel==='record'){removeItem('record');F.recordPlaced=1;render();msg('«Вальс для Элеоноры». Игла опускается...');music.waltz();
+      setTimeout(()=>{F.eyesOpen=1;if(S.scene==='room')render();msg('Мама... открыла глаза?');},6000);
+      setTimeout(()=>{sfx.creak();F.portraitOpen=1;if(S.scene==='room')render();msg('Портрет отошёл от стены. За ним что-то есть.');save();},12500);
+      return true;}
+    if(sel) return false;
+    if(F.recordPlaced){music.waltz();msg('Её вальс. Она танцевала под него на кухне.');} else msg('Граммофон. Пластинки нет — мама всегда её прятала.');
+    return true;
+  case 'room:portrait':
+    if(sel==='magnifier'){msg('Мазки мелкие, торопливые. Художник писал её по памяти, уже после.');return true;}
+    if(sel) return false;
+    msg(F.eyesOpen?'Она смотрит на доску. Будто хочет что-то сказать.':'Мама. Художник написал её с закрытыми глазами — будто она спит.');return true;
+  case 'room:niche':
+    if(!F.photoTaken){F.photoTaken=1;addItem('photo');render();msg('Фотография того самого вечера. Двадцать два года она пряталась за маминым портретом.');}
+    else msg('Пустой тайник. Только пыль и паутина.');
+    return true;
+  case 'room:magnifier': F.magTaken=1;addItem('magnifier');render();msg('Мамина лупа.');return true;
+  case 'room:lamp': if(sel) return false; F.lampOff=!F.lampOff;sfx.click();render();return true;
+  case 'room:window': if(sel) return false; msg('Дождь не прекращается с того самого ноября.');return true;
+  case 'room:desk': if(sel) return false; msg('В ящиках — мои записи. Двадцать два года вопросов без ответов.');return true;
+  case 'room:books': if(sel) return false; msg('Справочник ядов. Подшивка «Вечернего вестника». Мамины статьи.');return true;
+  /* clock */
+  case 'clock:wH': case 'clock:wM':
+    if(sel) return false;
+    if(F.clockOpen){msg('Часы снова молчат. Они уже отдали то, что прятали.');return true;}
+    if(id==='wH') F.ch=F.ch%12+1; else F.cm=(F.cm+1)%12;
+    sfx.tick();render();
+    if(F.ch===9&&F.cm===8){F.clockOpen=1;setTimeout(()=>{sfx.chime();render();msg('Без двадцати десять. Часы вздрогнули, и дверца маятника открылась.');},500);}
+    return true;
+  case 'clock:face': if(sel) return false; msg('Часы стоят. Под циферблатом две заводные скважины, по одной на каждую стрелку.');return true;
+  case 'clock:ckey': F.keyTaken=1;addItem('key');render();msg('Маленький латунный ключ. Висел на маятнике.');return true;
+  /* trunk */
+  case 'trunk:record': F.recordTaken=1;addItem('record');render();msg('Пластинка. «Вальс для Элеоноры».');return true;
+  case 'trunk:invite': F.inviteTaken=1;addItem('invite');render();msg('Приглашение на тот ужин. На обороте — список гостей.');return true;
+  case 'trunk:drawing': if(sel) return false; msg('Мой рисунок. Мама и я. Мне было семь.');return true;
+  case 'trunk:scarf': if(sel) return false; msg('Её шарф. Он до сих пор пахнет ландышем.');return true;
+  case 'trunk:lidlabel': if(sel) return false; msg('«Э. Лэнг». Мамин почерк на крышке.');return true;
+  /* board */
+  case 'board:clipping': if(sel) return false; newsOv();return true;
+  case 'board:cardA': if(sel) return false; msg('Пикман-холл, 14 ноября 1953 года. Место и время.');return true;
+  case 'board:cardB': if(sel) return false; msg('Главный вопрос.');return true;
+  case 'board:sixth': msg('«Ты смотришь не туда, Ада». Кто держал фотоаппарат в тот вечер?');return true;
+  case 'board:center':
+    if(sel==='sediment'){removeItem('sediment');F.centerLinked=1;sfx.pin();sfx.thread();render();msg('Яд. Не сердце. Её отравили.');checkEnd();return true;}
+    if(sel) return false;
+    msg('Мама. Элеонора Лэнг, 1919–1953.');return true;
+  /* dinner */
+  case 'dinner:camera':
+    if(sel) return false;
+    if(!F.cameraTaken){F.cameraTaken=1;addItem('camera');render();msg('Чужой фотоаппарат. На нём нет имени. Кто-то снимал этот вечер.');}
+    else msg('Пустой штатив. Кто-то стоял здесь весь вечер — и смотрел.');
+    return true;
+  case 'dinner:watchHand': if(sel==='camera') return act('doctor',sel); go('watch');return true;
+  case 'dinner:bag': go('bag');return true;
+  case 'dinner:glass':
+    if(sel==='magnifier'&&!F.sediment){F.sediment=1;addItem('sediment');msg('На дне — белёсый осадок. Запах горького миндаля. Это не сердце.');return true;}
+    if(sel) return false;
+    msg(F.sediment?'Пустой бокал. Всё, что в нём было, теперь у меня.':'Мамин бокал. Опрокинут, вино растеклось по скатерти.');return true;
+  case 'dinner:fan':
+    if(sel) return false;
+    if(!F.noteTaken){F.noteTaken=1;addItem('note');render();msg('В сложенном веере — записка.');} else msg('Веер леди Вейн. Чёрное кружево, слоновая кость.');
+    return true;
+  case 'dinner:tray':
+    if(sel==='camera') return act('butler',sel);
+    if(sel) return false;
+    if(!F.gloveTaken){F.gloveTaken=1;addItem('glove');render();msg('На подносе лежит одна перчатка. Вторая на руке у Хиггса.');} else msg('Серебряный поднос. Бутылка бордо урожая сорок седьмого.');
+    return true;
+  case 'dinner:handbag':
+    if(sel) return false;
+    if(!F.pageTaken){F.pageTaken=1;addItem('page');msg('Мамина сумочка. Блокнота нет, но под подкладкой — вырванная страница.');} else msg('Пустая сумочка. Пудреница, ключи, трамвайный билет.');
+    return true;
+  case 'dinner:motherChair':
+    if(sel==='camera'){msg('Её место пусто. Даже на снимке.');return true;}
+    if(sel) return false;
+    msg('Мамин стул. Шаль ещё тёплая.');return true;
+  case 'dinner:clockD': if(sel) return false; msg('Без двадцати десять. Здесь всегда будет без двадцати десять.');return true;
+  case 'dinner:painting': if(sel) return false; msg('Портрет хозяина. Он смотрит на всех нас сверху.');return true;
+  case 'dinner:eyes': if(sel) return false; msg('Это я. Мне семь. Я спряталась под столом, когда мама упала.');return true;
+  case 'dinner:windowD': if(sel) return false; msg('За окном 1953 год. Тот же самый дождь.');return true;
+  case 'dinner:door': if(sel) return false; msg('Дверь на кухню. Оттуда пахнет миндальным пирогом. Или не пирогом.');return true;
+  /* bag */
+  case 'bag:w0': case 'bag:w1': case 'bag:w2': {
+    if(sel) return false;
+    const i=+id[1]; F.bag[i]=(F.bag[i]+1)%10; sfx.tick();
+    if(F.bag.join('')==='731'){F.bagOpen=1;sfx.unlock();msg('Щёлк. Саквояж открыт.');}
+    render(); return true; }
+  case 'bag:vial': F.vialTaken=1;addItem('vial');render();msg('Пустой флакон. Аптечная этикетка.');return true;
+  case 'bag:bagBody': if(sel) return false; msg(F.bagOpen?'Бинты, стетоскоп, шприцы. Самое интересное я уже забрала.':'Саквояж доктора Грея. Кодовый замок на три цифры.');return true;
+  /* watch */
+  case 'watch:engr':
+    if(sel==='magnifier'){F.engr=1;render();msg('«Д-ру А. Грею — за 731 спасённую жизнь». А сколько он отнял?');return true;}
+    if(sel) return false;
+    msg(F.engr?'«За 731 спасённую жизнь».':'На крышке гравировка. Слишком мелко — без лупы не разобрать.');return true;
+  case 'watch:dial': if(sel) return false; msg('Без двадцати десять. Даже его часы остановились.');return true;
+  }
+  // people in dinner
+  if(sc==='dinner'&&PEOPLE[id]){
+    if(sel==='camera'){
+      if(F.shot[id]){msg('Этот снимок у меня уже есть.');return true;}
+      F.shot[id]=1; sfx.flash(); flashFx(); addItem('ph_'+id); render();
+      const done=['doctor','pickman','lady','butler'].every(p=>F.shot[p]);
+      msg(`Вспышка. ${PEOPLE[id].name}. ${id==='lady'?'Она':'Он'} медленно поворачивает голову ко мне.`);
+      if(done){setTimeout(()=>{removeItem('camera');msg('Плёнка кончилась. Четыре лица — и всё.');},2600);}
+      return true;
+    }
+    if(sel==='magnifier'&&id==='doctor'){go('watch');return true;}
+    if(sel) return false;
+    talk(id); return true;
+  }
+  // board slots
+  if(sc==='board'&&id.startsWith('slot')){
+    const i=+id[4], pid=F.slots[i];
+    if(!pid){
+      if(sel&&sel.startsWith('ph_')){const p=sel.slice(3);F.slots[i]=p;removeItem(sel);sfx.pin();render();msg(PEOPLE[p].name+'. '+PEOPLE[p].role);return true;}
+      if(sel&&EVIDENCE[sel]){sfx.wrong();msg('Сначала лицо. Улику приколю потом, рядом с ним.');S.sel=null;renderInv();return true;}
+      if(sel) return false;
+      msg('Пустое место. Здесь не хватает лица.');return true;
+    }
+    if(sel&&EVIDENCE[sel]){
+      if(EVIDENCE[sel]===pid){F.linked[pid]=sel;removeItem(sel);sfx.pin();sfx.thread();render();msg(LINKMSG[sel]);checkEnd();}
+      else{sfx.wrong();msg(PEOPLE[pid].he?'Не сходится. Это не про него.':'Не сходится. Это не про неё.');S.sel=null;renderInv();}
+      return true;
+    }
+    if(sel==='sediment'){sfx.wrong();msg('Осадок — это о маме, а не о них.');S.sel=null;renderInv();return true;}
+    if(sel) return false;
+    msg(PEOPLE[pid].name+'. '+(F.linked[pid]?LINKMSG[F.linked[pid]]:PEOPLE[pid].role));return true;
+  }
+  return false;
+}
+sceneEl.addEventListener('click',e=>{
+  if(busy) return;
+  const t=e.target.closest('[data-h]'); if(!t) return;
+  const sel=S.sel, ok=act(t.dataset.h,sel);
+  if(!ok&&sel){ S.sel=null; renderInv(); if(!act(t.dataset.h,null)) wrong(); }
+  save();
+});
+function enterMemory(){
+  if(MEMORY.has(S.scene)){msg('Я уже здесь.');return;}
+  sfx.whoosh(); S.f.visited=1; S.sel=null; renderInv();
+  go('dinner',true);
+  setTimeout(()=>say(['14 ноября 1953 года. Без двадцати десять.','Всё застыло — в ту самую минуту.']),1100);
+}
+function checkEnd(){
+  const F=S.f;
+  if(F.ended||!F.centerLinked||Object.keys(F.linked).length<4) return;
+  F.ended=1; save();
+  setTimeout(()=>{lightning(true);},1400);
+  setTimeout(()=>{sfx.caw();F.sixth=1;F.sixthAnim=true;if(S.scene==='board')render();msg('Ворон влетел в окно и бросил на доску ещё одну фотографию.',5000);},2600);
+  setTimeout(showEnding,8200);
+}
+function showEnding(){
+  openOv(`<div class="ending"><div class="ch">ГЛАВА I · КОНЕЦ</div><h2>Человек без лица</h2><p>Четыре лица на доске. Четыре нити тянутся к маме: флакон из саквояжа, угроза в веере, перчатка на подносе, страница из блокнота. Каждый из них мог.</p><p>Но кто-то в тот вечер стоял за фотоаппаратом. На снимке, который бросил ворон, у этого человека нет лица. На обороте выцветшими чернилами написано:</p><div class="q">«Ты смотришь не туда, Ада»</div><div class="row" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px"><button class="btn" id="eStay">Посмотреть на доску</button><button class="btn red" id="eNew">Начать заново</button></div></div>`,e=>{
+    if(e.target.id==='eNew'){closeOv();restart();return true;}
+    if(e.target.id==='eStay'){closeOv();if(S.scene!=='board')go('board');return true;}
+    return true;
+  });
+  ovIn.querySelector('.close').remove();
+}
+
+/* ---------- fx ---------- */
+function flashFx(){const f=$('#flash');f.style.transition='none';f.style.opacity=.95;requestAnimationFrame(()=>{f.style.transition='opacity 1.1s';f.style.opacity=0;});}
+function lightning(force){
+  const roomish=!MEMORY.has(S.scene);
+  if(!roomish&&!force) return;
+  const f=$('#flash'), w=document.getElementById('lightning');
+  const seq=[.22,0,.12,0]; let i=0;
+  const step=()=>{f.style.transition='none';f.style.opacity=seq[i]*(S.scene==='room'?1:.6);if(w)w.setAttribute('opacity',seq[i]*3.5);i++;if(i<seq.length)setTimeout(step,70+Math.random()*90);};
+  step(); setTimeout(()=>sfx.thunder(),600+Math.random()*900);
+}
+setInterval(()=>{if(started&&!document.hidden&&Math.random()<.045&&!MEMORY.has(S.scene))lightning();},1000);
+// dust motes
+const cv=$('#fx'),cx=cv.getContext('2d'); let motes=[];
+function sizeFx(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=r.width*d;cv.height=r.height*d;}
+new ResizeObserver(sizeFx).observe(cv);
+for(let i=0;i<46;i++) motes.push({x:Math.random(),y:Math.random(),r:Math.random()*1.6+.4,vx:(Math.random()-.5)*.00012,vy:-Math.random()*.0001-.00002,p:Math.random()*6});
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function loop(t){
+  cx.clearRect(0,0,cv.width,cv.height);
+  const mem=MEMORY.has(S&&S.scene), W=cv.width,H=cv.height, k=W/1000;
+  for(const m of motes){m.x+=m.vx+Math.sin(t/3000+m.p)*.00005;m.y+=m.vy;if(m.y<-.02){m.y=1.02;m.x=Math.random();}if(m.x<0)m.x=1;if(m.x>1)m.x=0;
+    const a=(.25+.25*Math.sin(t/900+m.p))*(mem?1.2:.8);cx.fillStyle=mem?`rgba(255,214,150,${a})`:`rgba(255,226,180,${a*.8})`;cx.beginPath();cx.arc(m.x*W,m.y*H,m.r*k*1.3,0,7);cx.fill();}
+  if(!reduce) requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ---------- audio ---------- */
+const A={ctx:null,on:true};
+function ain(){
+  if(A.ctx) return;
+  const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+  const c=A.ctx=new AC();
+  A.master=c.createGain();A.master.gain.value=A.on?.85:0;A.master.connect(c.destination);
+  const len=c.sampleRate*2.5, ir=c.createBuffer(2,len,c.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
+  A.rev=c.createConvolver();A.rev.buffer=ir;A.revG=c.createGain();A.revG.gain.value=.35;A.rev.connect(A.revG);A.revG.connect(A.master);
+  const nb=c.createBuffer(1,c.sampleRate*3,c.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;A.noise=nb;
+  // rain
+  const rs=c.createBufferSource();rs.buffer=nb;rs.loop=true;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1500;bp.Q.value=.45;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;A.rainG=c.createGain();A.rainG.gain.value=0;rs.connect(bp);bp.connect(lp);lp.connect(A.rainG);A.rainG.connect(A.master);rs.start();
+  const rs2=c.createBufferSource();rs2.buffer=nb;rs2.loop=true;rs2.playbackRate.value=.6;const lp2=c.createBiquadFilter();lp2.type='lowpass';lp2.frequency.value=320;const g2=c.createGain();g2.gain.value=.5;rs2.connect(lp2);lp2.connect(g2);g2.connect(A.rainG);rs2.start();
+  // memory drone
+  A.memG=c.createGain();A.memG.gain.value=0;const mlp=c.createBiquadFilter();mlp.type='lowpass';mlp.frequency.value=420;mlp.connect(A.memG);A.memG.connect(A.master);A.memG.connect(A.rev);
+  [[55,'sine',.5],[82.4,'triangle',.18],[110.6,'sine',.12],[164.8,'sine',.05]].forEach(([f,t,g])=>{const o=c.createOscillator();o.type=t;o.frequency.value=f;const gg=c.createGain();gg.gain.value=g;o.connect(gg);gg.connect(mlp);o.start();});
+  const lfo=c.createOscillator();lfo.frequency.value=.07;const lg=c.createGain();lg.gain.value=160;lfo.connect(lg);lg.connect(mlp.frequency);lfo.start();
+  // crackle
+  const cb=c.createBuffer(1,c.sampleRate*4,c.sampleRate),cd=cb.getChannelData(0);for(let i=0;i<cd.length;i++)cd[i]=Math.random()<.0009?(Math.random()*2-1):(Math.random()*2-1)*.012;
+  const cs=c.createBufferSource();cs.buffer=cb;cs.loop=true;const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=900;A.crG=c.createGain();A.crG.gain.value=0;cs.connect(hp);hp.connect(A.crG);A.crG.connect(A.master);cs.start();
+  amb();
+}
+function amb(){
+  if(!A.ctx) return; const t=A.ctx.currentTime, mem=MEMORY.has(S.scene);
+  A.rainG.gain.setTargetAtTime(mem?.045:.2,t,.8);A.memG.gain.setTargetAtTime(mem?.11:0,t,1);A.crG.gain.setTargetAtTime(mem?.5:(A.playing?.45:0),t,.5);
+}
+function env(g,t,a,peak,d){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);}
+function osc(type,f,t,dur,peak,dest,a=.005){const c=A.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);o.connect(g);g.connect(dest||A.master);env(g,t,a,peak,dur);o.start(t);o.stop(t+a+dur+.05);return o;}
+function noiseB(t,dur,peak,ftype,f,q=1,dest){const c=A.ctx,s=c.createBufferSource();s.buffer=A.noise;const fl=c.createBiquadFilter();fl.type=ftype;fl.frequency.setValueAtTime(f,t);fl.Q.value=q;const g=c.createGain();s.connect(fl);fl.connect(g);g.connect(dest||A.master);env(g,t,.004,peak,dur);s.start(t,Math.random()*2);s.stop(t+dur+.1);return fl;}
+const sfx={
+  click(){if(!A.ctx)return;noiseB(A.ctx.currentTime,.03,.25,'highpass',3000);},
+  tick(){if(!A.ctx)return;const t=A.ctx.currentTime;noiseB(t,.02,.5,'bandpass',2600,3);osc('square',1800,t,.02,.04);},
+  pick(){if(!A.ctx)return;const t=A.ctx.currentTime;osc('sine',880,t,.5,.12,A.rev);osc('sine',1318,t+.09,.7,.1,A.rev);osc('sine',880,t,.25,.08);},
+  unlock(){if(!A.ctx)return;const t=A.ctx.currentTime;noiseB(t,.03,.6,'bandpass',2200,4);noiseB(t+.14,.04,.7,'bandpass',1500,4);osc('sine',90,t+.14,.3,.3);},
+  wrong(){if(!A.ctx)return;const t=A.ctx.currentTime;osc('sine',98,t,.3,.3);osc('triangle',73,t,.35,.15);},
+  pin(){if(!A.ctx)return;const t=A.ctx.currentTime;noiseB(t,.05,.5,'bandpass',900,2);osc('sine',220,t,.08,.15);},
+  thread(){if(!A.ctx)return;const t=A.ctx.currentTime;const f=noiseB(t+.05,.5,.18,'bandpass',1800,6);f.frequency.exponentialRampToValueAtTime(4500,t+.5);},
+  chime(){if(!A.ctx)return;const t=A.ctx.currentTime;[[196,1],[196*2.76,.4],[196*5.4,.15],[392,.3]].forEach(([f,g])=>osc('sine',f,t,3.4,.22*g,A.rev,.002));[[196,1],[392,.3]].forEach(([f,g])=>osc('sine',f,t,2.5,.2*g,null,.002));},
+  flash(){if(!A.ctx)return;const t=A.ctx.currentTime;noiseB(t,.12,.6,'highpass',1200);const o=osc('sine',2400,t,.9,.06);o.frequency.exponentialRampToValueAtTime(7000,t+.8);},
+  caw(){if(!A.ctx)return;const c=A.ctx;[0,.38].forEach(d=>{const t=c.currentTime+d,o=c.createOscillator(),bp=c.createBiquadFilter(),g=c.createGain(),tr=c.createOscillator(),tg=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(720,t);o.frequency.exponentialRampToValueAtTime(380,t+.28);bp.type='bandpass';bp.frequency.value=1300;bp.Q.value=2.5;tr.frequency.value=48;tg.gain.value=.5;tr.connect(tg);tg.connect(g.gain);o.connect(bp);bp.connect(g);g.connect(A.master);g.connect(A.rev);env(g,t,.02,.35,.3);o.start(t);tr.start(t);o.stop(t+.4);tr.stop(t+.4);});},
+  thunder(){if(!A.ctx)return;const c=A.ctx,t=c.currentTime,s=c.createBufferSource();s.buffer=A.noise;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=180;const g=c.createGain();s.connect(lp);lp.connect(g);g.connect(A.master);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.9,t+.25);g.gain.exponentialRampToValueAtTime(.3,t+1);g.gain.exponentialRampToValueAtTime(.001,t+3.6);s.start(t);s.stop(t+3.8);},
+  creak(){if(!A.ctx)return;const c=A.ctx,t=c.currentTime,o=c.createOscillator(),lp=c.createBiquadFilter(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(70,t);o.frequency.linearRampToValueAtTime(150,t+.6);o.frequency.linearRampToValueAtTime(95,t+1.3);lp.type='bandpass';lp.frequency.value=700;lp.Q.value=6;o.connect(lp);lp.connect(g);g.connect(A.master);g.connect(A.rev);env(g,t,.1,.25,1.3);o.start(t);o.stop(t+1.6);},
+  whoosh(){if(!A.ctx)return;const t=A.ctx.currentTime;const f=noiseB(t,1.6,.4,'bandpass',300,2,A.rev);f.frequency.exponentialRampToValueAtTime(3000,t+.8);f.frequency.exponentialRampToValueAtTime(250,t+1.6);osc('sine',110,t,1.8,.12,A.rev,.6);}
+};
+const music={
+  waltz(){
+    if(!A.ctx||A.playing) return; A.playing=true; amb();
+    const c=A.ctx, bt=.44, t0=c.currentTime+.2, mf=m=>440*Math.pow(2,(m-69)/12);
+    const mel=[[76,2],[81,1],[79,1],[77,1],[76,1],[74,2],[71,1],[72,3],[74,2],[77,1],[76,1],[74,1],[72,1],[71,2],[68,1],[69,3],[76,2],[81,1],[83,1],[81,1],[79,1],[77,2],[74,1],[76,3],[72,1],[74,1],[76,1],[77,2],[71,1],[72,1],[71,1],[68,1],[69,3]];
+    const CH={Am:[45,[57,60,64]],Dm:[50,[57,62,65]],E:[40,[56,59,64]],G:[43,[55,59,62]],C:[48,[55,60,64]]};
+    const prog=['Am','Am','E','Am','Dm','Am','E','Am','Am','G','Dm','C','C','Dm','E','Am'];
+    const box=(m,t,v,d=1.8)=>{const f=mf(m);osc('sine',f,t,d,.16*v,null,.003);osc('sine',f*2,t,d*.6,.05*v,null,.003);osc('sine',f*4.02,t,d*.25,.018*v,null,.002);osc('sine',f,t,d,.08*v,A.rev,.003);};
+    let t=t0; mel.forEach(([m,b])=>{box(m,t,1);t+=b*bt;});
+    prog.forEach((ch,i)=>{const [bass,tri]=CH[ch],tb=t0+i*3*bt;box(bass+12,tb,.7,2.4);tri.forEach(n=>{box(n,tb+bt,.32,.9);box(n,tb+2*bt,.28,.9);});});
+    const total=48*bt;
+    box(57,t0+total,.6,3);box(69,t0+total,.5,3);
+    setTimeout(()=>{A.playing=false;amb();},(total+2)*1000);
+  }
+};
+
+/* ---------- top bar / menu ---------- */
+$('#bHint').onclick=()=>{if(!started)return;sfx.caw();msg(hint(),6500);};
+$('#bSound').onclick=()=>{A.on=!A.on;if(A.master)A.master.gain.setTargetAtTime(A.on?.85:0,A.ctx.currentTime,.1);$('#bSound').style.opacity=A.on?1:.45;};
+$('#bMenu').onclick=()=>{
+  let armed=false;
+  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button><button class="btn" id="mNews">Перечитать газету</button><button class="btn red" id="mNew">Начать заново</button></div>`,e=>{
+    const id=e.target.id;
+    if(id==='mNew'){if(!armed){armed=true;e.target.textContent='Точно? Прогресс сотрётся';return true;}closeOv();restart();return true;}
+    if(id==='mNews'){closeOv();setTimeout(newsOv,320);return true;}
+    if(id==='mCont'){closeOv();return true;}
+    return false;
+  });
+};
+function restart(){S=fresh();save();render();renderInv();amb();setTimeout(intro,500);}
+function intro(){say(['1975 год. Двадцать два года назад, на ужине у мистера Пикмана, умерла моя мать.','Полиция сказала: сердце. Я никогда в это не верила.','Всё, что у меня есть, — газетная вырезка на доске. И эта комната.']);}
+
+/* ---------- boot ---------- */
+let started=false;
+function start(data){
+  const saved=(data&&data.f)?data:load();
+  S=saved&&saved.f?saved:fresh();
+  S.sel=null;
+  if(S.f.recordPlaced&&!S.f.portraitOpen){S.f.eyesOpen=1;S.f.portraitOpen=1;}
+  if(S.f.ended&&!S.f.sixth) S.f.sixth=1;
+  render(); renderInv();
+  const hasProgress=saved&&(saved.inv.length||saved.f.clockOpen||saved.f.ch!==3);
+  if(hasProgress){$('#bCont').hidden=false;$('#bStart').textContent='Новая игра';$('#bStart').classList.remove('red');$('#bCont').classList.add('red');}
+  $('#bStart').onclick=()=>{ain();if(hasProgress){S=fresh();render();renderInv();}begin(true);};
+  $('#bCont').onclick=()=>{ain();begin(false);};
+  window.claude?.hot?.snapshot?.(()=>JSON.parse(JSON.stringify(S)));
+  if(data&&data.f){begin(false);}
+}
+function begin(isNew){started=true;$('#title').classList.add('gone');amb();sfx.thunder();if(isNew)setTimeout(intro,900);else setTimeout(()=>msg(hint().replace('Кар! ','')),900);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ov.hidden)closeOv();});
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body>
+</html>
