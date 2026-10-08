@@ -49,7 +49,14 @@ jobs:
           STORE_PW="$(trim "$RAW_STORE_PASSWORD")"; ALIAS="$(trim "$RAW_KEY_ALIAS")"; KEY_PW="$(trim "$RAW_KEY_PASSWORD")"
           echo "::add-mask::$STORE_PW"; echo "::add-mask::$KEY_PW"
           if ! keytool -list -keystore "$RUNNER_TEMP/release.keystore" -storepass "$STORE_PW" -alias "$ALIAS" > /dev/null 2>&1; then
-            echo "::error::Ключ не открывается: проверьте секреты ANDROID_KEYSTORE_PASSWORD и ANDROID_KEY_ALIAS (без лишних слов и кавычек)."
+            # диагностика без раскрытия секретов: только длины и состав
+            info() { printf '%s' "$1" | awk -v n="$2" 'BEGIN{l=0}{l++; t=t $0}END{printf "%s: строк %d, символов %d, только буквы и цифры: %s\n", n, l, length(t), (t ~ /^[A-Za-z0-9]+$/ ? "да" : "нет")}'; }
+            echo "Ожидается: файл ключа 2658 байт, пароль — 1 строка из 24 букв и цифр, имя ключа — krasnayanit (1 строка, 11 символов)."
+            echo "Файл ключа после декодирования: $(stat -c %s "$RUNNER_TEMP/release.keystore") байт, начало sha256: $(sha256sum "$RUNNER_TEMP/release.keystore" | cut -c1-16) (ожидается e8154fc98df52489)"
+            info "$STORE_PW" "ANDROID_KEYSTORE_PASSWORD"
+            info "$KEY_PW" "ANDROID_KEY_PASSWORD"
+            [ "$ALIAS" = "krasnayanit" ] && echo "ANDROID_KEY_ALIAS: верно" || info "$ALIAS" "ANDROID_KEY_ALIAS (неверно)"
+            echo "::error::Ключ не открывается: проверьте секреты (см. строки выше)."
             exit 1
           fi
           {
