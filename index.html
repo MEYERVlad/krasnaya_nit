@@ -2377,8 +2377,10 @@ $('#bMenu').onclick=()=>{
   let armed=false;
   const open=[1,2,3,4].filter(unlocked);
   const chs=open.length>1?open.map(n=>`<button class="btn${n===S.ch?' red':''}" id="mCh${n}">${CHAPTERS[n].name}</button>`).join(''):'';
-  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button></div>`,e=>{
+  openOv(`<div class="menu"><h2>Красная нить</h2><button class="btn" id="mCont">Продолжить</button>${chs}<button class="btn" id="mNews">Перечитать газету</button><button class="btn" id="mNew">Начать главу заново</button>${window.desktop?'<button class="btn" id="mFull">Во весь экран / в окне</button><button class="btn" id="mQuit">Выйти из игры</button>':''}</div>`,e=>{
     const id=e.target.id;
+    if(id==='mFull'){window.desktop.toggleFullscreen();return true;}
+    if(id==='mQuit'){save();window.desktop.quit();return true;}
     if(/^mCh\d$/.test(id)){closeOv();switchChapter(+id[3]);return true;}
     if(id==='mNew'){if(!armed){armed=true;e.target.textContent='Точно? Прогресс сотрётся';return true;}closeOv();restart();return true;}
     if(id==='mNews'){closeOv();setTimeout(newsOv,320);return true;}

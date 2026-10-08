@@ -1,0 +1,52 @@
+{
+  "name": "krasnaya-nit",
+  "productName": "Krasnaya Nit",
+  "version": "1.0.0",
+  "description": "Красная нить — детективная point-and-click головоломка",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare-app": "node scripts/prepare.mjs",
+    "start": "npm run prepare-app && electron .",
+    "dist:win": "npm run prepare-app && electron-builder --win --x64",
+    "dist:linux": "npm run prepare-app && electron-builder --linux --x64",
+    "dist:mac": "npm run prepare-app && electron-builder --mac --universal",
+    "icons": "node scripts/icons.mjs",
+    "store-assets": "npm run prepare-app && node scripts/store-assets.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.krasnayanit.game",
+    "productName": "Krasnaya Nit",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**",
+      "build/icon.png"
+    ],
+    "asar": true,
+    "win": {
+      "target": "dir",
+      "icon": "build/icon.ico",
+      "executableName": "KrasnayaNit"
+    },
+    "linux": {
+      "target": "dir",
+      "icon": "build/icon.png",
+      "category": "Game",
+      "executableName": "krasnaya-nit"
+    },
+    "mac": {
+      "target": "dir",
+      "icon": "build/icon.png",
+      "category": "public.app-category.adventure-games"
+    }
+  },
+  "author": "Krasnaya Nit"
+}
